@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forkline Crew</title>
+<link rel="icon" type="image/svg+xml" href="../forkline-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{color-scheme:dark;--void:#0a1322;--deep:#070d18;--panel:#101c30;--line:#3a5277;--ink:#f4efe4;--muted:#c9d1de;--amber:#f2a93b;--amber-ink:#1d1405;--good:#6cc790;--bad:#ff8a7a;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{background:var(--deep);color:var(--ink)}
+body{margin:0;font:17px/1.5 var(--f-body)}
+a{color:#86c9ea}
+main{max-width:560px;margin:0 auto;min-height:100vh;background:var(--void);box-shadow:0 0 0 1px var(--line);padding:0 16px 40px}
+header{padding:18px 0 14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.eyebrow{font:500 12.5px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 34px/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:4px 0 0}h1 span{color:var(--amber)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+.btn{appearance:none;border:1px solid var(--amber);background:var(--amber);color:var(--amber-ink);font:800 20px/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;border-radius:10px;min-height:52px;padding:0 18px;cursor:pointer;width:100%;display:grid;place-items:center;text-decoration:none}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--muted)}
+.btn:disabled{opacity:.5;cursor:wait}
+.ok{color:var(--good);font-weight:700}.err{color:var(--bad);font-weight:700}
+.small{font-size:15.5px;color:var(--muted)}
+p{margin:0}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">Forkline · Crew list</span>
+    <h1>Fork<span>line</span> crew</h1>
+  </header>
+
+  <section class="card" id="confirm" hidden>
+    <p>Tap below to confirm you'd like occasional Forkline updates: new builds, playtests and launch news.</p>
+    <button class="btn" type="button" id="confirm-go">Yes, add me</button>
+  </section>
+
+  <section class="card" id="unsub" hidden>
+    <p>Stop getting Forkline crew emails?</p>
+    <button class="btn" type="button" id="unsub-go">Unsubscribe</button>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <p id="result-msg"></p>
+    <a class="btn ghost" href="../">Play Forkline</a>
+  </section>
+
+  <section class="card" id="none" hidden>
+    <p>This page confirms or cancels Forkline crew emails. Use the link in your email to get here.</p>
+    <p class="small">Questions or removal requests: <a href="mailto:crew@playforkline.com">crew@playforkline.com</a></p>
+    <a class="btn ghost" href="../">Play Forkline</a>
+  </section>
+</main>
+<script>
+'use strict';
+const API = 'https://oaemgwclfilzlycxxccg.supabase.co/functions/v1/crew/manage';
+const $ = s => document.querySelector(s);
+const q = new URLSearchParams(location.search), UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const c = q.get('c') || '', u = q.get('u') || '';
+const MSG = {
+  confirmed: ['ok', "You're confirmed. Welcome to the Forkline crew."],
+  already: ['ok', "You're all set. Nothing else to do."],
+  expired: ['err', 'This link has expired. Join again from the tester report to get a new one.'],
+  invalid: ['err', "This link doesn't work any more. If you still want updates, join again from the tester report."],
+  unsubscribed: ['ok', "You're unsubscribed. You won't get more Forkline crew emails."],
+};
+function done(status) {
+  const [cls, text] = MSG[status] || ['err', "Something went wrong. Please try again, or email crew@playforkline.com."];
+  $('#result-msg').className = cls; $('#result-msg').textContent = text;
+  ['#confirm', '#unsub', '#none'].forEach(s => $(s).hidden = true); $('#result').hidden = false;
+}
+async function send(action, token, btn) {
+  btn.disabled = true;
+  try {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, token }) });
+    const j = await r.json().catch(() => ({}));
+    done(r.ok ? j.status : 'error');
+  } catch (e) { done('error'); } finally { btn.disabled = false; }
+}
+if (UUID.test(c)) { $('#confirm').hidden = false; $('#confirm-go').addEventListener('click', e => send('confirm', c, e.currentTarget)); }
+else if (UUID.test(u)) { $('#unsub').hidden = false; $('#unsub-go').addEventListener('click', e => send('unsubscribe', u, e.currentTarget)); }
+else $('#none').hidden = false;
+</script>
+<div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body>
+</html>

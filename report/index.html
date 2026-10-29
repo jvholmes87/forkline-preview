@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>Forkline Tester Report</title>
+<link rel="icon" type="image/svg+xml" href="../forkline-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Forkline tester report: one column, phone first. Same tokens as the game. */
+:root{
+  color-scheme:dark;
+  --void:#0a1322; --deep:#070d18; --panel:#101c30; --panel2:#16253e; --line:#3a5277;
+  --ink:#f4efe4; --muted:#c9d1de; --amber:#f2a93b; --amber-ink:#1d1405;
+  --ice:#86c9ea; --good:#6cc790; --bad:#f2705f;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--deep);color:var(--ink)}
+body{margin:0;font:17px/1.5 var(--f-body)}
+button,input,textarea{font:inherit;color:inherit}
+a{color:var(--ice)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+main{max-width:560px;margin:0 auto;min-height:100vh;background:var(--void);box-shadow:0 0 0 1px var(--line);padding:0 max(16px,env(safe-area-inset-left,0px)) 40px}
+header{padding:18px 0 14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.eyebrow{font:500 12.5px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1,h2{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin:4px 0 0;line-height:1}
+h1{font-size:34px} h1 span{color:var(--amber)} h2{font-size:26px;margin-bottom:10px}
+p{margin:0 0 12px} .muted{color:var(--muted)} .small{font-size:15.5px}
+.step,.qlist{display:grid;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.btn{appearance:none;border:1px solid var(--amber);background:var(--amber);color:var(--amber-ink);font:800 20px/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;border-radius:10px;min-height:52px;padding:0 18px;cursor:pointer;width:100%}
+.btn.ghost{background:none;color:var(--ink);border:2px solid var(--muted)}
+.backbtn{appearance:none;background:none;border:2px solid var(--ice);color:var(--ice);border-radius:10px;min-height:44px;padding:0 16px;font:700 17px var(--f-body);cursor:pointer;margin-bottom:12px}
+.backbtn:hover{background:var(--panel2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px}.row .btn{flex:1}
+.big{display:grid;gap:10px}
+.big button{appearance:none;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;display:grid;gap:2px}
+.big button b{font:800 26px/1 var(--f-display);text-transform:uppercase}
+.big button span{color:var(--muted);font-size:16px}
+.big button:hover{border-color:var(--ice)}
+fieldset{border:1px solid var(--line);border-radius:12px;padding:14px 14px 10px;margin:0;background:var(--panel);min-width:0}
+legend{float:left;width:100%;padding:0;margin:0 0 6px;font-weight:700;line-height:1.35}
+legend+*{clear:both}
+.qn{display:inline-grid;place-items:center;width:28px;height:28px;border:2px solid var(--amber);border-radius:50%;font:500 14px var(--f-mono);margin-right:6px;color:var(--amber)}
+.hint{font-size:16px;color:var(--muted);margin:2px 0 8px}
+.opt{display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 2px;cursor:pointer}
+.opt input{appearance:none;-webkit-appearance:none;width:26px;height:26px;flex:none;margin:0;border:2.5px solid var(--muted);border-radius:50%;background:var(--deep);display:grid;place-items:center;cursor:pointer}
+.opt input[type=checkbox]{border-radius:6px}
+.opt input:checked{border-color:var(--amber);background:var(--amber)}
+.opt input[type=radio]:checked::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber-ink)}
+.opt input[type=checkbox]:checked::after{content:"\2713";color:var(--amber-ink);font:700 17px/1 var(--f-body)}
+.opt:has(input:checked){color:var(--amber);font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8px}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
+.scale label{display:grid;justify-items:center;gap:4px;cursor:pointer;padding:6px 0;border-radius:10px;border:1px solid transparent}
+.scale input{position:absolute;opacity:0;pointer-events:none}
+.scale .face{font-size:34px;line-height:1;filter:grayscale(.3)}
+.scale .num{font:500 16px var(--f-mono);width:36px;height:36px;border-radius:50%;border:2.5px solid var(--muted);display:grid;place-items:center}
+.scale input:checked+.face{filter:none;transform:scale(1.15)}
+.scale input:checked~.num{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+.scale input:focus-visible~.num{outline:3px solid var(--amber);outline-offset:2px}
+.ends{display:flex;justify-content:space-between;font-size:15px;color:var(--ink);margin-top:4px}
+textarea,input[type=text],input[type=number],input[type=email]{width:100%;background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{min-height:70px;resize:vertical}
+::placeholder{color:#aeb9ca;opacity:1}
+textarea,input[type=text],input[type=number],input[type=email]{border-width:1.5px;border-color:#5a7299}
+.err{color:#ff8a7a;font-size:16px;font-weight:700}
+.ok{color:var(--good)}
+.progress{height:6px;background:var(--panel2);border-radius:3px;overflow:hidden}.progress i{display:block;height:100%;background:var(--amber);width:0;transition:width .2s}
+.badge{display:inline-block;border:1px solid var(--good);color:var(--good);border-radius:999px;padding:2px 10px;font:500 12px var(--f-mono);letter-spacing:.08em}
+details{border-top:1px solid var(--line);padding-top:12px;margin-top:20px} summary{cursor:pointer;color:var(--ice)}
+details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <button type="button" class="backbtn" id="back" hidden>&larr; Back</button><br>
+    <span class="eyebrow">Playtest · Build <span id="build"></span></span>
+    <h1>Fork<span>line</span> tester report</h1>
+  </header>
+
+  <!-- 1. Welcome -->
+  <section class="step" id="s-welcome">
+    <p>Thanks for testing Forkline! Your answers help us make the game fun and easy to learn. It takes about 5 minutes.</p>
+    <p class="small muted">The report doesn't ask for your name, email or where you live. You'll make up a space callsign instead.</p>
+    <p class="small">If your feedback makes it into the game, your callsign can go in the in-game credits.</p>
+    <button class="btn" type="button" id="code-go">Start</button>
+    <p class="small">Haven't played yet? <a href="../" target="_blank" rel="noopener">Open the game</a>, play a mission, then come back here.</p>
+  </section>
+
+  <!-- 2. Age group -->
+  <section class="step" id="s-age" hidden>
+    <h2>How old is the player?</h2>
+    <p class="small muted">Filing for your child? Pick their age. A grown-up says OK first for players under 14.</p>
+    <div class="big">
+      <button type="button" data-age="8-12"><b>8 to 12</b><span>Short questions with bubbles. A grown-up says OK first.</span></button>
+      <button type="button" data-age="13-17"><b>13 to 17</b><span>A few more questions.</span></button>
+      <button type="button" data-age="18+"><b>18 or older</b><span>The full report, including balance and pricing.</span></button>
+    </div>
+  </section>
+
+  <!-- 2b. Teens: 14 check (Korea requires a guardian's OK under 14) -->
+  <section class="step" id="s-teen" hidden>
+    <h2>One more check</h2>
+    <p>Are you 14 or older?</p>
+    <div class="row"><button class="btn" type="button" id="teen-yes">Yes, 14+</button><button class="btn ghost" type="button" id="teen-no">No, I'm 13</button></div>
+  </section>
+
+  <!-- 3. Grown-up gate -->
+  <section class="step" id="s-grownup" hidden>
+    <h2>For a grown-up</h2>
+    <div class="card">
+      <p><b>Please read this with your child.</b></p>
+      <ul class="small">
+        <li>We collect: an age group, a made-up callsign, the device type and answers about the game.</li>
+        <li>We don't collect names, emails, photos, location or contact details. Please make sure written answers don't include any.</li>
+        <li>Answers are stored on a server in Seoul and kept for up to 12 months, then deleted. They're used only to improve Forkline and aren't sold or shared.</li>
+      </ul>
+      <label class="opt"><input type="checkbox" id="gu-ok"> I'm this child's parent or guardian, and I agree.</label>
+      <p class="small" style="margin:10px 0 6px">Grown-up check: what is <b id="gate-q"></b>?</p>
+      <input type="number" inputmode="numeric" id="gate-a" aria-label="Answer to the grown-up check">
+      <p class="err" id="gate-err" hidden>That answer doesn't match. Please try again.</p>
+    </div>
+    <button class="btn" type="button" id="gate-go">Continue</button>
+  </section>
+
+  <!-- 4. Setup -->
+  <section class="step" id="s-setup" hidden>
+    <h2>Your mission</h2>
+    <fieldset>
+      <legend>Your callsign</legend>
+      <p class="hint">Make up a space name. Don't use your real name.</p>
+      <div class="row" style="align-items:center"><input type="text" id="callsign" maxlength="24" autocomplete="off" aria-label="Callsign"><button class="btn ghost" type="button" id="cs-gen" style="flex:0 0 auto;width:auto;font-size:16px">Make one</button></div>
+    </fieldset>
+    <fieldset id="f-quest">
+      <legend>Which quest did you play?</legend>
+      <div id="quests"></div>
+    </fieldset>
+    <fieldset>
+      <legend>What did you play on?</legend>
+      <div class="grid3">
+        <label class="opt"><input type="radio" name="device" value="phone"> Phone</label>
+        <label class="opt"><input type="radio" name="device" value="tablet"> Tablet</label>
+        <label class="opt"><input type="radio" name="device" value="pc"> Computer</label>
+      </div>
+    </fieldset>
+    <p class="err" id="setup-err" hidden></p>
+    <button class="btn" type="button" id="setup-go">Next</button>
+  </section>
+
+  <!-- 5. Questions -->
+  <section class="step" id="s-questions" hidden>
+    <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+    <h2 id="q-title"></h2>
+    <form id="qform" class="qlist" novalidate></form>
+    <p class="err" id="q-err" hidden></p>
+    <div aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"><label>Leave this empty <input type="text" id="hp-website" tabindex="-1" autocomplete="off"></label></div>
+    <div id="ts-box"></div>
+    <button class="btn" type="button" id="send">Send my report</button>
+    <p class="small muted" id="send-note" hidden></p>
+  </section>
+
+  <!-- 6. Thanks -->
+  <section class="step" id="s-done" hidden>
+    <span class="badge">Report received</span>
+    <h2>Thanks, <span id="done-cs"></span>!</h2>
+    <p>Your report is in. You just helped build a space game. That's real game-tester work.</p>
+    <div class="card" id="crew" hidden>
+      <h2 style="font-size:22px">Join the crew list <span class="muted" style="font-size:16px;text-transform:none">(optional, 18+)</span></h2>
+      <p class="small">Get occasional updates from the developer: new builds, playtests and launch news. Your report has already been sent and stays anonymous; this list is kept separately.</p>
+      <label for="crew-name"><b>First name or nickname</b> <span class="muted small">(optional)</span></label>
+      <input type="text" id="crew-name" maxlength="60" autocomplete="given-name" style="margin:6px 0 12px">
+      <label for="crew-email"><b>Email</b></label>
+      <input type="email" id="crew-email" maxlength="254" autocomplete="email" inputmode="email" style="margin:6px 0 10px">
+      <label class="opt"><input type="checkbox" id="crew-ok"> I'm 18 or older, and I'd like Forkline and Songtan Labs updates by email. I can unsubscribe at any time.</label>
+      <label class="opt"><input type="checkbox" id="crew-beta"> Also invite me to the beta team when it starts (try big updates before everyone else).</label>
+      <p class="err" id="crew-err" hidden></p>
+      <button class="btn" type="button" id="crew-go" style="margin-top:8px">Add me</button>
+      <p class="ok" id="crew-done" hidden>Almost done: check your inbox for an email from crew@playforkline.com and tap Confirm. Not there in a few minutes? Check spam.</p>
+    </div>
+    <a class="btn" href="../" style="display:grid;place-items:center;text-decoration:none">Back to the game</a>
+    <button class="btn ghost" type="button" id="again">Send another report</button>
+  </section>
+
+  <details>
+    <summary>Privacy, in plain words</summary>
+    <ul class="small">
+      <li>We ask for an age group, a made-up callsign, which quest you played, your device type and your answers. Nothing else.</li>
+      <li>To keep out spam and bots, the server limits how many reports one connection can send. It keeps your connection address only as a scrambled code that can't be turned back into the address and is deleted within 2 days. We also use Cloudflare Turnstile, a privacy-friendly bot check.</li>
+      <li>We count visits with Cloudflare Web Analytics, which uses no cookies and doesn't identify you.</li>
+      <li>Reports never ask for names, emails, photos or locations. Please don't type them in answers.</li>
+      <li>Adults (18+) can choose to join the crew list after sending a report. We keep the email, and a first name if you give one, separately from your report, and use it only for Forkline and Songtan Labs updates. It isn't sold or shared. We email you once to confirm; if you don't confirm within 7 days, the address is deleted. Once confirmed, it's kept until you unsubscribe or ask to be removed: email <a href="mailto:crew@playforkline.com">crew@playforkline.com</a>. Under-18s never see this option.</li>
+      <li>Under 14, a parent or guardian must say OK first.</li>
+      <li>Reports are stored in Seoul (Supabase) and kept for up to 12 months, then deleted. They aren't sold or shared, and they're never used for ads.</li>
+      <li>The server may log your network address for a short time to keep the service running. We don't store it with your report.</li>
+      <li>Callsigns only appear in the credits if you say yes and your feedback is used. We check callsigns before listing them.</li>
+      <li>Forkline is made to be an E for Everyone game that teaches science, money and business through play.</li>
+    </ul>
+  </details>
+</main>
+
+<script>
+'use strict';
+const BUILD = (new URLSearchParams(location.search).get('b') || 'v25').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r2';
+const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
+const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
+const DRAFT = 'forkline-report-draft';
+const CREW_API = 'https://oaemgwclfilzlycxxccg.supabase.co/functions/v1/crew/join', CONSENT = 'c2';
+const $ = s => document.querySelector(s);
+$('#build').textContent = BUILD;
+
+const REPORT_API = 'https://oaemgwclfilzlycxxccg.supabase.co/functions/v1/report/submit';
+const TS_SITE = '0x4AAAAAAFqtdFQP-jSLcsR5';   // Cloudflare Turnstile site key (public). Empty = Turnstile off.
+let tsToken = '', tsReady = false;
+const st = { receipt: '', t0: 0, age: null, under14: false, grownUp: false, quest: null, callsign: '', device: null };
+
+/* ---------- questions ---------- */
+// type: one | many | scale | faces | text. ages: which bands see it (default all). col: stored in a column too.
+const QUESTS = {
+  Q1: 'Quest 1 · Boot up', Q2: 'Quest 2 · First profit', Q3: 'Quest 3 · Explorer',
+  Q4: 'Quest 4 · Big jump', Q5: 'Quest 5 · Banker', Q6: 'Quest 6 · Finish line', free: 'Free play (no quest)'
+};
+const KID = ['8-12', '13-17'], ALL = ['8-12', '13-17', '18+'];
+const PER_QUEST = {
+  Q1: [
+    { id: 'job', type: 'one', q: 'What is your job in this game?', opts: ['Fight space aliens', 'Buy and sell cargo between space stations to make money', 'Build a space station', "I'm not sure"] },
+    { id: 'job_words', type: 'text', q: 'Now say it in your own words.', opt: true },
+    { id: 'debt', type: 'one', q: 'What does "debt" mean in this game?', opts: ['Money I owe that grows bigger every day', 'Money I saved for later', 'Fuel for my ship', "I'm not sure"] }
+  ],
+  Q2: [
+    { id: 'pick', type: 'one', q: 'How did you choose what to buy?', opts: ['I used the Trades page', 'I bought green (made here, cheap) things', 'I guessed', 'Someone helped me'] },
+    { id: 'profit', type: 'one', q: 'Did you sell something for more than you paid?', opts: ['Yes', 'No', "I'm not sure"] },
+    { id: 'rule', type: 'one', q: 'Where is the best place to sell something?', opts: ['Where it is wanted (orange price)', 'Where it is made (green price)', 'Anywhere, prices are the same', "I'm not sure"] }
+  ],
+  Q3: [
+    { id: 'stops', type: 'one', q: 'How many different stops did you visit?', opts: ['1', '2', '3', '4 or more'] },
+    { id: 'move_easy', type: 'scale', q: 'How easy was moving between stops?', ends: ['very hard', 'super easy'] },
+    { id: 'map', type: 'one', q: 'Did you notice the space map with the ship flying?', opts: ['Yes, I liked it', "Yes, but I didn't care", 'No, I never saw it'] }
+  ],
+  Q4: [
+    { id: 'star', type: 'one', q: 'Which star did you fly to?', opts: ['Proxima b', 'Barnard b', 'Tau Ceti', "I didn't make it"] },
+    { id: 'star_cost', type: 'one', q: 'What did the star trip cost you?', opts: ['Days (and interest on my debt)', 'Fuel money', 'Nothing at all', "I'm not sure"] },
+    { id: 'old_news', type: 'one', q: 'Star prices say "report 3d old". What does that mean?', opts: ['The price news took days to travel, so it may have changed', 'The price is 3 dollars', 'The station is 3 days old', "I'm not sure"] }
+  ],
+  Q5: [
+    { id: 'bank', type: 'one', q: 'What does a bank do in this game?', opts: ['Lends you money you pay back with extra (interest)', 'Gives you free money', 'Stores your cargo', "I'm not sure"] },
+    { id: 'treasury', type: 'one', q: 'What does the STA Treasury do?', opts: ['Pays you a little for saving money', 'Takes your money away', 'Fixes your ship', "I'm not sure"] },
+    { id: 'insurance', type: 'one', q: 'Why would you buy insurance?', opts: ['It pays you back if your ship gets damaged', 'It makes your ship faster', 'It is a kind of cargo', "I'm not sure"] }
+  ],
+  Q6: [
+    { id: 'ending', type: 'scale', q: 'How did the ending feel?', ends: ['bad', 'awesome'] },
+    { id: 'fund', type: 'text', q: 'What was your replication fund at the end?', opt: true, ph: 'for example $154M' },
+    { id: 'fork', type: 'one', q: 'What is a fork in this game?', opts: ['A copy of you that keeps working and earning', 'Something to eat with', 'A road that splits', "I'm not sure"] }
+  ],
+  free: []
+};
+const COMMON = [
+  { id: 'fun', type: 'faces', q: 'How fun was it?', ends: ['boring', 'super fun'], col: 'fun' },
+  { id: 'clear', type: 'scale', q: 'How easy was it to know what to do?', ends: ['very confusing', 'super easy'], col: 'clear' },
+  { id: 'tips', type: 'one', q: 'Little tip boxes pop up while you play. They...', opts: ['helped a lot', 'helped a little', "I didn't notice them", 'got in the way'], cols: 2 },
+  { id: 'words', type: 'many', ages: KID, q: "Tick every word you didn't understand.", hint: 'Skip the ones you know.', cols: 3,
+    opts: ['debt', 'fund', 'fork', 'colony', 'cargo', 'freight', 'standing', 'Treasury', 'hull', 'insurance', 'shortage', 'glut', 'rumor', 'light-lag', 'spread', 'interest'] },
+  { id: 'words_other', type: 'text', ages: KID, q: 'Any other words you didn\'t understand?', opt: true },
+  { id: 'unclear', type: 'text', ages: ['18+'], q: 'Was anything unclear or confusing?', opt: true },
+  { id: 'stuck', type: 'one', q: "Was there a time you didn't know what to do next?", opts: ['never', 'once or twice', 'a lot'], cols: 3 },
+  { id: 'stuck_where', type: 'text', q: 'Where? Which screen or button?', opt: true },
+  { id: 'learned', type: 'many', q: 'Did the game teach you anything about...', hint: 'Tick all that fit.', cols: 2,
+    opts: ['money and prices', 'space and science', 'running a business', 'nothing yet'] },
+  { id: 'learned_what', type: 'text', ages: ['13-17', '18+'], q: 'What did you learn? One thing is enough.', opt: true },
+  { id: 'coolest', type: 'one', ages: ['8-12'], q: 'What was the coolest part?', cols: 2, opts: ['the story', 'buying and selling', 'the space map', 'making lots of money', 'the tip boxes', 'something else'] },
+  { id: 'coolest_text', type: 'text', q: 'What was the coolest part?', ages: ['13-17', '18+'], opt: true },
+  { id: 'annoying', type: 'text', q: 'What was the most annoying part?', opt: true },
+  { id: 'idea', type: 'text', q: 'If you could add or change ONE thing, what would it be?', opt: true },
+  { id: 'difficulty', type: 'one', ages: ['13-17', '18+'], q: 'How hard was the game?', opts: ['too easy', 'about right', 'too hard'], cols: 3 },
+  { id: 'length', type: 'one', ages: ['18+'], q: 'Which mission length did you play?', opts: ['30 days', '45 days', '60 days', 'Daily mission'], cols: 2 },
+  { id: 'economy', type: 'text', ages: ['18+'], q: 'Did prices, events and freight feel fair? Anything too strong or too weak?', opt: true },
+  { id: 'pay', type: 'one', ages: ['18+'], q: 'Would you pay a one-time price (about $5) to unlock longer missions, an unlimited mission and extra sandbox slots? The full mission stays free.', opts: ['yes', 'maybe', 'no'], cols: 3 },
+  { id: 'again', type: 'one', q: 'Would you play again tomorrow?', opts: ['yes!', 'maybe', 'no'], cols: 3 },
+  { id: 'credit', type: 'one', q: 'If your feedback makes it into the game, can we list your callsign in the game credits?', opts: ['Yes, list my callsign', 'No, thanks'], opt: true }
+];
+const GROWNUP = [
+  { id: 'gu_minutes', type: 'text', q: 'For the grown-up: about how many minutes did it take?', opt: true, ph: 'minutes', num: true },
+  { id: 'gu_story', type: 'one', q: 'For the grown-up: the boot story was...', opts: ['read', 'skimmed', 'skipped'], cols: 3, opt: true },
+  { id: 'gu_finished', type: 'one', q: 'For the grown-up: did they finish?', opts: ['on their own', 'needed help', "didn't finish"], cols: 3, opt: true },
+  { id: 'gu_bugs', type: 'text', q: 'For the grown-up: anything broken or weird?', opt: true }
+];
+const FACES = ['😣', '🙁', '😐', '🙂', '😄'];
+
+function questionsFor() {
+  const qs = [...(PER_QUEST[st.quest] || []), ...COMMON].filter(q => (q.ages || ALL).includes(st.age));
+  return st.grownUp ? [...qs, ...GROWNUP] : qs;
+}
+
+/* ---------- rendering ---------- */
+function el(tag, attrs, kids) { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs || {})) { if (k === 'text') e.textContent = v; else e.setAttribute(k, v); } (kids || []).forEach(k => e.append(k)); return e; }
+function renderQuestions() {
+  const qs = questionsFor(), f = $('#qform'); f.textContent = '';
+  $('#q-title').textContent = QUESTS[st.quest];
+  qs.forEach((q, i) => {
+    const fs = el('fieldset', { 'data-q': q.id });
+    const lg = el('legend'); lg.append(el('span', { class: 'qn', text: String(i + 1) }), document.createTextNode(q.q)); fs.append(lg);
+    if (q.hint) fs.append(el('p', { class: 'hint', text: q.hint }));
+    if (q.type === 'one' || q.type === 'many') {
+      const box = el('div', { class: q.cols === 3 ? 'grid3' : q.cols === 2 ? 'grid2' : '' });
+      q.opts.forEach(o => { const lab = el('label', { class: 'opt' }); lab.append(el('input', { type: q.type === 'one' ? 'radio' : 'checkbox', name: q.id, value: o }), document.createTextNode(o)); box.append(lab); });
+      fs.append(box);
+    } else if (q.type === 'scale' || q.type === 'faces') {
+      const box = el('div', { class: 'scale', role: 'radiogroup', 'aria-label': q.q });
+      for (let n = 1; n <= 5; n++) { const lab = el('label'); const inp = el('input', { type: 'radio', name: q.id, value: String(n), 'aria-label': `${n} of 5` }); lab.append(inp); if (q.type === 'faces') lab.append(el('span', { class: 'face', 'aria-hidden': 'true', text: FACES[n - 1] })); lab.append(el('span', { class: 'num', text: String(n) })); box.append(lab); }
+      fs.append(box, el('div', { class: 'ends' }, [el('span', { text: q.ends[0] }), el('span', { text: q.ends[1] })]));
+    } else {
+      fs.append(q.num ? el('input', { type: 'number', inputmode: 'numeric', name: q.id, placeholder: q.ph || '' }) : el('textarea', { name: q.id, maxlength: '400', placeholder: q.ph || (st.age === '18+' ? '' : 'Short is fine. No names, please.') }));
+    }
+    f.append(fs);
+  });
+  restoreDraft(); progress();
+}
+$('#qform').addEventListener('input', () => { progress(); saveDraft(); });
+$('#qform').addEventListener('change', () => { progress(); saveDraft(); if (!$('#q-err').hidden && !missing().length) $('#q-err').hidden = true; });
+function collect() {
+  const out = {}, qs = questionsFor(), fd = new FormData($('#qform'));
+  for (const q of qs) {
+    if (q.type === 'many') { const v = fd.getAll(q.id); if (v.length) out[q.id] = v; }
+    else { const v = fd.get(q.id); if (v !== null && String(v).trim() !== '') out[q.id] = q.type === 'scale' || q.type === 'faces' ? +v : String(v).trim().slice(0, 400); }
+  }
+  return out;
+}
+function missing() { const a = collect(); return questionsFor().filter(q => q.type !== 'text' && q.type !== 'many' && !q.opt && a[q.id] === undefined); }
+function progress() { const qs = questionsFor(), a = collect(), done = qs.filter(q => a[q.id] !== undefined).length; $('#prog').style.width = Math.round(done / qs.length * 100) + '%'; }
+
+/* ---------- drafts (this device only) ---------- */
+const draftKey = () => `${DRAFT}|${st.age}|${st.quest}`;
+function saveDraft() { try { localStorage.setItem(draftKey(), JSON.stringify(collect())); } catch (e) {} }
+function restoreDraft() { let d = null; try { d = JSON.parse(localStorage.getItem(draftKey()) || 'null'); } catch (e) {} if (!d) return;
+  for (const [k, v] of Object.entries(d)) { const vals = Array.isArray(v) ? v : [v];
+    document.querySelectorAll(`#qform [name="${CSS.escape(k)}"]`).forEach(inp => { if (inp.type === 'radio' || inp.type === 'checkbox') inp.checked = vals.map(String).includes(inp.value); else inp.value = v; }); } }
+function clearDraft() { try { localStorage.removeItem(draftKey()); } catch (e) {} }
+
+/* ---------- navigation ---------- */
+// Back button: a simple history of steps (answers are kept as drafts on this device)
+const hist = [];
+const current = () => [...document.querySelectorAll('.step')].find(s => !s.hidden)?.id;
+function show(id, push = true) { const cur = current(); if (push && cur && cur !== id && cur !== 's-done') hist.push(cur); if (id === 's-done' || id === 's-welcome') hist.length = 0;
+  $('#back').hidden = !hist.length; $('#back').nextElementSibling.hidden = !hist.length;
+  document.querySelectorAll('.step').forEach(s => s.hidden = s.id !== id); window.scrollTo(0, 0); const h = $('#' + id + ' h2'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
+// No tester code since v25.6 (DEC-054): the server checks for bots instead.
+$('#code-go').addEventListener('click', () => show('s-age'));
+document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => show(b.dataset.next)));
+document.querySelectorAll('[data-age]').forEach(b => b.addEventListener('click', () => {
+  st.age = b.dataset.age; st.under14 = st.age === '8-12'; st.grownUp = false; if (!st.t0) st.t0 = Date.now();
+  if (st.age === '13-17') return show('s-teen');
+  if (st.age === '8-12') return openGate();
+  setup();
+}));
+$('#teen-yes').addEventListener('click', () => { st.under14 = false; setup(); });
+$('#teen-no').addEventListener('click', () => { st.under14 = true; openGate(); });
+
+// Grown-up gate: consent box plus a sum a young child is unlikely to answer
+let gate = 0;
+function openGate() { const a = 6 + Math.floor(Math.random() * 4), b = 7 + Math.floor(Math.random() * 3); gate = a * b; $('#gate-q').textContent = `${a} × ${b}`; $('#gate-a').value = ''; $('#gu-ok').checked = false; $('#gate-err').hidden = true; show('s-grownup'); }
+$('#gate-go').addEventListener('click', () => {
+  if (!$('#gu-ok').checked) { $('#gate-err').textContent = 'Please tick the box to agree first.'; $('#gate-err').hidden = false; return; }
+  if (+$('#gate-a').value !== gate) { $('#gate-err').textContent = "That answer doesn't match. Please try again."; $('#gate-err').hidden = false; return; }
+  st.grownUp = true; setup();
+});
+
+const CS1 = ['Comet', 'Nova', 'Orbit', 'Pulsar', 'Rocket', 'Quasar', 'Nebula', 'Astro', 'Meteor', 'Photon', 'Zenith', 'Vega'];
+const CS2 = ['Fox', 'Hawk', 'Otter', 'Lynx', 'Wolf', 'Owl', 'Panda', 'Tiger', 'Falcon', 'Koala'];
+function genCallsign() { const r = n => Math.floor(Math.random() * n); return `${CS1[r(CS1.length)]}-${CS2[r(CS2.length)]}-${10 + r(90)}`; }
+$('#cs-gen').addEventListener('click', () => { $('#callsign').value = genCallsign(); });
+function setup() {
+  const box = $('#quests'); box.textContent = '';
+  for (const [k, v] of Object.entries(QUESTS)) { if (k === 'free' && st.age === '8-12') continue;
+    const lab = el('label', { class: 'opt' }); lab.append(el('input', { type: 'radio', name: 'quest', value: k }), document.createTextNode(v)); box.append(lab); }
+  try { const cs = localStorage.getItem('forkline-callsign'); if (cs && !$('#callsign').value) $('#callsign').value = cs; } catch (e) {}
+  show('s-setup');
+}
+$('#setup-go').addEventListener('click', () => {
+  const cs = $('#callsign').value.trim(), q = document.querySelector('input[name=quest]:checked'), d = document.querySelector('input[name=device]:checked');
+  const err = !cs ? 'Please make up a callsign (or tap Make one).' : !q ? 'Please choose the quest you played.' : !d ? 'Please choose what you played on.' : '';
+  if (err) { $('#setup-err').textContent = err; $('#setup-err').hidden = false; return; }
+  $('#setup-err').hidden = true; st.callsign = cs.slice(0, 24); st.quest = q.value; st.device = d.value;
+  try { localStorage.setItem('forkline-callsign', st.callsign); } catch (e) {}
+  renderQuestions(); show('s-questions'); loadTurnstile();
+});
+
+/* ---------- submit ---------- */
+$('#send').addEventListener('click', async () => {
+  const miss = missing();
+  if (miss.length) { $('#q-err').textContent = `Please answer question${miss.length > 1 ? 's' : ''} ${miss.map(q => questionsFor().indexOf(q) + 1).join(', ')}.`; $('#q-err').hidden = false;
+    document.querySelector(`[data-q="${miss[0].id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  $('#q-err').hidden = true;
+  const a = collect(), row = { form_version: FORM, age_band: st.age, under14: st.under14, grown_up_ok: st.grownUp, quest: st.quest, build: BUILD,
+    callsign: st.callsign, device: st.device, fun: a.fun ?? null, clear: a.clear ?? null, answers: a };
+  const b = $('#send'); b.disabled = true; b.textContent = 'Sending…';
+  try {
+    const r = await fetch(REPORT_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row, hp: $('#hp-website').value, t_ms: Date.now() - st.t0, ts: tsToken }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const out = await r.json().catch(() => ({})); st.receipt = out.receipt || '';
+    if (window.turnstile && tsReady) { try { turnstile.reset('#ts-box'); } catch (e) {} } tsToken = '';
+    clearDraft(); $('#done-cs').textContent = st.callsign; crewReset(); show('s-done');
+  } catch (e) {
+    $('#send-note').textContent = String(e.message).includes('429') ? "Too many reports from this connection right now. Your answers are saved on this device: try again in an hour." : String(e.message).includes('403') ? "The bot check didn't pass. Your answers are saved on this device: wait a moment and tap Send again." : "It didn't send. Your answers are saved on this device: check your connection and tap Send again."; $('#send-note').hidden = false;
+  } finally { b.disabled = false; b.textContent = 'Send my report'; }
+});
+$('#back').addEventListener('click', () => { const prev = hist.pop(); if (!prev) return; if (current() === 's-questions') saveDraft(); show(prev, false); });
+$('#again').addEventListener('click', () => { $('#send-note').hidden = true; st.t0 = Date.now(); setup(); });
+
+/* ---------- Cloudflare Turnstile (only when a site key is set) ---------- */
+function loadTurnstile() {
+  if (!TS_SITE || tsReady) return;
+  window.onTsLoad = () => { try { turnstile.render('#ts-box', { sitekey: TS_SITE, size: 'flexible', callback: t => { tsToken = t; }, 'expired-callback': () => { tsToken = ''; } }); tsReady = true; } catch (e) {} };
+  const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTsLoad&render=explicit'; sc.async = true; document.head.append(sc);
+}
+
+/* ---------- optional crew list (18+ only; separate from the report) ---------- */
+function crewReset() {
+  $('#crew').hidden = st.age !== '18+';
+  ['#crew-name', '#crew-email'].forEach(s => { $(s).value = ''; $(s).disabled = false; });
+  $('#crew-ok').checked = false; $('#crew-ok').disabled = false; $('#crew-beta').checked = false; $('#crew-beta').disabled = false; $('#crew-err').hidden = true; $('#crew-done').hidden = true; $('#crew-go').hidden = false;
+}
+$('#crew-go').addEventListener('click', async () => {
+  if (st.age !== '18+') return;
+  const email = $('#crew-email').value.trim(), name = $('#crew-name').value.trim(), err = $('#crew-err');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; err.hidden = false; return; }
+  if (!$('#crew-ok').checked) { err.textContent = 'Please tick the box to confirm you\'re 18 or older and want updates.'; err.hidden = false; return; }
+  err.hidden = true; const b = $('#crew-go'); b.disabled = true; b.textContent = 'Adding…';
+  try {
+    const r = await fetch(CREW_API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name, receipt: st.receipt, adult: true, consent_version: CONSENT, beta: $('#crew-beta').checked }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    b.hidden = true; $('#crew-done').hidden = false;
+    ['#crew-name', '#crew-email', '#crew-ok', '#crew-beta'].forEach(s => $(s).disabled = true);
+  } catch (e) {
+    err.textContent = /40[13]/.test(String(e.message)) ? 'This sign-up link has expired. Send another report to join, or email crew@playforkline.com.' : 'That didn\'t go through. Check the email and your connection, then try again.'; err.hidden = false;
+  } finally { b.disabled = false; b.textContent = 'Add me'; }
+});
+</script>
+<div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body>
+</html>

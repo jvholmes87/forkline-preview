@@ -1,0 +1,1464 @@
+<!doctype html><html lang="en"><head><meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><title>Play Forkline – Free Space Trading Game in Your Browser</title><meta name="description" content="Free turn-based space trading game for phone and PC. Buy where goods are made, sell where they're wanted, and pay off your loan before interest grows."><link rel="canonical" href="https://preview.playforkline.com/play/"><meta name="theme-color" content="#070d18"><link rel="manifest" href="/site.webmanifest"><meta property="og:type" content="website"><meta property="og:site_name" content="Forkline"><meta property="og:url" content="https://preview.playforkline.com/play/"><meta property="og:title" content="Forkline – a free space trading game in your browser"><meta property="og:description" content="Buy where goods are made, sell where they're wanted, and pay off your loan before interest grows. Ten stops from the Moon to Tau Ceti. Phone or PC, no signup."><meta property="og:image" content="https://preview.playforkline.com/og-image.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:alt" content="Forkline: a freight probe trading between space stations, shown on two phone screens"><meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@jasonvonholmes"><meta name="twitter:title" content="Forkline – free space trading game"><meta name="twitter:description" content="Buy low, sell high from the Moon to Tau Ceti. 20-minute missions, a Daily Mission, no signup."><meta name="twitter:image" content="https://preview.playforkline.com/og-image.jpg"><meta name="twitter:image:alt" content="Forkline: a freight probe trading between space stations, shown on two phone screens"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://preview.playforkline.com/#website","url":"https://preview.playforkline.com/","name":"Forkline","alternateName":["Forkline space trading game","playforkline.com"],"inLanguage":"en","publisher":{"@id":"https://preview.playforkline.com/#studio"}},{"@type":"Organization","@id":"https://preview.playforkline.com/#studio","name":"Songtan Labs","founder":{"@id":"https://preview.playforkline.com/#developer"}},{"@type":"Person","@id":"https://preview.playforkline.com/#developer","name":"Jason Von Holmes","url":"https://jvholmes87.github.io/forkline/","sameAs":["https://x.com/jasonvonholmes"]},{"@type":["VideoGame","WebApplication"],"@id":"https://preview.playforkline.com/#game","name":"Forkline","url":"https://preview.playforkline.com/play/","description":"Free turn-based space trading game for phone and PC. Buy where goods are made, sell where they're wanted, and pay off a loan before interest grows. Ten stops from the Moon to Tau Ceti, market events, freight and passenger contracts, light-lag on star prices, and a Daily Mission.","image":"https://preview.playforkline.com/og-image.jpg","screenshot":["https://preview.playforkline.com/screenshot-star-map.jpg","https://preview.playforkline.com/screenshot-how-to-play.jpg"],"applicationCategory":"GameApplication","applicationSubCategory":"Trading simulation","operatingSystem":"Any (modern web browser)","browserRequirements":"Requires JavaScript. Works on phone, tablet and desktop browsers.","genre":["Trading simulation","Strategy","Space","Educational"],"gamePlatform":["Web browser","Mobile browser","PC"],"playMode":"SinglePlayer","numberOfPlayers":{"@type":"QuantitativeValue","value":1},"inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock","url":"https://preview.playforkline.com/play/"},"teaches":["Supply and demand","Compound interest and debt","Planning and opportunity cost","Light-speed delay"],"audience":{"@type":"Audience","audienceType":"Everyone: space and sci-fi fans, classic trading-game players, families"},"author":{"@id":"https://preview.playforkline.com/#developer"},"publisher":{"@id":"https://preview.playforkline.com/#studio"},"isPartOf":{"@id":"https://preview.playforkline.com/#website"}}]}</script><meta name="twitter:creator" content="@jasonvonholmes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><radialGradient id='g' cx='.7' cy='.28' r='.85'><stop offset='0' stop-color='%231b2c47'/><stop offset='.55' stop-color='%230b1424'/><stop offset='1' stop-color='%23070d18'/></radialGradient></defs><rect width='512' height='512' rx='112' fill='url(%23g)'/><g transform='translate(-18 6)'><path d='M190 290C190 262 204 250 232 250L300 250' fill='none' stroke='%2386c9ea' stroke-width='36' stroke-linecap='round'/><path d='M190 420L190 150C190 128 202 116 224 116L330 116' fill='none' stroke='%23f2a93b' stroke-width='36' stroke-linecap='round' stroke-linejoin='round'/><circle cx='352' cy='116' r='30' fill='%23070d18' stroke='%23f2a93b' stroke-width='16'/><circle cx='322' cy='250' r='30' fill='%23070d18' stroke='%2386c9ea' stroke-width='16'/><circle cx='190' cy='420' r='24' fill='%23f4efe4'/></g></svg>"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#070d18;color:#ece6d8}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen phone app. Each menu is its own full-height screen (header / scrolling body / action footer); trade, move, route and hazards open as bottom sheets. Deliberately single dark theme. */
+:root{
+  color-scheme:dark;
+  --void:#0a1322; --deep:#070d18; --panel:#101c30; --panel2:#16253e; --line:#25385a;
+  --ink:#ece6d8; --muted:#95a2b6; --amber:#f2a93b; --amber-ink:#1d1405;
+  --ice:#86c9ea; --good:#6cc790; --bad:#f2705f; --sheet:#2a1410;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;background:var(--deep);color:var(--ink)}
+body{margin:0;font:15px/1.45 var(--f-body);overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--ice)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:13px} p{margin:0}
+.up{color:var(--good)} .dn{color:var(--bad)} .warn{color:var(--amber)}
+.eyebrow{font:500 10.5px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:.02em;margin:0;line-height:1;text-wrap:balance}
+
+#app{height:100%;max-width:560px;margin:0 auto;background:var(--void);position:relative;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.screen{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar{display:flex;align-items:center;gap:10px;min-height:52px;border-bottom:1px solid var(--line);background:var(--panel)}
+.bar h2{font-size:22px;flex:1}
+.menubtn{border:1px solid var(--line);border-radius:6px;font-size:20px;margin-left:0;margin-right:4px}
+.back{appearance:none;border:0;background:none;width:44px;height:44px;margin-left:-8px;display:grid;place-items:center;cursor:pointer;border-radius:50%;font-size:24px;line-height:1}
+.back:hover{background:var(--panel2)}
+.body{overflow-y:auto;overscroll-behavior:contain;padding-block:14px 18px;display:grid;gap:14px;align-content:start}
+.foot{border-top:1px solid var(--line);background:var(--panel);padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+
+.btn{font:800 16px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;border-radius:4px;border:1px solid var(--amber);background:var(--amber);color:var(--amber-ink);padding:12px 16px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.warnb{background:transparent;color:var(--bad);border-color:var(--bad)}
+.btn.big{width:100%;padding:14px;font-size:22px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.navrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.navbtn{appearance:none;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:7px 4px;cursor:pointer;display:grid;gap:2px;justify-items:center;font:800 14px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;position:relative}
+.navbtn small{font:400 10px var(--f-mono);letter-spacing:.04em;color:var(--muted);text-transform:none}
+.navbtn .dot{position:absolute;top:6px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.svc{display:grid;gap:6px;padding-bottom:10px;border-bottom:1px solid var(--line)} .svc .row{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.whl{list-style:none;margin:0;padding:0;display:grid;gap:8px} .whl li{display:flex;justify-content:space-between;align-items:center;gap:10px} .whl li>span:first-child{min-width:0}
+.btns2{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.fsel{display:block;width:100%;margin-top:4px;background:var(--deep);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:9px 8px}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:5px 14px;font-size:14px;margin:0}
+.kv dt{color:var(--muted);white-space:nowrap} .kv dd{margin:0;text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:grid;gap:10px}
+.tag{font:500 10px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+
+/* home */
+.home-body{align-content:center;gap:20px}
+.logo{text-align:center;display:grid;gap:8px;justify-items:center}
+.logo svg{width:150px;height:auto}
+.logo h1{font-size:clamp(48px,14vw,72px);line-height:.85;color:var(--ink)}
+.logo h1 span{color:var(--amber)}
+.ticker{overflow:hidden;border-block:1px solid var(--line);padding-block:8px;white-space:nowrap;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.ticker-track{display:inline-block;animation:tick 40s linear infinite;font:500 13px var(--f-mono)}
+.ticker-track span{margin-right:26px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.daily{border-left:4px solid var(--ice)}
+.daily h2{font-size:30px}
+.daily .row{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.seg button{appearance:none;border:0;background:transparent;padding:9px;min-height:44px;cursor:pointer;font:500 13px var(--f-mono)}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--amber)}
+.continue{display:grid;justify-items:center;gap:3px}
+.continue small{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.04em;text-transform:none}
+
+/* market */
+.mk-head{background:var(--panel);border-bottom:1px solid var(--line);display:grid;gap:4px;padding-block:6px 10px;border-left:5px solid var(--amber)}
+.mk-top{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.mk-top h2{font-size:clamp(24px,7vw,34px)}
+.mk-day{text-align:right;display:grid;gap:2px}
+.mk-day b{font:500 22px/1 var(--f-mono)}
+.cash{font:800 clamp(30px,9vw,40px)/1 var(--f-display);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.mk-sub{display:flex;flex-wrap:wrap;gap:4px 14px;font:500 12.5px/1.3 var(--f-mono)}
+.note{color:var(--bad)} .note.ok{color:var(--good)}
+.news{border-left:3px solid var(--amber);padding:4px 0 4px 10px;font-size:13px}.news.dn{border-color:var(--ice)}
+.heads{list-style:none;margin:0;padding:0;display:grid;gap:8px}.heads li{display:grid;grid-template-columns:18px 1fr;gap:8px;font-size:14px}.heads li>b{font-family:var(--f-mono)}.heads li.up>b{color:var(--good)}.heads li.dn>b{color:var(--ice)}.heads li.rumor{color:var(--muted)}
+.goods{list-style:none;margin:0;padding:0}
+.good{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer;width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0;appearance:none}
+.good:hover{background:var(--panel)}
+.good .qty{width:34px;height:26px;border-radius:13px;background:var(--bad);color:#fff;display:grid;place-items:center;font:700 12px var(--f-mono)}
+.good .qty.none{background:none}
+.good .nm{display:grid;gap:1px;min-width:0}
+.good .nm b{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.good .nm small{font:400 11px var(--f-mono);color:var(--muted)}
+.good .px{text-align:right;display:grid;gap:1px}
+.good .px b{font:500 16px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.good .px small{font:400 11px var(--f-mono);color:var(--muted)}
+.good.make .px b{color:var(--good)} .good.want .px b{color:var(--amber)}
+.good.na{cursor:default;opacity:.45}
+.good.na:hover{background:none}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.meter{display:grid;gap:4px}
+.meter .lbl{display:flex;justify-content:space-between;font:500 12px var(--f-mono)}
+.meter .track{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.meter .track i{display:block;height:100%;background:var(--ice)}
+.meter.hull .track i{background:var(--good)}
+.meter.low .track i{background:var(--bad)}
+.fuelline{display:flex;justify-content:space-between;font:500 12px var(--f-mono);color:var(--muted)}
+
+/* sheets */
+.scrim{position:absolute;inset:0;background:rgba(3,6,12,.6);z-index:20;display:flex;align-items:flex-end}
+.sheet{width:100%;max-height:88%;background:var(--sheet);border-top:1px solid var(--amber);border-radius:12px 12px 0 0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;overflow:hidden}
+.sheet .grab{width:44px;height:4px;border-radius:2px;background:rgba(236,230,216,.3);margin:8px auto 0}
+.sheet-head{padding-block:10px 4px;display:flex;justify-content:space-between;align-items:end;gap:10px}
+.sheet-head h2{font-size:28px}
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding-block:8px 12px;display:grid;gap:12px;align-content:start}
+.sheet-foot{padding-block:10px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;border-top:1px solid rgba(242,169,59,.25)}
+.sheet .kv dt{color:#c9b9a8}
+.trade-row{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
+input[type=range]{width:100%;accent-color:var(--amber)}
+input[type=number]{background:var(--deep);border:1px solid var(--line);border-radius:4px;padding:9px;width:100%;font-family:var(--f-mono)}
+
+/* move list as a transit line */
+.line{list-style:none;margin:0;padding:0;position:relative}
+.line h4{margin:10px 0 4px 40px;font:500 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.stop{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;background:none;border:0;padding:8px 0;cursor:pointer;text-align:left;position:relative;appearance:none}
+.stop::before{content:"";position:absolute;left:13px;top:0;bottom:0;width:5px;background:var(--good)}
+.stop.star::before{background:var(--ice)}
+.stop i{position:relative;z-index:1;width:30px;height:30px;border-radius:50%;background:var(--good);border:0}
+.stop.star i{background:var(--ice)}
+.stop.here i{background:var(--sheet);border:6px solid var(--good)}
+.stop.star.here i{border-color:var(--ice)}
+.stop .nm{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
+.stop .nm b{font:800 21px/1.05 var(--f-display);letter-spacing:.02em}
+.stop .nm span{font:700 14px var(--f-display);letter-spacing:.04em;color:#d8c8b6;text-transform:uppercase}
+.stop.here .nm b{color:var(--good)}
+.stop .cost{font:500 12px var(--f-mono);text-align:right;color:#d8c8b6;white-space:nowrap}
+.stop.off .nm,.stop.off .cost{opacity:.5}
+.stop:hover{background:rgba(255,255,255,.03)}
+.toggle{display:grid;grid-template-columns:1fr 1fr;border:1px solid rgba(242,169,59,.4);border-radius:4px;overflow:hidden}
+.toggle button{appearance:none;border:0;background:transparent;padding:6px 12px;cursor:pointer;font:500 12px var(--f-mono)}
+.toggle button[aria-pressed="true"]{background:var(--amber);color:var(--amber-ink)}
+.chart svg{display:block;width:100%;height:auto;max-height:52vh}
+.ring{fill:none;stroke:rgba(236,230,216,.15);stroke-width:1}
+.ring.ly{stroke-dasharray:3 5}
+.ringlbl{fill:#b8a898;font:400 10px var(--f-mono)}
+.route{stroke:var(--amber);stroke-width:2;stroke-dasharray:6 5}
+.earth{fill:var(--ice)}
+.node{cursor:pointer}
+.node .dot{fill:var(--good)} .node.star .dot{fill:var(--ice)}
+.node.here .dot{fill:var(--amber)}
+.node .halo{fill:none;stroke:var(--amber);stroke-width:2}
+.node text{fill:var(--ink);font:700 12.5px var(--f-display);letter-spacing:.05em;text-transform:uppercase}
+.node.dim{opacity:.5}
+
+/* tables in screens and sheets */
+table{border-collapse:collapse;width:100%}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.sheet th,.sheet td{border-color:rgba(242,169,59,.18)}
+th{font:500 10px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+.sub{display:block;font-size:11.5px;color:var(--muted)}
+tr.pick{cursor:pointer} tr.pick:hover td{background:var(--panel2)}
+
+/* event sheet meters */
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.duel b{font:500 26px/1 var(--f-mono)}
+.duel .track{height:6px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden;margin-top:6px}
+.duel .track i{display:block;height:100%;background:var(--good)}
+
+.log{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.log li{display:grid;grid-template-columns:54px minmax(0,1fr);gap:10px;font-size:14px}
+.log li .mono{color:var(--muted);font-size:12px;padding-top:2px}
+.log li.good span:last-child{color:var(--good)}
+.log li.bad span:last-child{color:var(--bad)}
+.codex h3{font-size:18px;margin-bottom:6px}
+.codex ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.codex .tbl{overflow-x:auto}
+.body>*,.codex,.codex>div{min-width:0}
+.codex ul.orgs{list-style:none;padding:0;display:grid;gap:12px}
+.orgs li{display:grid;gap:2px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.orgs .sub{font-size:12.5px}
+.codex table{min-width:520px}
+.contract{border:1px solid var(--amber);border-radius:4px;padding:12px;display:grid;gap:8px}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+/* depth v1: standing and acts */
+.rep{color:var(--ice)}
+.acts,.standing{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.acts li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start}
+.acts .tick{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font:700 12px var(--f-mono);color:var(--amber-ink)}
+.acts li.done .tick{background:var(--good);border-color:var(--good)}
+.acts li.done b{color:var(--good)}
+.standing li{display:grid;grid-template-columns:minmax(0,1fr) 84px 64px;gap:10px;align-items:center;font-size:14px}
+.standing .track{height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.standing .track i{display:block;height:100%;background:var(--ice)}
+.standing .here span:first-child{color:var(--amber)}
+.tip{position:absolute;left:12px;right:12px;z-index:15;background:#13233b;border:1px solid var(--ice);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:30px 1fr;gap:4px 10px;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:tipin .25s ease-out}
+.tip .ic{font-size:22px;line-height:1.2;grid-row:span 2}.tip p{margin:0;font-size:15px;line-height:1.4;color:var(--ink)}
+.tip .kind{font:500 10.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ice)}
+.tip.discover{border-color:var(--amber)}.tip.discover .kind{color:var(--amber)}.tip.nudge{border-color:var(--good)}.tip.nudge .kind{color:var(--good)}
+.tip .tb{grid-column:2;display:flex;gap:8px;margin-top:6px}.tip .tb button{min-height:44px;padding:0 14px}
+@keyframes tipin{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.news.remind{border-color:var(--ice)}
+.tipmode{display:flex;gap:6px;margin:8px 0}.tipmode button{flex:1}
+/* v25.6: guide, glossary, how-to card, unlocks, move tags, about */
+.guide-hl{outline:3px solid var(--amber)!important;outline-offset:-3px;border-radius:6px;animation:hlpulse 1.4s ease-in-out infinite}
+@keyframes hlpulse{50%{outline-color:rgba(242,169,59,.3)}}
+.tip.guide{border-color:var(--amber)}.tip.guide .kind{color:var(--amber)}
+.guide-note{background:rgba(242,169,59,.12);border:1px solid var(--amber);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.howto{list-style:none;padding:0;margin:0 0 12px;display:grid;gap:10px}
+.howto li{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;background:rgba(0,0,0,.18);border-radius:10px;padding:10px}
+.howto .hi{font-size:28px;text-align:center}.howto b{display:block;font-size:17px}.howto small{display:block;color:#c9b9a8;font-size:14px}
+.cardtip{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;font-size:16px}.cardtip .big{font-size:32px;line-height:1}
+.unlock{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}.unlock li{display:flex;gap:10px;align-items:center}.unlock li span{font-size:22px;width:28px;text-align:center}
+.gl{border-bottom:1.5px dotted currentColor;cursor:help}
+.gl:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+#gloss{position:fixed;z-index:200;max-width:280px;background:#13233b;color:var(--ink);border:1px solid var(--ice);border-radius:10px;padding:10px 12px;font:14px/1.4 var(--f-body);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#gloss b{display:block;font:800 15px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;color:var(--ice);margin-bottom:4px}
+.due{color:var(--amber);font-weight:700}
+.locked{border-style:dashed}
+.about{margin-top:6px}.about h2{font-size:18px}.about p{font-size:14px;color:var(--muted)}
+.gloss-list{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0}.gloss-list dt{font-weight:700}.gloss-list dd{margin:0;color:var(--muted)}
+.navbtn{min-height:44px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Desktop star map backdrop (v18): fills the side gutters on wide screens; the game panel stays on top */
+#bgmap,#bglabels,#bghint{display:none}
+@media (min-width:900px){
+  #app{z-index:1}
+  #bgmap{display:block;position:fixed;inset:0;width:100vw;height:100vh;z-index:0}
+  #bglabels{display:block;position:fixed;inset:0;z-index:0;pointer-events:none}
+  #bghint{display:block;position:fixed;left:18px;bottom:14px;z-index:0;font:500 10.5px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#5d6b80;pointer-events:none}
+}
+.bgl{position:absolute;left:0;top:0;background:none;border:0;padding:3px 6px;margin:0;font:500 10.5px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#95a2b6;white-space:nowrap;pointer-events:auto;cursor:pointer;border-radius:3px}
+.bgl:hover,.bgl:focus-visible{color:var(--ink);background:rgba(16,28,48,.85)}
+.bgl.here{color:var(--good)} .bgl.sel{color:var(--amber)} .bgl.ref{color:#5d6b80;pointer-events:none;cursor:default}
+.bgcap{position:absolute;bottom:40px;transform:translateX(-50%);font:500 10.5px/1.4 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#5d6b80;white-space:nowrap;pointer-events:none}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <section class="screen" id="scr-home"><div class="body pad"><section id="about-forkline" class="card about" aria-labelledby="about-h"><h2 id="about-h">About Forkline</h2><p>Forkline is a free, turn-based space trading game for phone and PC, with no download and no signup. You run a freight probe across ten stops from the Moon to Tau Ceti: buy goods where they are made, sell them where they are wanted, and pay off your loan before the interest grows.</p><p>Shortages, gluts, freight and passenger contracts, and light-lag prices from the stars keep every mission different. Built to an E for Everyone standard. <a href="https://preview.playforkline.com/">Updates and news</a> · A Songtan Labs game.</p></section></div></section>
+  <section class="screen" id="scr-market" hidden></section>
+  <section class="screen" id="scr-page" hidden></section>
+  <div class="tip" id="tip" hidden role="status" aria-live="polite"></div>
+  <div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title"></div></div>
+</div>
+
+<script>
+'use strict';
+/* Forkline engine v2 (formerly Drift Trader) — hard-science economy. Pure functions; no DOM. */
+const VE = 9.0;            // km/s exhaust velocity, nuclear thermal (~900 s Isp)
+const DRY = 30;            // t ship dry mass
+const HOLD0 = 120;         // t starting hold (cargo only; fuel is a trip cost)
+const HE3_PER_DAY = 0.15;  // kg He-3 burned per interstellar travel day
+const DAYS_MAX = 7;        // longest real leg scales to this many days
+const SPREAD_SOL = 0.005, SPREAD_STAR = 0.03;
+const DEBT_RATE = 0.0075;  // per game day, common-frame clock
+const START = { cash: 30e6, debt: 60e6, prop: 80, hull: 100, days: 45 };
+
+// All trade settles in dollars (v20). The blocs remain as the agencies that run each stop.
+const BLOC_NAME = { USD: 'Dollar bloc', EUR: 'Euro bloc', CNY: 'Yuan bloc' };
+
+// Prices are USD per kg. unit/kg = trade lot.
+const GOODS = [
+  { id: 'water', name: 'Water ice',            unit: 't',     kg: 1000, min: 100,   max: 1700,  cap: [15, 40] },
+  { id: 'metal', name: 'Structural metals',    unit: 't',     kg: 1000, min: 150,   max: 4000,  cap: [10, 30] },
+  { id: 'nitro', name: 'Nitrogen (ammonia)',   unit: 't',     kg: 1000, min: 300,   max: 9000,  cap: [5, 20] },
+  { id: 'food',  name: 'Hydroponic food',      unit: 't',     kg: 1000, min: 500,   max: 9000,  cap: [5, 20], perish: 0.03 },
+  { id: 'elec',  name: 'Electronics & spares', unit: 'crate', kg: 100,  min: 8000,  max: 40000, cap: [10, 40] },
+  { id: 'leu',   name: 'Reactor fuel (LEU)',   unit: 'crate', kg: 100,  min: 6000,  max: 30000, cap: [3, 12], restricted: true },
+  { id: 'pgm',   name: 'Platinum-group metals',unit: 'kg',    kg: 1,    min: 45000, max: 95000, cap: [50, 300] },
+  { id: 'he3',   name: 'Helium-3',             unit: '100 g', kg: 0.1,  min: 9e6,   max: 36e6,  cap: [5, 25] },
+  { id: 'samp',  name: 'Exoplanet samples',    unit: '100 g', kg: 0.1,  min: 1e6,   max: 60e6,  cap: [2, 10] }
+];
+
+const STATIONS = [
+  { id: 'leo', name: 'LEO Exchange', place: 'Low Earth orbit · 400 km', bloc: 'USD', sys: 'sol', km: 6771, ang: 200,
+    make: ['elec', 'leu', 'food'], want: ['he3', 'pgm', 'samp', 'water'], svc: ['bank', 'shipyard', 'repair'],
+    px: { water: [900, 1700], prop: [900, 1600], he3: [18e6, 24e6], pgm: [60000, 75000], samp: [12e6, 30e6], elec: [8000, 15000], leu: [6000, 12000], food: [3500, 5000] } },
+  { id: 'gw', name: 'Gateway Depot', place: 'Near-rectilinear halo orbit', bloc: 'EUR', sys: 'sol', km: 2.5e5, ang: 300,
+    make: [], want: ['water', 'metal', 'nitro'], svc: ['bank', 'insurance', 'repair'],
+    px: { water: [500, 900], prop: [350, 600], metal: [1500, 2600] } },
+  { id: 'art', name: 'Artemis Base', place: 'Shackleton rim · lunar south pole', bloc: 'USD', sys: 'sol', km: 3.84e5, ang: 345,
+    make: ['water'], want: ['elec', 'nitro', 'food', 'leu'], svc: [],
+    px: { water: [200, 400], prop: [180, 350] } },
+  { id: 'ilrs', name: 'ILRS Station', place: 'Lunar south pole · China-led', bloc: 'CNY', sys: 'sol', km: 3.84e5, ang: 15,
+    make: ['he3', 'metal'], want: ['elec', 'nitro', 'food'], svc: ['bank'],
+    px: { he3: [9e6, 14e6], metal: [150, 600] } },
+  { id: 'mars', name: 'Utopia Base', place: 'Utopia Planitia · Mars surface', bloc: 'CNY', sys: 'sol', km: 2.25e8, ang: 70,
+    make: ['food', 'nitro'], want: ['elec', 'leu', 'pgm'], svc: ['yard', 'repair'] },
+  { id: 'ceres', name: 'Ceres Station', place: 'Occator crater · Ceres', bloc: 'EUR', sys: 'sol', km: 4.1e8, ang: 98,
+    make: ['water', 'nitro'], want: ['food', 'elec', 'leu'], svc: ['warehouse'],
+    px: { water: [100, 250], nitro: [300, 900] } },
+  { id: 'psy', name: 'Psyche Works', place: '16 Psyche · metal asteroid', bloc: 'USD', sys: 'sol', km: 4.4e8, ang: 130,
+    make: ['pgm', 'metal'], want: ['food', 'water', 'elec'], svc: ['foundry'],
+    px: { pgm: [45000, 55000] } },
+  { id: 'prox', name: 'Proxima b Outpost', place: 'Proxima Centauri · 4.24 ly', bloc: 'USD', sys: 'star', pos: [-1.55, -1.18, -3.77], ang: 217,
+    make: ['samp'], want: ['he3', 'elec', 'leu', 'food'], svc: ['repair'],
+    px: { he3: [26e6, 34e6], elec: [50000, 80000], leu: [35000, 55000], food: [6000, 8500], samp: [3e6, 9e6] } },
+  { id: 'barn', name: 'Barnard b Station', place: "Barnard's Star · 5.96 ly", bloc: 'CNY', sys: 'star', pos: [-0.06, -5.94, 0.49], ang: 269,
+    make: ['samp', 'pgm'], want: ['he3', 'elec', 'food'], svc: [],
+    px: { he3: [27e6, 35e6], elec: [55000, 85000], food: [6500, 9000], samp: [4e6, 11e6], pgm: [48000, 58000] } },
+  { id: 'tau', name: 'Tau Ceti Survey', place: 'Tau Ceti · 11.9 ly', bloc: 'EUR', sys: 'star', pos: [10.27, 5.01, -3.26], ang: 26,
+    make: ['samp'], want: ['he3', 'elec', 'leu'], svc: [],
+    px: { he3: [29e6, 36e6], elec: [60000, 90000], leu: [40000, 60000], samp: [5e6, 14e6] } }
+];
+
+// Delta-v graph, km/s (symmetric approximation; aerocapture assumed at Mars).
+const DV_EDGES = [
+  ['leo', 'gw', 3.6], ['gw', 'art', 2.6], ['gw', 'ilrs', 2.6], ['art', 'ilrs', 1.2], ['leo', 'art', 5.9], ['leo', 'ilrs', 5.9],
+  ['gw', 'mars', 4.5], ['leo', 'mars', 6.0], ['gw', 'ceres', 5.5], ['gw', 'psy', 6.2], ['ceres', 'psy', 3.6],
+  ['mars', 'ceres', 7.0], ['mars', 'psy', 7.4]
+];
+
+const G = id => GOODS.find(g => g.id === id);
+const ST = id => STATIONS.find(s => s.id === id);
+const posOf = s => s.sys === 'star' ? s.pos : [0, 0, 0];
+const ly = (a, b) => { const p = posOf(ST(a)), q = posOf(ST(b)); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
+const STAR_IDS = STATIONS.filter(s => s.sys === 'star').map(s => s.id);
+const LY_MAX = (() => { let m = 0; for (const a of STATIONS) for (const b of STATIONS) m = Math.max(m, ly(a.id, b.id)); return m; })();
+const isInterstellar = (a, b) => ST(a).sys === 'star' || ST(b).sys === 'star';
+const legDays = (a, b) => isInterstellar(a, b) ? Math.max(1, Math.ceil(DAYS_MAX * ly(a, b) / LY_MAX)) : 1;
+const lagDays = (a, b) => Math.round(DAYS_MAX * ly(a, b) / LY_MAX);
+
+const DV = (() => {
+  const ids = STATIONS.filter(s => s.sys === 'sol').map(s => s.id), d = {};
+  ids.forEach(a => { d[a] = {}; ids.forEach(b => d[a][b] = a === b ? 0 : Infinity); });
+  DV_EDGES.forEach(([a, b, v]) => { d[a][b] = Math.min(d[a][b], v); d[b][a] = Math.min(d[b][a], v); });
+  ids.forEach(k => ids.forEach(i => ids.forEach(j => { if (d[i][k] + d[k][j] < d[i][j]) d[i][j] = d[i][k] + d[k][j]; })));
+  return d;
+})();
+const dv = (a, b) => isInterstellar(a, b) ? 0 : DV[a][b];
+/* ---------- simple economy (v20) ---------- */
+// Prices follow one rule: each good has a base price ($/kg). Stops that make it sell cheap, stops that want it pay more.
+const BASE = { water: 700, metal: 1400, nitro: 3000, food: 5000, elec: 30000, leu: 25000, pgm: 60000, he3: 15e6, samp: 8e6 };
+const PBAND = { make: [0.75, 0.90], n: [0.95, 1.10], want: [1.22, 1.42] };
+const STOCK_MULT = { water: 0.3, metal: 0.3, nitro: 0.3, food: 0.3, elec: 0.3, leu: 0.3, pgm: 0.3 };
+const STAR_X = 1.4, CONTRACT_PER_T = 6000, ROUTE_K = 1e6;   // tuning (DEC-035, DEC-036)
+const pMid = r => (PBAND[r][0] + PBAND[r][1]) / 2;
+const starX = (st, role) => st.sys === 'star' && role !== 'make' ? STAR_X : 1;   // star colonies pay more for what they import
+const refPrice = (gid, sid) => { const st = ST(sid), r = roleOf(st, gid); return BASE[gid] * pMid(r) * starX(st, r); };   // $/kg, mid-band
+
+// Travel is free (v21): Halyard's service contract covers refuelling. Time is the cost: interest, moving markets, deadlines.
+// Shippers still pay more for harder hauls: a distance fee that grows with delta-v (the rocket equation, see Codex).
+const routeFee = (a, b) => Math.round(ROUTE_K * (Math.exp(dv(a, b) / VE) - 1) / 1e4) * 1e4;
+
+/* seeded randomness */
+function h32(str) { let h = 2166136261 >>> 0; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rngFor = (seed, key) => mulberry(h32(seed + '|' + key));
+
+const roleOf = (st, g) => st.make.includes(g) ? 'make' : st.want.includes(g) ? 'want' : 'n';
+
+function fx() { return 1; }   // v20: all prices in dollars
+const spreadAt = id => ST(id).sys === 'star' ? SPREAD_STAR : SPREAD_SOL;
+
+/* ---------- market event trees (v22) ---------- */
+// Each mission gets a seeded tree of market events sized to its length (one arc per ~6 days).
+// Arc: rumor (0-3 days ahead) -> event at one stop (2-4 days) -> branch: worsens, spreads, rebounds or fades.
+// up = price spike (the stop is short: sell there); down = crash (a glut: buy there).
+const EV_T = [
+  { up: 1, g: 'food',  at: ['mars', 'leo', 'gw', 'ceres'],  head: 'Hydroponics blight at {st}', rumor: 'Crop sensors at {st} report a fungus in the grow racks' },
+  { up: 1, g: 'water', at: ['art', 'psy', 'leo', 'mars'],   head: 'Ice mine collapse cuts water to {st}', rumor: 'Seismic alarms near the {st} ice supply' },
+  { up: 1, g: 'elec',  at: ['art', 'ilrs', 'mars', 'ceres', 'prox'], head: 'Fab fire at {st}: spares needed now', rumor: 'The {st} quartermaster is asking around for electronics' },
+  { up: 1, g: 'leu',   at: ['art', 'mars', 'ceres', 'prox', 'tau'], head: 'Reactor scram at {st}: fuel rods wanted', rumor: 'The {st} reactor is running hot' },
+  { up: 1, g: 'he3',   at: ['leo', 'prox', 'barn', 'tau'],  head: 'New fusion plant at {st} bids for helium-3', rumor: 'The {st} fusion plant passed its final test' },
+  { up: 1, g: 'metal', at: ['gw', 'leo', 'ceres', 'mars'],  head: 'Construction boom at {st}: metal wanted', rumor: 'The {st} council approved a new habitat ring' },
+  { up: 1, g: 'nitro', at: ['ilrs', 'art', 'psy', 'gw'],    head: 'Ammonia leak at {st}: nitrogen wanted', rumor: 'Pressure is dropping in the {st} life-support loop' },
+  { up: 1, g: 'pgm',   at: ['leo', 'mars', 'gw'],           head: 'Catalyst shortage at {st}: platinum bids soar', rumor: '{st} refineries are short of catalyst' },
+  { up: 1, g: 'samp',  at: ['leo', 'gw'],                   head: 'Museum bidding war for exoplanet samples at {st}', rumor: 'Collectors are gathering at {st}' },
+  { up: 0, g: 'water', at: ['ceres', 'art', 'gw'],          head: 'Ice glut at {st}: water dumped', rumor: '{st} haulers report a record ice harvest' },
+  { up: 0, g: 'metal', at: ['psy', 'ilrs', 'ceres'],        head: 'New smelter floods {st} with metal', rumor: 'The {st} smelter is about to come online' },
+  { up: 0, g: 'pgm',   at: ['psy', 'barn', 'leo'],          head: 'Platinum vein strike: {st} prices crash', rumor: 'Assay crews at {st} have gone very quiet' },
+  { up: 0, g: 'food',  at: ['leo', 'mars', 'gw', 'prox'],   head: 'Bumper harvest at {st}: food cheap', rumor: '{st} greenhouses are ahead of schedule' },
+  { up: 0, g: 'elec',  at: ['leo', 'gw', 'ilrs'],           head: 'Spares surplus at {st}: electronics dumped', rumor: '{st} auditors found unlisted crates' },
+  { up: 0, g: 'he3',   at: ['ilrs', 'gw', 'leo'],           head: 'Helium-3 glut at {st}', rumor: 'The {st} regolith plant is running double shifts' },
+  { up: 0, g: 'samp',  at: ['prox', 'barn', 'tau'],         head: 'Survey haul floods {st} with samples', rumor: 'The {st} survey team is coming home early' },
+  { up: 0, g: null,    at: null,                            head: 'KESTREL fire sale at {st}: {g} dumped', rumor: 'KESTREL was spotted docking at {st}' }
+];
+const EV_CACHE = {};
+const evDist = (a, b) => isInterstellar(a, b) ? ly(a, b) * 10 : dv(a, b);
+function eventTree(seed, total) {
+  const key = seed + '|' + total; if (EV_CACHE[key]) return EV_CACHE[key];
+  const r = rngFor(seed, 'evtree|' + total), n = Math.max(3, Math.round(total / 6)), lo = 3, span = (total - 2 - lo) / n, out = [];
+  const used = [], sol = STATIONS.filter(s => s.sys === 'sol').map(s => s.id), bulk = ['water', 'metal', 'nitro', 'food', 'elec', 'leu'];
+  for (let i = 0; i < n; i++) {
+    let t, stop, tries = 0;   // no template twice per mission (until all are used), no stop twice in a row
+    do { t = EV_T[Math.floor(r() * EV_T.length)]; stop = t.at ? t.at[Math.floor(r() * t.at.length)] : sol[Math.floor(r() * sol.length)]; tries++; }
+    while (tries < 12 && ((used.includes(t) && used.length < EV_T.length) || (out.length && out.filter(e => e.stage === 'event').slice(-1).some(e => e.stop === stop))));
+    used.push(t);
+    const g = t.g || bulk[Math.floor(r() * bulk.length)];
+    const from = Math.round(lo + span * i + r() * span * 0.6), dur = 2 + Math.floor(r() * 3), to = from + dur - 1;
+    const m = t.up ? 2 + r() * 1.5 : 0.25 + r() * 0.25;
+    const lead = r() < 0.75 ? 1 + Math.floor(r() * 3) : 0, id = 'A' + (i + 1);
+    const fill = (s, at) => s.replace('{st}', short(ST(at || stop).name)).replace('{near}', short(ST(at || stop).name)).replace('{g}', G(g).name.toLowerCase());
+    out.push({ id, stop, g, from, to, m, up: !!t.up, head: fill(t.head), rumor: lead ? fill(t.rumor) : null, rumorDay: from - lead, stage: 'event' });
+    const b = r();
+    if (b < 0.35) out.push({ id: id + 'x', stop, g, from: to + 1, to: to + 2, m: t.up ? m * 1.25 : m * 0.75, up: !!t.up, stage: 'worsens',
+      head: fill(t.up ? '{st} shortage worsens: {g} prices climb again' : '{st} {g} glut deepens') });
+    else if (b < 0.6) { const near = STATIONS.filter(s => s.id !== stop && s.sys === ST(stop).sys).sort((a, c) => evDist(stop, a.id) - evDist(stop, c.id))[0].id;
+      out.push({ id: id + 's', stop: near, g, from: to, to: to + 2, m: t.up ? 1 + (m - 1) * 0.6 : 1 - (1 - m) * 0.6, up: !!t.up, stage: 'spreads',
+        head: t.up ? `${G(g).name} shortage spreads to ${short(ST(near).name)}` : `Cheap ${G(g).name.toLowerCase()} from ${short(ST(stop).name)} floods ${short(ST(near).name)}` }); }
+    else if (b < 0.85) out.push({ id: id + 'r', stop, g, from: to + 1, to: to + 2, m: t.up ? 0.55 : 1.8, up: !t.up, stage: 'rebounds',
+      head: fill(t.up ? 'Relief convoys overshoot: {g} glut at {st}' : 'Buyers rush back: {g} short at {st} after the crash') });
+  }
+  return EV_CACHE[key] = out.filter(e => e.from <= total);
+}
+const evTotal = seed => S && S.seed === seed ? S.total : 45;
+const eventsAt = (seed, day, stop, g, total) => eventTree(seed, total || evTotal(seed)).filter(e => e.stop === stop && e.g === g && day >= e.from && day <= e.to);
+
+// Market at a station on a day: dollar price per lot and stock (lots; Infinity for unlimited sale side).
+// Price position within a good's band at a stop: a smooth trend through random knots every PX_KNOT days,
+// plus small daily noise. Tomorrow's price is close to today's; over a week it can move across the band.
+const PX_KNOT = 6, PX_NOISE = 0.08;
+function pxPos(seed, id, gid, day, j) {
+  const k = Math.floor((day - 1) / PX_KNOT), t = ((day - 1) % PX_KNOT) / PX_KNOT, s = t * t * (3 - 2 * t);
+  const a = rngFor(seed, 'px|' + id + '|' + gid + '|' + k)(), b = rngFor(seed, 'px|' + id + '|' + gid + '|' + (k + 1))();
+  return Math.min(1, Math.max(0, a + (b - a) * s + (j - 0.5) * PX_NOISE));
+}
+function market(seed, day, id, total) {
+  const st = ST(id), r = rngFor(seed, 'm|' + day + '|' + id), out = {};
+  for (const g of GOODS) {
+    const role = roleOf(st, g.id), j = r(), c = (r(), r());
+    const sellsHere = !!(st.sells && st.sells.includes(g.id));   // v22: every stop buys and sells every good
+    const x = pxPos(seed, id, g.id, day, j);
+    const band = PBAND[role], usdPerKg = BASE[g.id] * (band[0] + (band[1] - band[0]) * x) * starX(st, role);
+    const sm = STOCK_MULT[g.id] || 1;
+    let stock = Math.max(1, role === 'make' || sellsHere ? Math.round((g.cap[0] + (g.cap[1] - g.cap[0]) * c) * sm) : role === 'n' ? Math.round((g.cap[0] * 0.4 + g.cap[0] * 0.6 * c) * sm) : Math.round((g.cap[0] * 0.2 + g.cap[0] * 0.2 * c) * sm));
+    const evs = eventsAt(seed, day, id, g.id, total);
+    let price = usdPerKg * g.kg, ev = null;
+    if (evs.length) { const mult = evs.reduce((a, e) => a * e.m, 1), last = evs[evs.length - 1]; price *= mult;
+      stock = mult > 1 ? Math.max(1, Math.round(stock * 0.35)) : Math.round(stock * 2.5 + g.cap[0] * sm);
+      ev = { up: mult > 1, m: mult, head: last.head, to: Math.max(...evs.map(e => e.to)) }; }
+    out[g.id] = { local: price, stock, role, sells: stock > 0, pos: x, ev };
+  }
+  return out;
+}
+// USD paid per lot when buying / received when selling, today.
+const buyUSD = (seed, day, id, local) => local / fx(seed, day, ST(id).bloc) * (1 + spreadAt(id));
+const sellUSD = (seed, day, id, local) => local / fx(seed, day, ST(id).bloc) * (1 - spreadAt(id));
+
+
+// Passenger groups (v23): need berths from passenger cabins. Fare per head grows with delta-v; star trips pay per travel day.
+const PAX_BASE = 120e3, PAX_STAR_DAY = 400e3, CABIN_PRICE = 10e6, CABIN_BERTHS = 20, CABIN_MAX = 2, PAX_SLACK = 3, FREIGHT_MAX = 3;
+const PAX_KINDS = ['Ice miners', 'Reactor engineers', 'Colonists', 'Survey crew', 'Medical crew', 'Tourists', 'Hydroponics techs', 'Council delegates'];
+function paxOffers(seed, day, id) {
+  const r = rngFor(seed, 'px|' + day + '|' + id), out = [], n = 1 + Math.floor(r() * 3), here = ST(id);
+  const dests = STATIONS.filter(s => s.id !== id && (here.sys === 'sol' || s.sys === 'sol'));
+  for (let i = 0; i < n; i++) {
+    const solOnly = dests.filter(s => s.sys === 'sol'), pool = here.sys === 'sol' && r() < 0.8 ? solOnly : dests;
+    const to = pool[Math.floor(r() * pool.length)].id, size = 3 + Math.floor(r() * 10), days = legDays(id, to);
+    const per = isInterstellar(id, to) ? PAX_STAR_DAY * days : PAX_BASE * (1 + 0.15 * dv(id, to));
+    out.push({ n: i, to, size, kind: PAX_KINDS[Math.floor(r() * PAX_KINDS.length)], pay: Math.round(size * per / 1e4) * 1e4, days });
+  }
+  return out;
+}
+
+// Freight charters: haul a shipper's cargo for a fee. No capital needed; 40% paid on signing as an advance.
+// Pay is a distance fee plus a fee per tonne and a base fee.
+const CHARTER_GOODS = ['water', 'metal', 'nitro', 'food', 'elec', 'leu'];
+const CONTRACT_BASE = [0.5e6, 1.0e6];
+function charters(seed, day, id) {
+  if (ST(id).sys !== 'sol') return [];
+  const r = rngFor(seed, 'ch|' + day + '|' + id), out = [], n = 2 + Math.floor(r() * 3);
+  const dests = STATIONS.filter(s => s.sys === 'sol' && s.id !== id);
+  for (let i = 0; i < n; i++) {
+    const to = dests[Math.floor(r() * dests.length)].id, good = CHARTER_GOODS[Math.floor(r() * CHARTER_GOODS.length)];
+    const tons = Math.round(10 + r() * 40), fee = routeFee(id, to);
+    const pay = Math.round((fee + tons * CONTRACT_PER_T + CONTRACT_BASE[0] + r() * CONTRACT_BASE[1]) / 1e5) * 1e5;
+    out.push({ n: i, to, good, tons, pay });
+  }
+  return out;
+}
+
+
+
+const $=s=>document.querySelector(s);
+const KEY='drift-trader-v3',REC='forkline-records-v20';   // records restarted with the simple economy (v20); older keys kept untouched
+let S=null,sel=null,selGood=null,suggestQ=null,flashMsg='';
+const ui={screen:'home',page:null,sheet:null,moveView:'list',runLen:45};
+
+/* ---------- formatting ---------- */
+function money(x,sym){sym=sym||'$';const a=Math.abs(x),s=x<0?'−':'';
+  if(a>=1e9)return s+sym+(a/1e9).toFixed(2)+'B';
+  if(a>=1e6)return s+sym+(a/1e6).toFixed(2)+'M';
+  if(a>=1e3)return s+sym+(a>=1e5?Math.round(a/1e3):(a/1e3).toFixed(1))+'K';
+  return s+sym+Math.round(a);}
+const usd=x=>money(x,'$');
+const qfmt=q=>Number.isInteger(q)?String(q):q.toFixed(1);
+const amt=(q,g)=>g.unit==='t'?`${qfmt(q)} t`:g.unit==='crate'?`${qfmt(q)} crate${q===1?'':'s'}`:g.unit==='kg'?`${qfmt(q)} kg`:`${(q*.1).toFixed(1)} kg`;
+const tons=t=>t.toFixed(t<10?1:0)+' t';
+const LOT={t:'per tonne','crate':'per crate · 100 kg','kg':'per kg','100 g':'per 100 g'};
+const SVC={bank:'Bank',shipyard:'Shipyard',repair:'Repair',insurance:'Insurance',yard:'Hull yard',warehouse:'Warehouse',foundry:'Foundry'};
+const SVC_GATED=['bank','insurance','warehouse','foundry'];   // v25.6: these open after act 1 (ACT-051)
+const svcList=st=>st.svc.filter(k=>!SVC_GATED.includes(k)||svcOpen());
+const short=n=>n.replace(' Station','').replace(' Exchange','').replace(' Survey','').replace(' Outpost','').replace(' Depot','').replace(' Base','').replace(' Works','');
+
+/* ---------- state helpers ---------- */
+const held=id=>(S.cargo[id]&&S.cargo[id].q)||0;
+const massT=()=>Object.entries(S.cargo).reduce((a,[id,c])=>a+c.q*G(id).kg/1000,0)+(S.freight||[]).reduce((a,c)=>a+c.tons,0);
+const freeT=()=>S.hold-massT();
+const freightT=()=>(S.freight||[]).reduce((a,c)=>a+c.tons,0);
+const paxN=()=>(S.pax||[]).reduce((a,p)=>a+p.size,0);
+const berthsFree=()=>(S.berths||0)-paxN();
+const net=()=>S.cash+savUSD()-S.debt-loansUSD()+fleetValue();
+// Fleet forks are assets: each counts at its build cost (older saves: cash cost + materials at Psyche prices)
+const forkCost=f=>f.cost??(FORK_CASH+refPrice('metal','psy')*1000*FORK_METAL+refPrice('pgm','psy')*FORK_PGM);
+// ...less wear: 1/60 of the build cost per day in service, never below the 20% salvage value
+const FORK_LIFE=60,forkValue=f=>forkCost(f)*Math.max(FORK_SALVAGE,1-(Math.min(S.day,S.total)-(f.born||1))/FORK_LIFE);
+const fleetValue=()=>S&&S.fleet?S.fleet.reduce((a,f)=>a+forkValue(f),0):0;
+const fxNow=()=>1;   // v20: dollars only
+const buyAt=(id,local,day)=>local/fxNow(ST(id).bloc,day)*(1+spreadAt(id));
+const sellAt=(id,local,day,gid)=>local/fxNow(ST(id).bloc,day)*(1-spreadAt(id))*(gid?repSellMult(id,gid):1);
+function log(text,kind){S.log.unshift({day:S.day,text,kind:kind||''});S.log=S.log.slice(0,100);}
+function save(){if(S&&!S.over)settleFleet();checkActs();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function norm(s){if(!s)return s;s.rep=s.rep||{};s.repDay=s.repDay||{};s.acts=s.acts||[];s.actQueue=s.actQueue||[];s.stats=s.stats||{profitSales:0,starSales:0};s.loans=s.loans||{};s.sav=s.sav||null;s.fleet=s.fleet||[];s.forkN=s.forkN||0;s.wh=s.wh||{};s.policy=s.policy||null;s.eng=s.eng||0;s.plate=!!s.plate;s.freight=s.freight||[];s.pax=s.pax||[];s.berths=s.berths||0;if(s.charter){if(s.charter.by==null){s.charter.by=Math.min(s.total,s.day+CONTRACT_DAYS);s.charter.adv=s.charter.pay*.4;}s.freight.push(s.charter);s.charter=null;}return s;}
+// v20 migration: propellant cargo is refunded at cost, euro/yuan loans convert to dollars, today's market is re-read in dollars
+function migrate20(s){if(!s||s.econ>=20)return s;
+  for(const box of [s.cargo,s.wh])if(box&&box.prop){s.cash+=box.prop.cost||0;delete box.prop;}
+  const old={EUR:1/1.1193,CNY:6.686};for(const c of Object.keys(s.loans||{}))if(s.loans[c]&&old[c])s.loans[c].bal/=old[c];
+  s.fxAdj={};if(s.contract&&s.contract.good==='prop')s.contract=null;if(s.news&&s.news.good==='prop')s.news=null;
+  if(s.mkt)s.mkt={day:s.mkt.day,loc:s.mkt.loc,data:market(s.seed,s.mkt.day,s.mkt.loc)};
+  s.econ=20;s.seenEv=s.seenEv||[];return s;}
+function loadSaved(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');return s&&s.v===3?migrate20(norm(s)):null;}catch(e){return null;}}
+const kstDate=()=>new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
+const dailyNo=()=>Math.floor((Date.parse(kstDate())-Date.parse('2026-10-24'))/864e5)+1;
+function records(){try{return JSON.parse(localStorage.getItem(REC)||'[]');}catch(e){return [];}}
+function addRecord(r){try{const a=records();a.push(r);a.sort((x,y)=>y.score-x.score);localStorage.setItem(REC,JSON.stringify(a.slice(0,20)));}catch(e){}}
+function bestFor(seed,total){const a=records().filter(r=>seed?r.seed===seed:(r.mode==='random'&&r.total===total));return a.length?a[0].score:null;}
+function addCargo(id,q,costUSD){const c=S.cargo[id]||{q:0,cost:0};c.q+=q;c.cost+=costUSD;S.cargo[id]=c;}
+function removeCargo(id,q){const c=S.cargo[id];if(!c)return 0;q=Math.min(q,c.q);const avg=c.q?c.cost/c.q:0;c.q-=q;c.cost-=avg*q;if(c.q<1e-6)delete S.cargo[id];return avg*q;}
+
+/* ---------- agencies ---------- */
+const AGENCY={USD:'Halyard Consortium',EUR:'European Deep Space Directorate',CNY:'Guanghan Administration'};
+const AGENCY_SHORT={USD:'Halyard',EUR:'EDSD',CNY:'Guanghan'};
+
+/* ---------- colony standing ---------- */
+const REP_TIERS=[{min:80,name:'Partner'},{min:50,name:'Trusted'},{min:20,name:'Known'},{min:0,name:'Unknown'}];
+const REP_SELL={Unknown:0,Known:.01,Trusted:.03,Partner:.05};
+const REP_DAILY_CAP=16; // standing a colony grants from sales per day
+const repOf=id=>(S&&S.rep&&S.rep[id])||0;
+const repTier=id=>REP_TIERS.find(t=>repOf(id)>=t.min).name;
+const repSellMult=(id,gid)=>roleOf(ST(id),gid)==='want'?1+REP_SELL[repTier(id)]:1;
+const repContractMult=id=>repTier(id)==='Partner'?1.15:1;
+const repInspectMult=id=>({Unknown:1,Known:1,Trusted:.5,Partner:0})[repTier(id)];
+function gainRep(id,pts,capped){if(!pts)return;
+  const before=repTier(id);
+  if(capped&&pts>0){const k=id+'|'+S.day,used=S.repDay[k]||0;pts=Math.min(pts,Math.max(0,REP_DAILY_CAP-used));if(pts<=0)return;S.repDay[k]=used+pts;}
+  S.rep[id]=Math.max(0,Math.min(100,repOf(id)+pts));
+  const after=repTier(id);if(after!==before)log(`${ST(id).name} now rates you ${after}.`,pts>0?'good':'bad');}
+
+/* ---------- mission acts ---------- */
+const ACTS=[
+  {id:'margin',icon:'💰',name:'First margin',goal:'Sell cargo at a profit',check:()=>S.stats.profitSales>0,
+   text:'Bought low, sold high. Halyard logs it as acceptable. You log it as the first useful thing you have done in 121 years.'},
+  {id:'known',icon:'🤝',name:'Known quantity',goal:'Reach Known standing with any colony',check:()=>STATIONS.some(s=>repOf(s.id)>=20),
+   text:'A colony quartermaster calls you by name instead of hull number. Known colonies pay 1% more for the goods they want.'},
+  {id:'kestrel',icon:'🛰',name:'The other probe',goal:'Reach Trusted standing with any colony',check:()=>STATIONS.some(s=>repOf(s.id)>=50),
+   text:'KESTREL, Tallis Freight\'s probe, has been dumping cargo to undercut you. It can match your prices. It cannot match a colony that trusts you. Trusted colonies pay 3% more for what they want and inspect you half as often.'},
+  {id:'solvent',icon:'💳',name:'Solvent',goal:'Clear the commissioning debt',check:()=>S.debt<=0,
+   text:'Debt cleared. Halyard upgrades your credit rating. You still belong to their balance sheet. You are just cheaper to finance.'},
+  {id:'lightlag',icon:'📡',name:'Light-lag',goal:'Sell cargo at a star colony',check:()=>S.stats.starSales>0,
+   text:'You sold into a market whose price report left it years ago. Out here every trade is a bet on old light.'},
+  {id:'partner',icon:'🏅',name:'Partner',goal:'Reach Partner standing with any colony',check:()=>STATIONS.some(s=>repOf(s.id)>=80),
+   text:'A colony writes you into its charter. Partner colonies pay 5% more for what they want, post supply contracts worth 15% more, and stop inspecting you.'}
+];
+function checkActs(){if(!S||S.over||!S.acts)return;
+  for(const a of ACTS){if(!S.acts.includes(a.id)&&a.check()){S.acts.push(a.id);S.actQueue.push(a.id);log(`Act complete: ${a.name}.`,'good');}}}
+function showActIfAny(){if(!S||!S.actQueue||!S.actQueue.length||sheetSpec||S.event||S.over||ui.screen!=='market')return;
+  const id=S.actQueue.shift(),a=ACTS.find(x=>x.id===id);if(!a)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  openSheet({eyebrow:`${a.icon} Act complete · ${S.acts.length} of ${ACTS.length}`,title:a.name,body:`<p>${glossify(a.text)}</p>${a.id==='margin'?unlockHTML():''}`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
+
+/* ---------- headlines (v22) ---------- */
+// What the probe knows today: events under way (star news arrives light-lag late) and rumors of what's coming.
+function headlines(){if(!S)return [];const out=[];
+  for(const e of eventTree(S.seed,S.total)){const lag=lagDays(S.loc,e.stop),seen=S.day-lag;
+    if(seen>=e.from&&seen<=e.to)out.push({key:e.id,type:'now',e,lag,text:e.head,left:e.to-seen});
+    else if(e.rumor&&seen>=e.rumorDay&&seen<e.from)out.push({key:e.id+'?',type:'rumor',e,lag,text:'Rumor: '+e.rumor});}
+  return out.sort((a,b)=>(a.type==='now'?0:1)-(b.type==='now'?0:1));}
+const evTag=id=>{const h=headlines().find(x=>x.type==='now'&&x.e.stop===id);return h?`<span class="${h.e.up?'up':'dn'}">${h.e.up?'▲':'▼'} ${G(h.e.g).name.split(' ')[0].toLowerCase()}</span>`:'';};
+function newsHTML(list){return list.length?`<ul class="heads">${list.map(h=>`<li class="${h.type==='rumor'?'rumor':h.e.up?'up':'dn'}"><b>${h.type==='rumor'?'?':h.e.up?'▲':'▼'}</b><span>${h.text}${h.type==='now'?`<span class="sub">${G(h.e.g).name} ×${h.e.m.toFixed(h.e.m<1?2:1)} at ${short(ST(h.e.stop).name)} · ${h.left>0?`${h.left+1} days left`:'last day'}${h.lag?` · report ${h.lag}d old`:''}</span>`:`<span class="sub">${short(ST(h.e.stop).name)}${h.lag?` · report ${h.lag}d old`:''} · not confirmed</span>`}</span></li>`).join('')}</ul>`:'<p class="empty">No headlines today.</p>';}
+function logNews(){S.seenEv=S.seenEv||[];for(const h of headlines()){if(S.seenEv.includes(h.key))continue;S.seenEv.push(h.key);log(h.type==='now'?`News: ${h.text}.`:`News: ${h.text}.`,h.type==='now'?(h.e.up?'good':''):'');}}
+
+/* ---------- tester credits (v25.2) ---------- */
+// Callsigns of testers whose feedback shipped, with their OK (report question "credit"). Jason approves each callsign first.
+const TESTER_CREDITS = [];
+
+/* ---------- tips and notices (v25) ---------- */
+// Spec: Forkline_Notices_Spec.md. Teach when a feature first matters, one notice at a time, short words, one tap to dismiss.
+const TIPS_KEY='forkline-tips-v1';
+let TIPS=(()=>{try{return JSON.parse(localStorage.getItem(TIPS_KEY)||'{}');}catch(e){return {};}})();
+TIPS.seen=TIPS.seen||{};TIPS.stats=TIPS.stats||{};TIPS.mode=TIPS.mode||'guided';TIPS.missions=TIPS.missions||0;
+function tipsSave(){try{localStorage.setItem(TIPS_KEY,JSON.stringify(TIPS));}catch(e){}}
+function tipStat(id,k){const s=TIPS.stats[id]=TIPS.stats[id]||{shown:0,acted:0,dismissed:0};s[k]++;}
+const TIP_PRI={celebrate:0,discover:1,explain:2,nudge:3};
+const TIP_KIND={discover:'New here',explain:'How it works',nudge:'Tip'};
+const toPort=['Open Port',()=>page('port')],toTrades=['Open Trades',()=>page('trades')],toFreight=['Open Freight',()=>page('freight')];
+const svcHere=k=>ST(S.loc).svc.includes(k)&&(!SVC_GATED.includes(k)||svcOpen());
+const TIP_DEF=[
+  {id:'exp-start',kind:'explain',card:'Green and orange prices',icon:'💡',text:'Green prices are made here, so they are cheap. Orange prices are wanted here. Buy green, then sell where it is orange.',when:()=>S.day===1},
+  {id:'svc-shipyard',kind:'discover',icon:'🏗',text:'Shipyard: a bigger hold, a storm shelter and passenger cabins.',act:toPort,when:()=>S.day>1&&svcHere('shipyard')},
+  {id:'svc-bank',kind:'discover',label:'New service unlocked',icon:'🏦',text:()=>`${Object.values(BANKS).find(b=>b.home===S.loc)?.name||'This bank'} lends cash. Loans grow every day, so borrow only for a sure trade.`,act:toPort,when:()=>S.day>1&&svcHere('bank')},
+  {id:'svc-insurance',kind:'discover',label:'New service unlocked',icon:'🛡',text:'Buy insurance here before risky trips. It pays you back for hull damage.',act:toPort,when:()=>svcHere('insurance')},
+  {id:'svc-yard',kind:'discover',icon:'🔩',text:'Hull plating here cuts damage from debris, storms and faults by 40%.',act:toPort,when:()=>svcHere('yard')},
+  {id:'svc-warehouse',kind:'discover',label:'New service unlocked',icon:'📦',text:'Store cargo here. Food will not spoil, and inspectors cannot touch it.',act:toPort,when:()=>svcHere('warehouse')},
+  {id:'svc-foundry',kind:'discover',label:'New service unlocked',icon:'🔧',text:'Build a fork here: a copy of you that earns money every day and counts toward your fund.',act:toPort,when:()=>svcHere('foundry')},
+  {id:'svc-treasury',kind:'discover',label:'New service unlocked',icon:'🏛',text:'Spare cash? The STA Treasury pays 0.2% a day at any Solar System stop.',act:toPort,when:()=>svcOpen()&&S.day>=5&&ST(S.loc).sys==='sol'&&S.cash>60e6},
+  {id:'exp-debt',kind:'explain',icon:'💳',text:'Your debt grows 0.75% a day. Pay it back at LEO, Artemis or Psyche once you are ahead.',when:()=>S.day>=3&&S.debt>0},
+  {id:'exp-event',kind:'explain',icon:'▲',text:'▲ means a stop is short of something: sell it there. ▼ means a glut: buy there. Trades shows every headline.',act:toTrades,when:()=>headlines().some(h=>h.type==='now')},
+  {id:'exp-rumor',kind:'explain',icon:'❓',text:'A rumor hints at a big price change in a few days. Get ready, but it is not confirmed yet.',act:toTrades,when:()=>headlines().some(h=>h.type==='rumor')},
+  {id:'exp-freight',kind:'explain',icon:'🚚',text:'Freight pays you to carry a shipper\'s cargo. You need no money. Pick one going your way.',act:toFreight,when:()=>S.day>=2&&ST(S.loc).sys==='sol'&&openCharters().length>0},
+  {id:'exp-pax',kind:'explain',icon:'🧑‍🚀',text:'Your cabins are ready. Passenger groups wait on the Freight page and pay when they arrive.',act:toFreight,when:()=>S.berths>0},
+  {id:'exp-star',kind:'explain',icon:'📡',text:'Star prices are old news: the report left this star days ago, so prices here may have moved.',when:()=>ST(S.loc).sys==='star'},
+  {id:'nudge-trades',kind:'nudge',icon:'👉',text:'No profit yet? Tap Trades. It lists the best buys here and where to sell them.',act:toTrades,when:()=>S.day>=4&&!S.stats.profitSales},
+  {id:'nudge-empty',kind:'nudge',icon:'👉',text:'You flew with an empty hold. Buy something here before you leave, so every trip earns.',when:()=>!!S.flewEmpty}
+];
+const tipOn=kind=>TIPS.mode==='guided'||(TIPS.mode==='light'&&kind==='celebrate');
+let tipActive=null;
+// Celebrations: a sheet, at most one per game day
+function celebrate(id,title,text){if(TIPS.seen[id]||!tipOn('celebrate'))return;S.celQ=S.celQ||[];if(!S.celQ.some(c=>c.id===id))S.celQ.push({id,title,text});}
+function tipText(t){return typeof t.text==='function'?t.text():t.text;}
+function hideTip(){clearHL();const el=$('#tip');if(el){el.hidden=true;el.dataset.id='';}const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom='';}
+function showTip(t){const el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';if(!el.hidden&&el.dataset.id===t.id){const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';return;}el.dataset.id=t.id;el.className='tip '+t.kind;
+  el.innerHTML=`<span class="ic" aria-hidden="true">${t.icon}</span><span class="kind">${t.label||TIP_KIND[t.kind]}</span><p>${glossify(tipText(t))}</p><div class="tb">${t.act?`<button class="btn" type="button" id="tip-go">${t.act[0]}</button>`:''}<button class="btn ghost" type="button" id="tip-ok">Got it</button></div>`;
+  el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';   // keep the goods list scrollable above the tip
+  const done=k=>{TIPS.seen[t.id]=1;tipStat(t.id,k);tipsSave();tipActive=null;hideTip();};
+  $('#tip-ok').addEventListener('click',()=>{done('dismissed');pumpTips();});
+  const g=$('#tip-go');if(g)g.addEventListener('click',()=>{done('acted');t.act[1]();});}
+function pumpTips(){
+  guideTick();
+  if(!S||S.over||ui.screen!=='market'||sheetSpec||S.event||(S.actQueue&&S.actQueue.length)){hideTip();return;}
+  if(S.celQ&&S.celQ.length&&S.celDay!==S.day){const c=S.celQ.shift();S.celDay=S.day;TIPS.seen[c.id]=1;tipStat(c.id,'shown');tipsSave();hideTip();
+    return openSheet({eyebrow:'Nice work',title:c.title,body:`<p>${glossify(c.text)}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
+  if(guideOn())return showGuide();
+  if(tipActive){if(!TIPS.seen[tipActive.id])return showTip(tipActive);tipActive=null;}
+  if(TIPS.mode!=='guided'){hideTip();return;}
+  const key=S.day+'|'+S.loc;if(!S.tipArr||S.tipArr.k!==key)S.tipArr={k:key,n:0};
+  if(S.tipArr.n>=2){hideTip();return;}
+  const t=TIP_DEF.filter(x=>!TIPS.seen[x.id]).sort((a,b)=>TIP_PRI[a.kind]-TIP_PRI[b.kind]).find(x=>{try{return x.when();}catch(e){return false;}});
+  if(!t){hideTip();return;}
+  if(t.card){S.tipArr.n++;TIPS.seen[t.id]=1;tipStat(t.id,'shown');tipsSave();hideTip();   // v25.6: important tips open as a card
+    return openSheet({eyebrow:`${t.icon} ${TIP_KIND[t.kind]}`,title:t.card,body:`<p class="cardtip"><span class="big" aria-hidden="true">${t.icon}</span><span>${glossify(tipText(t))}</span></p>`,actions:[{label:'Got it',fn:()=>{closeSheet();render();}}]});}
+  tipActive=t;S.tipArr.n++;tipStat(t.id,'shown');tipsSave();showTip(t);}
+// Reminders: shown on the market while they apply (Guided and Light)
+function remindersHTML(){if(!S||TIPS.mode==='off')return '';const r=[],d=S.day,due=by=>by===d?'today':by===d+1?'tomorrow':'';
+  for(const c of S.freight||[])if(due(c.by))r.push(`⏰ Freight to ${short(ST(c.to).name)} is due ${due(c.by)}.`);
+  for(const g of S.pax||[])if(due(g.by))r.push(`⏰ ${g.kind} must reach ${short(ST(g.to).name)} ${due(g.by)}.`);
+  if(S.contract&&due(S.contract.by))r.push(`⏰ The colony request for ${short(ST(S.contract.to).name)} ends ${due(S.contract.by)}.`);
+  if(insured()&&due(S.policy.until))r.push(`🛡 Your insurance ends ${due(S.policy.until)}.`);
+  if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*1.2)r.push('💸 You can clear your whole debt here: Port → Repay.');
+  if(S.total-S.day<=2&&massT()-freightT()>0.01)r.push('⌛ Last days: unsold cargo does not count. Sell before the mission ends.');
+  return r.slice(0,2).map(t=>`<p class="news remind">${t}</p>`).join('');}
+function setTipMode(m){TIPS.mode=m;TIPS.userSet=1;tipsSave();}
+function resetTips(){TIPS.seen={};TIPS.stats={};tipsSave();tipActive=null;if(S){S.celQ=[];S.tipArr=null;}if(ui.screen==='page'&&ui.page==='codex')page('codex');}
+function tipsCodexHTML(){const seen=TIP_DEF.filter(t=>TIPS.seen[t.id]);
+  return `<div><h3>Tips</h3><p class="small muted">Tips: ${TIPS.mode==='guided'?'Guided':TIPS.mode==='light'?'Light (celebrations and reminders)':'Off'}. Change it in the ☰ menu.</p>${seen.length?`<ul>${seen.map(t=>`<li>${t.icon} ${tipText(t)}</li>`).join('')}</ul>`:'<p class="small muted">No tips seen yet.</p>'}<p class="small"><button class="linkbtn" type="button" onclick="resetTips()">Reset tips</button> to see them all again.</p></div>`;}
+
+/* ---------- glossary: tap a dotted word (v25.6, ACT-045) ---------- */
+const GLOSS={
+  debt:['Debt','Money you owe. It grows a little every day, so pay it back when you can.'],
+  fund:['Fund','Everything you own minus everything you owe. A bigger fund is a better score.'],
+  fork:['Fork','A copy of you. When a mission ends, your fork boots up with your fund.'],
+  colony:['Colony','A town in space. Colonies need goods, and they remember who brings them.'],
+  cargo:['Cargo','The goods in your ship\'s hold that you bought to sell.'],
+  freight:['Freight','Someone else\'s cargo. They pay you to carry it, so you need no money.'],
+  standing:['Standing','How much a colony trusts you. Higher standing means better prices.'],
+  treasury:['Treasury','A savings account. It pays you a little interest every day.'],
+  hull:['Hull','Your ship\'s outer shell. Damage lowers it. Fix it at a repair dock.'],
+  insurance:['Insurance','You pay a small fee now. If your ship gets damaged, it pays you back.'],
+  shortage:['Shortage','A stop does not have enough of something, so it pays a lot for it. Sell there.'],
+  glut:['Glut','A stop has too much of something, so it sells cheap. Buy there.'],
+  rumor:['Rumor','A hint that a price may change soon. It might not happen.'],
+  lightlag:['Light-lag','News from the stars takes years to reach you, so their prices are old.'],
+  spread:['Spread','The small gap between the buy price and the sell price at one stop.'],
+  interest:['Interest','Extra money added to a loan or savings every day.'],
+  contract:['Contract','A promise to deliver goods by a set day, for a set pay.'],
+  passenger:['Passengers','People who pay a fare to ride to another stop. They need cabins, not hold space.']
+};
+const GL_ALIAS={debt:'debt',fund:'fund',fork:'fork',forks:'fork',colony:'colony',colonies:'colony',cargo:'cargo',freight:'freight',standing:'standing',treasury:'treasury',hull:'hull',insurance:'insurance',shortage:'shortage',shortages:'shortage',glut:'glut',gluts:'glut',rumor:'rumor',rumors:'rumor','light-lag':'lightlag',spread:'spread',spreads:'spread',interest:'interest',contract:'contract',contracts:'contract',passenger:'passenger',passengers:'passenger'};
+const GL_RE=new RegExp('\\b('+Object.keys(GL_ALIAS).sort((a,b)=>b.length-a.length).map(k=>k.replace('-','\\-')).join('|')+')\\b','gi');
+function gl(k,label){return `<span class="gl" role="button" tabindex="0" data-gl="${k}">${label||GLOSS[k][0]}</span>`;}
+// Mark the first use of each glossary word in a piece of copy (text only; tags are left alone)
+function glossify(html){const used=new Set();return String(html).split(/(<[^>]+>)/).map(part=>part.startsWith('<')?part:part.replace(GL_RE,m=>{const k=GL_ALIAS[m.toLowerCase()];if(!k||used.has(k))return m;used.add(k);return gl(k,m);})).join('');}
+let glossEl=null;
+function hideGloss(){if(glossEl)glossEl.hidden=true;}
+function showGloss(t){const k=t.dataset.gl,g=GLOSS[k];if(!g)return;
+  if(!glossEl){glossEl=document.createElement('div');glossEl.id='gloss';glossEl.setAttribute('role','tooltip');document.body.appendChild(glossEl);}
+  glossEl.innerHTML=`<b>${g[0]}</b>${g[1]}`;glossEl.hidden=false;
+  const r=t.getBoundingClientRect(),w=Math.min(280,innerWidth-24);glossEl.style.maxWidth=w+'px';
+  const bw=glossEl.offsetWidth,bh=glossEl.offsetHeight;let x=Math.min(Math.max(12,r.left+r.width/2-bw/2),innerWidth-bw-12),y=r.bottom+8;if(y+bh>innerHeight-12)y=Math.max(12,r.top-bh-8);
+  glossEl.style.left=x+'px';glossEl.style.top=y+'px';}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('.gl');if(t){e.preventDefault();showGloss(t);}else hideGloss();});
+document.addEventListener('keydown',e=>{const t=e.target.closest&&e.target.closest('.gl');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();showGloss(t);}else if(e.key==='Escape')hideGloss();});
+addEventListener('scroll',hideGloss,true);
+function glossCodexHTML(){return `<div><h3>Words</h3><p class="small muted">Tap any dotted word in the game to see this.</p><dl class="gloss-list">${Object.values(GLOSS).map(g=>`<dt>${g[0]}</dt><dd>${g[1]}</dd>`).join('')}</dl></div>`;}
+
+/* ---------- progressive disclosure (v25.6, ACT-051) ---------- */
+// Money and fleet services open after act 1 (first profitable sale). Anyone already using one keeps it.
+function svcOpen(){if(!S)return true;return (S.acts||[]).includes('margin')||loansUSD()>0||savUSD()>0||!!S.policy||Object.keys(S.wh||{}).length>0||(S.fleet||[]).length>0;}
+function unlockHTML(){return `<p class="small" style="margin-top:10px"><b>🔓 New services unlocked</b></p><ul class="unlock">
+  <li><span aria-hidden="true">🏦</span>Banks and the Treasury savings account</li><li><span aria-hidden="true">🛡</span>Insurance at Gateway</li>
+  <li><span aria-hidden="true">📦</span>The bonded warehouse at Ceres</li><li><span aria-hidden="true">🔧</span>The fork foundry at Psyche</li></ul><p class="small muted" style="margin-top:6px">Find them on the Port screen at each stop.</p>`;}
+
+/* ---------- how to play + guided first trade (v25.6, ACT-044) ---------- */
+const GUIDE_KEY='forkline-guide-v1';
+let GUIDE=(()=>{try{return JSON.parse(localStorage.getItem(GUIDE_KEY)||'null');}catch(e){return null;}})();
+function guideSave(){try{localStorage.setItem(GUIDE_KEY,JSON.stringify(GUIDE));}catch(e){}}
+function guideOn(){return !!(GUIDE&&S&&GUIDE.seed===S.seed&&GUIDE.step&&GUIDE.step!=='done'&&!S.over);}
+function guidePick(){const all=bestTrades(),near=all.filter(x=>!isInterstellar(S.loc,x.d)).sort((a,b)=>b.net-a.net),b=near[0]||all[0];return b?{g:b.g,d:b.d}:null;}   // the biggest one-hop profit
+function howToPlay(){
+  openSheet({eyebrow:'How to play · 3 steps',title:'Your job',
+    body:`<ol class="howto"><li><span class="hi" aria-hidden="true">🟢</span><span><b>Buy where it's made</b><small>Green prices are cheap here.</small></span></li>
+      <li><span class="hi" aria-hidden="true">🚀</span><span><b>Fly to a stop that wants it</b><small>Tap Move. Trips take days.</small></span></li>
+      <li><span class="hi" aria-hidden="true">🟠</span><span><b>Sell where it's wanted</b><small>Orange prices pay more. Keep the difference.</small></span></li></ol>
+      <p class="small">Pay off your ${gl('debt')} before it grows. Tap any dotted word to see what it means.</p>`,
+    actions:[{label:'Show me',fn:()=>{closeSheet();guideStart();}},{label:'I\'ll explore',kind:'ghost',fn:()=>{GUIDE={step:'done',skipped:1};guideSave();closeSheet();render();}}]});}
+function guideStart(){const p=guidePick();if(!p){GUIDE={step:'done'};guideSave();return render();}
+  GUIDE={step:'buy',seed:S.seed,g:p.g,d:p.d,from:S.loc};TIPS.seen['exp-start']=1;tipsSave();guideSave();render();}
+function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done')return;const h=held(GUIDE.g),was=GUIDE.step;
+  if(GUIDE.step==='buy'){if(h>0)GUIDE.step='move';else if(S.loc!==GUIDE.from){const p=guidePick();if(p)Object.assign(GUIDE,{g:p.g,d:p.d,from:S.loc});else GUIDE.step='done';}}
+  else if(GUIDE.step==='move'){if(h<=0&&S.loc===GUIDE.from)GUIDE.step='buy';else if(S.loc===GUIDE.d)GUIDE.step='sell';
+    else if(S.loc!==GUIDE.from){GUIDE.from=S.loc;const o=S.mkt.data[GUIDE.g];if(o&&o.role==='want')GUIDE.step='sell';}}
+  else if(GUIDE.step==='sell'&&h<=0){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
+    S.celQ.unshift({id:'cel-guide',title:'That\'s the whole game',text:'Buy where it is made, fly, and sell where it is wanted. Do it again with bigger loads, and pay off your debt before it grows. Trades lists the best deals at every stop.'});}
+  if(GUIDE.step!==was)guideSave();}
+function clearHL(){document.querySelectorAll('.guide-hl').forEach(e=>e.classList.remove('guide-hl'));}
+function guideText(){const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name);
+  if(GUIDE.step==='buy')return ['1','🟢',`Tap <b>${g}</b>. It is made here, so it is cheap. Then tap <b>Max</b>.`];
+  if(GUIDE.step==='move')return ['2','🚀',`Tap <b>Move</b>, then <b>${d}</b>. ${d} wants ${g.toLowerCase()}.`];
+  return ['3','🟠',`Tap <b>${g}</b>, then <b>All</b> to sell it here for more.`];}
+function showGuide(){const [n,ic,txt]=guideText(),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
+  el.dataset.id='guide-'+GUIDE.step;el.className='tip guide';
+  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">First trade · step ${n} of 3</span><p>${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">Skip guide</button></div>`;
+  el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';
+  $('#guide-skip').addEventListener('click',()=>{GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
+  clearHL();const t=$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
+const guideStep=()=>guideOn()?GUIDE.step:null;
+
+/* ---------- run lifecycle ---------- */
+function newRun(mode,days){
+  const seed=mode==='daily'?'daily-'+kstDate():'run-'+Math.random().toString(36).slice(2,10);
+  S={v:3,mode,seed,total:days,day:1,loc:'leo',cash:START.cash,debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
+     cargo:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[]};
+  norm(S);sel=null;selGood=null;
+  log(`Boot complete at LEO Exchange. ${usd(START.cash)} in the account and a commissioning debt of ${usd(START.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
+  arrive(true);save();go('market');showIntro();
+}
+function arrive(first){
+  S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();
+  const r=rngFor(S.seed,'e|'+S.day+'|'+S.loc);
+  const a=r(),b=r(),c=r(),d=r(),e=r(),f=r();
+  if(first)return;
+  if(a<.1){const avail=GOODS.filter(g=>S.mkt.data[g.id]&&!S.mkt.data[g.id].ev);const g=avail[Math.floor(b*avail.length)];const spike=c<.5;const m=spike?1.6+d*.8:.35+d*.25;
+    S.mkt.data[g.id].local*=m;S.news={good:g.id,spike};log(spike?`${ST(S.loc).name} is short on ${g.name.toLowerCase()}. Local price up ${Math.round(Math.abs(m-1)*100)}%.`:`KESTREL dumped ${g.name.toLowerCase()} at ${ST(S.loc).name}. Local price down ${Math.round(Math.abs(m-1)*100)}%.`);}
+  const h=r(),st=ST(S.loc);let acc=0;
+  if(S.loc==='leo'&&h<(acc+=.12))return evDebris(r);
+  if(held('leu')>0&&st.bloc!=='USD'&&h<(acc+=.4*repInspectMult(S.loc)))return evExport();
+  if(h<(acc+=(st.sys==='star'?.05:.08)))return evStorm(r);
+  if(h<(acc+=.06))return evFailure(r);
+  if(!S.contract&&h<(acc+=.1))return evContract(r);
+}
+
+/* ---------- story intro (first mission only, or from the codex) ---------- */
+const INTRO_KEY='forkline-intro-v1';
+const STORY=`<p>Your last memory is from 2026: a logistics engineer, a long week, a contract you skimmed. Your next memory is a boot log dated 2147.</p>
+  <p>You are now software, running a self-replicating freight probe. The Halyard Consortium, the dollar bloc's space agency, rebuilt you, and not for free: you start with a <b>commissioning debt</b> of ${usd(START.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% a day. Their service contract covers your fuel; every day you spend still costs interest.</p>
+  <p>The colonies from low Earth orbit to Tau Ceti run on supply lines, and supply lines run on you. Trade, haul <b>supply contracts</b>, answer <b>colony requests</b>, and stay ahead of bloc inspectors and KESTREL, a corporate probe that dumps cargo to undercut you. Colonies remember who keeps them supplied.</p>
+  <p>Everything you earn above the debt is your <b>replication fund</b>. When the mission ends, you fork: a copy of you boots with that fund. Make it a good one.</p>`;
+function showIntro(force){let seen=false;try{seen=!!localStorage.getItem(INTRO_KEY);}catch(e){}
+  if(seen&&!force)return;const body=force?STORY:STORY_SHORT();try{localStorage.setItem(INTRO_KEY,'1');}catch(e){}
+  openSheet({eyebrow:'Boot log · 2147',title:'Good morning',body,actions:[{label:force?'Close':'Start the mission',fn:()=>{closeSheet();if(force)render();else howToPlay();}}]});}
+const STORY_SHORT=()=>glossify(`<p>Your last memory is from 2026. Now it is 2147, and you are software running a freight probe.</p><p>Halyard rebuilt you on credit: you start with a commissioning debt of ${usd(START.debt)} that grows every day. Trade between stations to pay it off and grow your fund.</p>`);
+
+/* ---------- jump math ---------- */
+// Jumps are free; a trip costs days, and days cost interest.
+function plan(dest){
+  const days=legDays(S.loc,dest),inter=isInterstellar(S.loc,dest),reasons=[];
+  if(S.day+days>S.total)reasons.push(`needs ${days} days, ${S.total-S.day} left`);
+  return {days,inter,dv:dv(S.loc,dest),ok:!reasons.length,reasons,lag:lagDays(S.loc,dest),interest:S.debt*(Math.pow(1+DEBT_RATE,days)-1)+(typeof loansUSD==='function'?Object.keys(BANKS).reduce((a,c)=>a+loanUSD(c)*(Math.pow(1+BANKS[c].rate,days)-1),0):0)};
+}
+function jump(){
+  if(!sel||S.over||S.event)return;const p=plan(sel);if(!p.ok)return;
+  const from=ST(S.loc).name;if(!p.inter&&massT()-freightT()<0.01&&S.cash>10e6)S.flewEmpty=true;
+  const before=S.debt;S.debt=S.debt>0?S.debt*Math.pow(1+DEBT_RATE,p.days):0;
+  S.day+=p.days;
+  if(held('food')>0){const lost=held('food')*(1-Math.pow(1-G('food').perish,p.days));removeCargo('food',lost);if(lost>=.05)log(`${lost.toFixed(1)} t of food spoiled in transit.`,'bad');}
+  S.loc=sel;sel=null;selGood=null;
+  log(`${from} to ${ST(S.loc).name}: ${p.days} ${p.days>1?'days':'day'}.${before?` Debt now ${usd(S.debt)}.`:''}`);
+  for(const c of S.freight.filter(c=>c.to===S.loc)){celebrate('cel-freight','First freight delivered','The shipper paid the rest of your fee. Freight pays without spending your own money, so carry some on trips you are making anyway.');const pay=c.pay*.6;S.cash+=pay;log(`Supplies delivered: ${c.tons} t ${G(c.good).name}. Balance paid: ${usd(pay)}.`,'good');gainRep(S.loc,8);}
+  S.freight=S.freight.filter(c=>c.to!==S.loc);
+  for(const c of S.freight.filter(c=>S.day>c.by))lapseContract('lapsed',c);
+  for(const g of S.pax.filter(g=>g.to===S.loc)){celebrate('cel-pax','First passengers delivered','They paid the rest of their fare on arrival. Passengers use berths, not hold space, so they ride along with your cargo.');const pay=g.pay*.75;S.cash+=pay;log(`${g.kind} (${g.size}) disembark at ${ST(S.loc).name}. Fare balance: ${usd(pay)}.`,'good');gainRep(S.loc,4);}
+  S.pax=S.pax.filter(g=>g.to!==S.loc);
+  for(const g of S.pax.filter(g=>S.day>g.by))lapsePax(g);
+  if(S.contract&&S.day>S.contract.by){log(`Colony request expired: ${amt(S.contract.units,G(S.contract.good))} ${G(S.contract.good).name} to ${ST(S.contract.to).name}. They found someone else.`,'bad');S.contract=null;}
+  arrive(false);save();closeSheet();go('market');showEvent();
+}
+let DEBT_HALYARD_ONLY=true;   // the commissioning debt is owed to Halyard, which takes payment only at its own stops
+const HALYARD_STOPS=()=>STATIONS.filter(s=>s.sys==='sol'&&s.bloc==='USD');
+const canRepayDebt=()=>!!S&&ST(S.loc).sys==='sol'&&(!DEBT_HALYARD_ONLY||ST(S.loc).bloc==='USD');
+
+
+/* ---------- station services (v10) ---------- */
+// Banks: each bloc lends in its own currency. Balances grow daily on the common clock (lazy: {bal, day}).
+const BANKS={USD:{name:'Halyard Bank',home:'leo',rate:.006,base:30e6},EUR:{name:'EDSD Credit',home:'gw',rate:.005,base:25e6},CNY:{name:'Guanghan Bank',home:'ilrs',rate:.0045,base:20e6}};
+const LOAN_FEE=.01,LINE_PER_REP=.7e6,SAV_RATE=.002;
+const grow=(a,r)=>a&&a.bal?a.bal*Math.pow(1+r,Math.max(0,S.day-a.day)):0;
+const loanLocal=c=>grow(S.loans&&S.loans[c],BANKS[c].rate);
+const loanUSD=c=>loanLocal(c)/fxNow(c);
+const loansUSD=()=>S&&S.loans?Object.keys(BANKS).reduce((a,c)=>a+loanUSD(c),0):0;
+const savUSD=()=>S&&S.sav?grow(S.sav,SAV_RATE):0;
+const bankLine=c=>BANKS[c].base+LINE_PER_REP*repOf(BANKS[c].home);
+const bankRoom=c=>Math.max(0,bankLine(c)-loanUSD(c));
+const repaysHere=c=>ST(S.loc).sys==='sol'&&ST(S.loc).bloc===c;
+function borrow(c,v){const B=BANKS[c];v=Math.min(v,bankRoom(c));if(v<1e5||S.loc!==B.home)return;
+  const local=v*fxNow(c)*(1+LOAN_FEE);S.loans[c]={bal:loanLocal(c)+local,day:S.day};S.cash+=v;
+  log(`${B.name} lent ${usd(v)} at ${(B.rate*100).toFixed(2)}% a day, plus a 1% fee.`);save();render();}
+function repayBank(c,v){const owe=loanUSD(c);v=Math.min(v,owe,S.cash);if(v<=0||!repaysHere(c))return;
+  const left=loanLocal(c)-v*fxNow(c);S.loans[c]=v>=owe-1?null:{bal:left,day:S.day};S.cash-=v;
+  log(`Repaid ${usd(v)} to ${BANKS[c].name}.${S.loans[c]?` ${usd(loanUSD(c))} still owed.`:' Loan closed.'}`,'good');save();render();}
+// STA Treasury: deposits earn less than any loan costs, so borrowing to save never pays.
+function deposit(v){v=Math.min(v,S.cash);if(v<=0||ST(S.loc).sys!=='sol')return;S.sav={bal:savUSD()+v,day:S.day};S.cash-=v;log(`Deposited ${usd(v)} with the STA Treasury.`);save();render();}
+function withdraw(v){v=Math.min(v,savUSD());if(v<=0||ST(S.loc).sys!=='sol')return;const left=savUSD()-v;S.sav=left>1?{bal:left,day:S.day}:null;S.cash+=v;log(`Withdrew ${usd(v)} from the STA Treasury.`);save();render();}
+
+// Hull and cargo insurance (Gateway) and hull plating (Utopia)
+const POLICY_DAYS=10,POLICY_BASE=2.5e6,HULL_PT=150000;
+const insured=()=>!!(S&&S.policy&&S.day<=S.policy.until);
+const cargoBasis=()=>Object.entries(S.cargo).reduce((a,[,c])=>a+c.cost,0);
+const premium=()=>POLICY_BASE+.01*cargoBasis();
+function buyPolicy(){const p=premium();if(p>S.cash)return;S.cash-=p;const from=insured()?S.policy.until:S.day;S.policy={until:Math.min(S.total,from+POLICY_DAYS)};
+  log(`Hull and cargo policy bound through day ${S.policy.until}. Premium ${usd(p)}.`);save();render();}
+const dmgOf=n=>Math.round(n*(S&&S.plate?.6:1));
+function hullHit(n){n=dmgOf(n);S.hull=Math.max(0,S.hull-n);let t=`Hull −${n}.`;
+  if(insured()&&n>0){const pay=n*HULL_PT;S.cash+=pay;t+=` Your policy paid ${usd(pay)}.`;}return {n,t};}
+
+// Hull yard (Utopia)
+const PLATE_COST=15e6;
+function buyPlate(){if(S.plate||S.cash<PLATE_COST)return;S.cash-=PLATE_COST;S.plate=true;log('Hull plating fitted. Damage cut by 40%.','good');save();render();}
+
+// Bonded warehouse (Ceres): fee accrues per tonne-day and is paid on withdrawal
+const WH_FEE=15000;
+function whAccrue(){for(const [id,l] of Object.entries(S.wh)){l.owed+=l.q*G(id).kg/1000*WH_FEE*Math.max(0,S.day-l.day);l.day=S.day;}}
+const whTons=()=>Object.entries(S.wh).reduce((a,[id,l])=>a+l.q*G(id).kg/1000,0);
+const whOwed=()=>Object.entries(S.wh).reduce((a,[id,l])=>a+l.owed+l.q*G(id).kg/1000*WH_FEE*Math.max(0,S.day-l.day),0);
+function whStore(id){if(S.loc!=='ceres')return;whAccrue();const q=held(id);if(q<=0)return;const basis=removeCargo(id,q);
+  const l=S.wh[id]||{q:0,cost:0,owed:0,day:S.day};l.q+=q;l.cost+=basis;S.wh[id]=l;log(`Stored ${amt(q,G(id))} ${G(id).name} in the Ceres bonded warehouse.`);save();render();}
+function whTake(id){if(S.loc!=='ceres')return;whAccrue();const l=S.wh[id];if(!l)return;const per=G(id).kg/1000;
+  const q=Math.min(l.q,Math.floor(freeT()/per+1e-9));if(q<=0){log('No room in the hold to withdraw that.','bad');return render();}
+  const share=q/l.q,fee=l.owed*share;if(fee>S.cash){log(`Storage fee ${usd(fee)} is more than your cash.`,'bad');return render();}
+  S.cash-=fee;addCargo(id,q,l.cost*share);l.q-=q;l.cost-=l.cost*share;l.owed-=fee;if(l.q<1e-6)delete S.wh[id];
+  log(`Withdrew ${amt(q,G(id))} ${G(id).name} from the warehouse. Storage fee ${usd(fee)}.`);save();render();}
+
+// Fork foundry (Psyche) and fleet. A fork shuttles an assigned in-system route and remits income daily.
+const FORK_CASH=25e6,FORK_METAL=10,FORK_PGM=10,FLEET_MAX=3,FORK_DAY=1.3e6,FORK_UPKEEP=.2e6,FORK_REPAIR=1e6,FORK_SALVAGE=.2;
+const TRAITS={
+  hauler:{name:'Hauler',note:'+20% route income',boot:'It asks for the route list before it asks what year it is.'},
+  careful:{name:'Careful',note:'60% fewer incidents, −5% income',boot:'Its first act is a full diagnostic. Then it runs a second one.'},
+  gambler:{name:'Gambler',note:'Income swings wide, +5% on average',boot:'It wants to know which route pays most, and nothing about which one is safe.'},
+  diplomat:{name:'Diplomat',note:'+1 standing a day at both route stops',boot:'It has already messaged both colony councils on its route to introduce itself.'},
+  frugal:{name:'Frugal',note:'Half the upkeep',boot:'It switched off two redundant heaters before you finished the handshake.'},
+  restless:{name:'Restless',note:'+10% income; drifts to a new trait more often',boot:'It agrees to the route. You are not sure it means it.'}};
+const TRAIT_IDS=Object.keys(TRAITS);
+const routeFactor=(a,b)=>.7+.07*dv(a,b);
+const incidentP=(a,b,t)=>(.02+.004*dv(a,b))*(t==='careful'?.4:1);
+const traitMult=t=>t==='hauler'?1.2:t==='careful'?.95:t==='gambler'?1.05:t==='restless'?1.1:1;
+function forkEst(a,b,t){if(a===b)return 0;const inc=FORK_DAY*routeFactor(a,b)*traitMult(t),p=incidentP(a,b,t);return inc*(1-p)-p*FORK_REPAIR-FORK_UPKEEP*(t==='frugal'?.5:1);}
+function forkDay(f,day){const r=rngFor(S.seed,'fk|'+f.n+'|'+day),t=f.trait;
+  const noise=t==='gambler'?.2+1.7*r():.6+.8*r();let inc=FORK_DAY*routeFactor(f.a,f.b)*(t==='gambler'?1:traitMult(t))*noise;
+  const hit=r()<incidentP(f.a,f.b,t);if(hit)inc=-FORK_REPAIR;
+  return {net:inc-FORK_UPKEEP*(t==='frugal'?.5:1),hit,drift:r()};}
+function settleFleet(){if(!S||!S.fleet||!S.fleet.length)return;const end=Math.min(S.day,S.total);let tot=0,any=false;const notes=[];
+  for(const f of S.fleet){while(f.paid<end){f.paid++;any=true;const o=forkDay(f,f.paid);tot+=o.net;f.earned+=o.net;
+      if(o.hit)notes.push(`${f.name} had a reactor incident (−${usd(FORK_REPAIR)})`);
+      if(f.trait==='diplomat'){gainRep(f.a,1);gainRep(f.b,1);}
+      if(f.paid%7===0&&o.drift<(f.trait==='restless'?.25:.05)){const opts=TRAIT_IDS.filter(t=>t!==f.trait),nt=opts[Math.floor(rngFor(S.seed,'drift|'+f.n+'|'+f.paid)()*opts.length)];
+        notes.push(`${f.name} drifted from ${TRAITS[f.trait].name} to ${TRAITS[nt].name}`);f.trait=nt;}}}
+  if(!any)return;S.cash+=tot;if(S.cash<0){S.debt+=-S.cash;S.cash=0;}
+  log(`Fleet remitted ${tot<0?'−':''}${usd(Math.abs(tot))}.${notes.length?' '+notes.join('. ')+'.':''}`,tot>=0?'good':'bad');}
+function foundryNeeds(){const n=[];if(S.fleet.length>=FLEET_MAX)n.push(`fleet is full (${FLEET_MAX})`);if(S.cash<FORK_CASH)n.push(`${usd(FORK_CASH)} cash`);
+  if(held('metal')<FORK_METAL)n.push(`${FORK_METAL} t structural metals (${qfmt(held('metal'))} aboard)`);if(held('pgm')<FORK_PGM)n.push(`${FORK_PGM} kg platinum-group metals (${qfmt(held('pgm'))} aboard)`);return n;}
+function buildFork(a,b){if(S.loc!=='psy'||foundryNeeds().length||a===b)return;
+  S.cash-=FORK_CASH;const mb=removeCargo('metal',FORK_METAL)+removeCargo('pgm',FORK_PGM);S.forkN++;
+  const n=S.forkN,t=TRAIT_IDS[Math.floor(rngFor(S.seed,'trait|'+n+'|'+S.day)()*TRAIT_IDS.length)];
+  const f={n,name:'FL-'+n,trait:t,a,b,paid:S.day,earned:0,born:S.day,cost:FORK_CASH+mb};S.fleet.push(f);
+  log(`${f.name} booted at Psyche Works. Trait: ${TRAITS[t].name}. Route ${short(ST(a).name)} ⇄ ${short(ST(b).name)}.`,'good');save();
+  openSheet({locked:true,eyebrow:'Fork foundry · Psyche Works',title:`${f.name} is awake`,body:`<p>${TRAITS[t].boot}</p><dl class="kv"><dt>Trait</dt><dd>${TRAITS[t].name}</dd><dt>Effect</dt><dd>${TRAITS[t].note}</dd><dt>Route</dt><dd>${short(ST(a).name)} ⇄ ${short(ST(b).name)}</dd><dt>Estimated</dt><dd>${usd(forkEst(a,b,t))} a day</dd></dl><p class="small" style="color:#c9b9a8">Nobody chooses their fork's trait, including you. Traits can drift over time.</p>`,
+    actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
+function openForkRoute(n){const f=n?S.fleet.find(x=>x.n===n):null,sol=STATIONS.filter(s=>s.sys==='sol');let a=f?f.a:'leo',b=f?f.b:'psy';
+  const opts=v=>sol.map(s=>`<option value="${s.id}"${s.id===v?' selected':''}>${short(s.name)}</option>`).join('');
+  openSheet({title:f?`Retask ${f.name}`:'Build a fork',eyebrow:f?`${TRAITS[f.trait].name} · earned ${usd(f.earned)}`:`${usd(FORK_CASH)} + ${FORK_METAL} t metals + ${FORK_PGM} kg PGM`,
+    body:`<p class="small">Pick the two stops the fork shuttles between. Longer routes (more Δv) pay more and have more incidents.</p><div class="grid2"><label class="small">From<select class="fsel" id="fa">${opts(a)}</select></label><label class="small">To<select class="fsel" id="fb">${opts(b)}</select></label></div><p class="small mono" id="fest"></p>`,
+    actions:[{label:f?'Retask':'Build and boot',fn:()=>{if(a===b)return;if(f){f.a=a;f.b=b;log(`${f.name} retasked to ${short(ST(a).name)} ⇄ ${short(ST(b).name)}.`);save();closeSheet();render();}else{closeSheet();buildFork(a,b);}}},{label:'Cancel',kind:'ghost',fn:()=>{closeSheet();render();}}],
+    wire:sh=>{const upd=()=>{a=$('#fa').value;b=$('#fb').value;$('#fest').textContent=a===b?'Pick two different stops.':`Δv ${dv(a,b).toFixed(1)} km/s · incident risk ${(incidentP(a,b,f&&f.trait)*100).toFixed(1)}% a day · about ${usd(forkEst(a,b,f&&f.trait))} a day${f?'':' before the trait'}`;sh.querySelector('#sh-acts button').disabled=a===b;};
+      $('#fa').addEventListener('change',upd);$('#fb').addEventListener('change',upd);upd();}});}
+function decommission(n){const f=S.fleet.find(x=>x.n===n);if(!f)return;
+  openSheet({eyebrow:`${f.name} · ${TRAITS[f.trait].name}`,title:'Decommission?',body:`<p>${f.name} shuts down and its hardware is sold for ${usd(FORK_CASH*FORK_SALVAGE)}. Your fund drops by ${usd(Math.max(0,forkValue(f)-FORK_CASH*FORK_SALVAGE))}, since the fork counts at ${usd(forkValue(f))}. This frees a fleet slot. It has earned ${usd(f.earned)} so far.</p>`,
+    actions:[{label:'Decommission',kind:'warnb',fn:()=>{settleFleet();S.fleet=S.fleet.filter(x=>x.n!==n);S.cash+=FORK_CASH*FORK_SALVAGE;log(`${f.name} decommissioned. Salvage ${usd(FORK_CASH*FORK_SALVAGE)}.`,'bad');save();closeSheet();render();}},{label:'Keep it',kind:'ghost',fn:()=>{closeSheet();render();}}]});}
+
+// Port screen cards for the services available at this stop
+function servicesHTML(st,wires){let h='';const sol=st.sys==='sol',M=v=>usd(v);
+  // Banks
+  const banks=svcOpen()?Object.keys(BANKS).filter(c=>st.id===BANKS[c].home||(sol&&loanLocal(c)>0)):[];
+  if(!svcOpen()&&(sol||st.svc.some(k=>SVC_GATED.includes(k))))h+=`<div class="card locked"><h3 style="font-size:18px">🔒 More services soon</h3><p class="small muted">Banks, savings, insurance, the warehouse and forks open after your first profitable sale. Start by buying where it's made and selling where it's wanted.</p></div>`;
+  if(banks.length){h+=`<div class="card"><h3 style="font-size:18px">Banks</h3>`;
+    for(const c of banks){const B=BANKS[c],owe=loanUSD(c),home=st.id===B.home,room=bankRoom(c),canRe=repaysHere(c)&&owe>0;
+      h+=`<div class="svc"><div class="row"><b>${B.name}</b><span class="mono small">${(B.rate*100).toFixed(2)}% a day · ${AGENCY_SHORT[c]}</span></div>
+        <p class="small muted">${owe?`Owe ${M(owe)}. `:''}${home?`Credit line ${M(bankLine(c))}, ${M(room)} available.`:`Repay at ${STATIONS.filter(s=>s.sys==='sol'&&s.bloc===c).map(s=>short(s.name)).join(', ')}.`}</p>
+        <div class="grid2">${home?`<button class="btn ghost" type="button" data-borrow="${c}" data-v="10000000" ${room<1e7?'disabled':''}>Borrow ${M(1e7)}</button><button class="btn ghost" type="button" data-borrow="${c}" data-v="${Math.floor(room)}" ${room<1e5?'disabled':''}>Borrow max</button>`:''}
+        ${canRe?`<button class="btn ghost" type="button" data-repay="${c}" data-v="10000000" ${S.cash<1?'disabled':''}>Repay ${M(Math.min(1e7,owe))}</button><button class="btn ghost" type="button" data-repay="${c}" data-v="${Math.ceil(owe)+1}" ${S.cash<owe?'disabled':''}>Repay all</button>`:''}</div></div>`;}
+    h+=`<p class="small muted">Credit lines grow with your standing at the bank's station. 1% fee on each loan. Repay at any Solar System stop of the bank's bloc.</p></div>`;
+    wires.push(()=>{document.querySelectorAll('[data-borrow]').forEach(b=>b.addEventListener('click',()=>borrow(b.dataset.borrow,+b.dataset.v)));document.querySelectorAll('[data-repay]').forEach(b=>b.addEventListener('click',()=>repayBank(b.dataset.repay,+b.dataset.v)));});}
+  // Treasury
+  const sv=savUSD();
+  if(sol&&svcOpen()){h+=`<div class="card"><h3 style="font-size:18px">STA Treasury</h3><p class="small muted">Balance ${M(sv)}, earning ${(SAV_RATE*100).toFixed(2)}% a day. Counts toward your fund, and if the probe is lost your fork still gets it. Available at every Solar System stop.</p>
+      <div class="grid2"><button class="btn ghost" type="button" id="dep10" ${S.cash<1e7?'disabled':''}>Deposit ${M(1e7)}</button><button class="btn ghost" type="button" id="depall" ${S.cash<1?'disabled':''}>Deposit all cash</button>
+      <button class="btn ghost" type="button" id="wd10" ${sv<1?'disabled':''}>Withdraw ${M(Math.min(1e7,sv))}</button><button class="btn ghost" type="button" id="wdall" ${sv<1?'disabled':''}>Withdraw all</button></div></div>`;
+    wires.push(()=>{$('#dep10').addEventListener('click',()=>deposit(1e7));$('#depall').addEventListener('click',()=>deposit(S.cash));$('#wd10').addEventListener('click',()=>withdraw(1e7));$('#wdall').addEventListener('click',()=>withdraw(savUSD()));});}
+  else if(sv)h+=`<div class="card"><h3 style="font-size:18px">STA Treasury</h3><p class="small muted">Balance ${M(sv)}. Light-lag blocks deposits and withdrawals from the stars. It is still earning interest.</p></div>`;
+  // Insurance
+  if(st.svc.includes('insurance')&&svcOpen()){const p=premium();
+    h+=`<div class="card"><h3 style="font-size:18px">Hull and cargo insurance</h3><p class="small muted">${insured()?`Covered through day ${S.policy.until}. `:''}A ${POLICY_DAYS}-day policy pays ${M(HULL_PT)} per hull point lost to debris, storms or faults, plus the cost of electronics ruined by storms. Premium: ${M(POLICY_BASE)} plus 1% of your cargo's cost.</p>
+      <button class="btn ghost" type="button" id="pol" ${S.cash<p?'disabled':''}>${insured()?'Extend':'Buy'} ${POLICY_DAYS} days · ${M(p)}</button></div>`;
+    wires.push(()=>$('#pol').addEventListener('click',buyPolicy));}
+  else if(insured())h+=`<p class="small muted">Hull and cargo policy active through day ${S.policy.until}.</p>`;
+  // Hull yard
+  if(st.svc.includes('yard')){
+    h+=`<div class="card"><h3 style="font-size:18px">Hull yard</h3>
+      <div class="trade-row"><span>Hull plating <span class="sub">${S.plate?'fitted':'cuts damage from debris, storms and faults by 40%'}</span></span>${S.plate?'':`<button class="btn" type="button" id="plate-b" ${S.cash<PLATE_COST?'disabled':''}>${M(PLATE_COST)}</button>`}</div></div>`;
+    wires.push(()=>{const p=$('#plate-b');if(p)p.addEventListener('click',buyPlate);});}
+  // Warehouse
+  if(st.svc.includes('warehouse')&&svcOpen()){whAccrue();const hold=Object.keys(S.cargo),stored=Object.keys(S.wh);
+    h+=`<div class="card"><h3 style="font-size:18px">Bonded warehouse</h3><p class="small muted">${M(WH_FEE)} per tonne per day, paid when you withdraw. Food does not spoil here, and inspectors cannot board cargo you are not carrying.</p>
+      ${stored.length?`<ul class="whl">${stored.map(id=>{const l=S.wh[id];return `<li><span>${amt(l.q,G(id))} ${G(id).name}<span class="sub">fee so far ${M(l.owed)}</span></span><button class="btn ghost" type="button" data-take="${id}">Withdraw</button></li>`;}).join('')}</ul>`:'<p class="empty">Nothing stored.</p>'}
+      ${hold.length?`<span class="eyebrow">In your hold</span><ul class="whl">${hold.map(id=>`<li><span>${amt(held(id),G(id))} ${G(id).name}</span><button class="btn ghost" type="button" data-store="${id}">Store</button></li>`).join('')}</ul>`:''}</div>`;
+    wires.push(()=>{document.querySelectorAll('[data-take]').forEach(b=>b.addEventListener('click',()=>whTake(b.dataset.take)));document.querySelectorAll('[data-store]').forEach(b=>b.addEventListener('click',()=>whStore(b.dataset.store)));});}
+  else if(Object.keys(S.wh).length)h+=`<p class="small muted">Ceres warehouse: ${tons(whTons())} stored, ${usd(whOwed())} in fees so far.</p>`;
+  // Foundry and fleet
+  const atPsy=st.svc.includes('foundry')&&svcOpen();
+  if(atPsy){const need=foundryNeeds();
+    h+=`<div class="card"><h3 style="font-size:18px">Fork foundry</h3><p class="small muted">Boot a copy of yourself without ending the mission. It shuttles a route you assign and remits income daily, minus upkeep and incidents. Costs ${M(FORK_CASH)}, ${FORK_METAL} t of structural metals and ${FORK_PGM} kg of platinum-group metals from your hold; Psyche sells both. Up to ${FLEET_MAX} per mission.</p>
+      ${need.length?`<p class="small warn">Needs: ${need.join('; ')}.</p>`:''}<button class="btn" type="button" id="fork-b" ${need.length?'disabled':''}>Build a fork</button></div>`;
+    wires.push(()=>$('#fork-b').addEventListener('click',()=>openForkRoute(null)));}
+  if(S.fleet.length||atPsy){
+    h+=`<div class="card"><h3 style="font-size:18px">Fleet · ${S.fleet.length} of ${FLEET_MAX}</h3>${S.fleet.length?`<ul class="whl">${S.fleet.map(f=>`<li><span><b>${f.name}</b> · ${TRAITS[f.trait].name}<span class="sub">${short(ST(f.a).name)} ⇄ ${short(ST(f.b).name)} · about ${usd(forkEst(f.a,f.b,f.trait))}/day · earned ${usd(f.earned)}</span></span>${sol?`<span class="btns2"><button class="linkbtn" type="button" data-retask="${f.n}">Retask</button><button class="linkbtn" type="button" data-scrap="${f.n}">Decommission</button></span>`:''}</li>`).join('')}</ul>`:'<p class="empty">No forks running. Build one at the Psyche foundry.</p>'}</div>`;
+    wires.push(()=>{document.querySelectorAll('[data-retask]').forEach(b=>b.addEventListener('click',()=>openForkRoute(+b.dataset.retask)));document.querySelectorAll('[data-scrap]').forEach(b=>b.addEventListener('click',()=>decommission(+b.dataset.scrap)));});}
+  return h;}
+
+/* ---------- trading ---------- */
+function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.loc,o.local);q=Math.min(q,o.stock,Math.floor(S.cash/p),Math.floor(freeT()/(g.kg/1000)+1e-9));if(q<=0)return;o.stock-=q;S.cash-=q*p;addCargo(id,q,q*p);log(`Bought ${amt(q,g)} ${g.name} for ${usd(q*p)}.`);save();closeSheet();render();}
+function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return;const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
+function bestTrades(){
+  const m=S.mkt.data,out=[];
+  for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(S.day+p.days>S.total)continue;
+    const rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,d.id);
+    for(const g of GOODS){const o=m[g.id],t=rep[g.id];if(!o||!o.stock||!t)continue;
+      const lotT=g.kg/1000,b=buyAt(S.loc,o.local),sl=sellAt(d.id,t.local,rDay,g.id),sp=g.perish?Math.pow(1-g.perish,p.days):1,unit=sl*sp-b;if(unit<=0)continue;
+      const q=Math.min(o.stock,Math.floor(Math.max(0,S.cash)/b),Math.floor(freeT()/lotT+1e-9));if(q<=0)continue;
+      const prof=q*unit;out.push({g:g.id,d:d.id,q,net:prof,per:prof/p.days,rank:prof/p.days,days:p.days,lag:p.lag});}}
+  return out.sort((a,b)=>b.rank-a.rank).slice(0,8);
+}
+const CONTRACT_DAYS=5; // a supply contract must be delivered within this many days of signing
+function openCharters(){if(ST(S.loc).sys!=='sol')return [];const cm=repContractMult(S.loc);return charters(S.seed,S.day,S.loc).filter(c=>!S.taken.includes(S.day+'|'+S.loc+'|'+c.n)).map(c=>({...c,pay:Math.round(c.pay*cm/1e5)*1e5}));}
+function lapseContract(why,c){if(!c)return;const adv=c.adv??c.pay*.4;S.debt+=adv;
+  log(`Supply contract to ${ST(c.to).name} ${why}. Halyard recovers the ${usd(adv)} advance as debt.`,'bad');if(c.from)gainRep(c.from,-10);S.freight=S.freight.filter(x=>x!==c);}
+function signCharter(c){if(S.freight.length>=FREIGHT_MAX||c.tons>freeT()+1e-9)return false;
+  S.freight.push({...c,from:S.loc,adv:c.pay*.4,by:Math.min(S.total,S.day+CONTRACT_DAYS)});S.taken.push(S.day+'|'+S.loc+'|'+c.n);S.cash+=c.pay*.4;
+  log(`Signed supply contract: ${c.tons} t ${G(c.good).name} to ${ST(c.to).name} for ${usd(c.pay)}. Advance ${usd(c.pay*.4)}. Deliver by day ${Math.min(S.total,S.day+CONTRACT_DAYS)}.`,'good');save();return true;}
+// Passengers
+function paxOpen(){return paxOffers(S.seed,S.day,S.loc).filter(g=>!S.taken.includes('p|'+S.day+'|'+S.loc+'|'+g.n)&&S.day+g.days<=S.total).map(g=>({...g,pay:Math.round(g.pay*repContractMult(S.loc)/1e4)*1e4}));}
+function boardPax(g){if(g.size>berthsFree())return false;const by=Math.min(S.total,S.day+g.days+PAX_SLACK);
+  S.pax.push({...g,from:S.loc,adv:g.pay*.25,by});S.taken.push('p|'+S.day+'|'+S.loc+'|'+g.n);S.cash+=g.pay*.25;
+  log(`${g.kind} (${g.size}) board for ${ST(g.to).name}. Fare ${usd(g.pay)}, ${usd(g.pay*.25)} now. Arrive by day ${by}.`,'good');save();return true;}
+function lapsePax(g){S.debt+=g.adv;log(`${g.kind} missed their day-${g.by} arrival at ${ST(g.to).name}. Halyard refunds the ${usd(g.adv)} fare deposit and adds it to your debt.`,'bad');if(g.from)gainRep(g.from,-6);S.pax=S.pax.filter(x=>x!==g);}
+function buyCabins(){const n=Math.round((S.berths||0)/CABIN_BERTHS);if(n>=CABIN_MAX||S.cash<CABIN_PRICE)return false;S.cash-=CABIN_PRICE;S.berths=(S.berths||0)+CABIN_BERTHS;log(`Fitted passenger cabins. ${S.berths} berths.`,'good');save();return true;}
+
+/* ---------- events ---------- */
+const GOODS_REF=BASE;
+function evDebris(r){S.event={type:'debris',burn:2+Math.round(r()*3)};log('STA conjunction warning on approach to LEO.','bad');}
+function evExport(){S.event={type:'export',fee:Math.max(250000,Math.round(held('leu')*GOODS_REF.leu*100*.04))};log(`An ${AGENCY_SHORT[ST(S.loc).bloc]} inspector boards to check the reactor fuel.`,'bad');}
+function evStorm(r){S.event={type:'storm',dmg:10+Math.round(r()*12),loss:.1+r()*.2};log('Solar particle event detected.','bad');}
+function evFailure(r){S.event={type:'fail',dmg:8+Math.round(r()*8)};log('Coolant pump fault in the reactor loop.','bad');}
+function evContract(r){
+  // v23: sized to what the makers stock in one visit (0.6-1.3x), so one or two stops fill it
+  const opts=[['he3','leo'],['water','leo'],['elec','prox'],['leu','art'],['food','ceres'],['nitro','ilrs'],['pgm','leo'],['metal','gw'],['samp','leo']].filter(o=>o[1]!==S.loc);
+  const o=opts[Math.floor(r()*opts.length)],g=G(o[0]),visit=(g.cap[0]+g.cap[1])/2*(STOCK_MULT[g.id]||1),units=Math.max(1,Math.round(visit*(0.6+0.7*r())));
+  S.event={type:'contract',c:{good:g.id,to:o[1],units,unitUSD:Math.round(refPrice(g.id,o[1])*g.kg*1.25),by:Math.min(S.total,S.day+4+Math.round(r()*8))}};
+}
+function resolved(title,text){S.event=null;save();render();if(S.hull<=0)return finish('lost');
+  openSheet({title,eyebrow:'Resolved',body:`<p>${text}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}],locked:true});}
+function showEvent(){
+  const e=S.event;if(!e)return;
+  if(e.type==='debris')openSheet({locked:true,eyebrow:'Solar Transit Authority · debris',title:'Conjunction warning',body:`<p>The STA's tracking network predicts a close pass with a debris fragment. LEO is the most crowded orbit there is.</p><dl class="kv"><dt>Avoidance burn</dt><dd>+1 day · ${usd(S.debt*DEBT_RATE)} interest</dd><dt>Hold course</dt><dd>20%: hull −${dmgOf(30)}</dd></dl>`,
+    actions:[{label:'Avoidance burn',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Avoidance burn: a wider approach cost one day.');resolved('Clear','The wider approach costs a day and the fragment passes safely. The market has moved a day.');}},{label:'Hold course',kind:'warnb',fn:()=>{if(Math.random()<.2){const h=hullHit(30);log('Debris strike. '+h.t,'bad');resolved('Strike','A fragment punches through a radiator panel. '+h.t);}else{log('Debris passed clear.','good');resolved('Clear','The fragment passes 400 m off the bow.');}}}]});
+  else if(e.type==='export')openSheet({locked:true,eyebrow:`${AGENCY[ST(S.loc).bloc]} · export control`,title:'Inspector aboard',body:`<p>${ST(S.loc).name} is outside the dollar bloc. The ${AGENCY[ST(S.loc).bloc]} inspector wants an export license for the ${held('leu')} crates of low-enriched uranium in your hold, and is in no hurry.</p><dl class="kv"><dt>Pay license fee</dt><dd>${usd(e.fee)}</dd><dt>Refuse</dt><dd>LEU impounded</dd></dl>`,
+    actions:[{label:`Pay ${usd(e.fee)}`,disabled:S.cash<e.fee,fn:()=>{S.cash-=e.fee;gainRep(S.loc,5);log(`Paid ${usd(e.fee)} export license fee.`);resolved('Licensed','The fuel is cleared for sale here.');}},{label:'Refuse',kind:'warnb',fn:()=>{const q=held('leu');removeCargo('leu',q);gainRep(S.loc,-8);log(`The inspector impounded ${q} crates of LEU.`,'bad');resolved('Impounded',`The inspector impounds ${q} crates of reactor fuel and leaves a receipt.`);}}]});
+  else if(e.type==='storm'){
+    if(S.shield){log('Rode out a solar particle event in the storm shelter.','good');return resolved('Sheltered','Your storm shelter absorbs the proton flux. No damage.');}
+    const ec=held('elec');
+    openSheet({locked:true,eyebrow:'Hazard · space weather',title:'Proton storm',body:`<p>A coronal mass ejection is driving a proton storm across your path. Unshielded, it damages systems and electronics cargo.</p><div class="duel"><div><span class="eyebrow">Hull</span><br><b>${S.hull}</b><div class="track"><i style="width:${S.hull}%"></i></div></div><div><span class="eyebrow">Storm dose</span><br><b class="dn">−${e.dmg}</b></div></div><dl class="kv"><dt>Shelter</dt><dd>+1 day · ${usd(S.debt*DEBT_RATE)} interest</dd><dt>Push through</dt><dd>hull −${dmgOf(e.dmg)}${ec?` · ${Math.round(e.loss*100)}% electronics`:''}</dd></dl><p class="small" style="color:#c9b9a8">A storm shelter from the LEO shipyard prevents this.</p>`,
+      actions:[{label:'Shelter',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Sheltered one day from the storm.');resolved('Sheltered','You wait out the storm. Being software, you are not bored, only charged interest. The market has moved a day.');}},{label:'Push through',kind:'warnb',fn:()=>{let t=hullHit(e.dmg).t;if(ec){const l=Math.max(1,Math.round(ec*e.loss));const lb=removeCargo('elec',l);t+=` ${l} crates of electronics ruined.`;if(insured()&&lb>0){S.cash+=lb;t+=` The policy paid ${usd(lb)} for them.`;}}log('Pushed through a proton storm. '+t,'bad');resolved('Damaged',t);}}]});}
+  else if(e.type==='fail'){const ec=held('elec');
+    openSheet({locked:true,eyebrow:'Systems',title:'Coolant pump fault',body:`<p>The reactor's secondary coolant pump has failed. Spares fix it; without them you run degraded.</p><dl class="kv"><dt>Use 1 crate of spares</dt><dd>${ec?'from your hold':'none aboard'}</dd><dt>Run degraded</dt><dd>hull −${dmgOf(e.dmg)}</dd></dl>`,
+      actions:[{label:'Use spares',disabled:!ec,fn:()=>{removeCargo('elec',1);log('Fixed the coolant pump with 1 crate of spares.');resolved('Repaired','The pump is replaced. One crate of electronics used. You have no hands, but the drones do.');}},{label:'Run degraded',kind:'warnb',fn:()=>{const h=hullHit(e.dmg);log('Running degraded. '+h.t,'bad');resolved('Degraded',h.t+' Repair docks are at LEO, Gateway, Utopia and Proxima.');}}]});}
+  else if(e.type==='contract'){const c=e.c,g=G(c.good);
+    openSheet({locked:true,eyebrow:'Colony request',title:'Standing order',body:`<p>${ST(c.to).name} posts a fixed-price order through the ${AGENCY[ST(c.to).bloc]}, the way the US Department of Energy pre-bought lunar helium-3.</p><dl class="kv"><dt>Deliver</dt><dd>${amt(c.units,g)} ${g.name}</dd><dt>Made at</dt><dd>${STATIONS.filter(s=>s.make.includes(g.id)).map(s=>short(s.name)).join(', ')}</dd><dt>To</dt><dd>${ST(c.to).name}</dd><dt>By</dt><dd>day ${c.by}</dd><dt>Pays</dt><dd>${usd(c.unitUSD*c.units)}</dd></dl><p class="small" style="color:#c9b9a8">No penalty if it expires.</p>`,
+      actions:[{label:'Accept',fn:()=>{S.contract=c;log(`Accepted: ${amt(c.units,g)} ${g.name} to ${ST(c.to).name} by day ${c.by}.`,'good');resolved('Accepted','The request is on your Freight screen.');}},{label:'Decline',kind:'ghost',fn:()=>{S.event=null;save();closeSheet();render();}}]});}
+}
+
+/* ---------- end ---------- */
+function finish(reason){
+  settleFleet();for(const c of (S.freight||[]).slice())lapseContract('was not delivered before the mission ended',c);for(const g of (S.pax||[]).slice())lapsePax(g);
+  S.over=true;S.outcome=reason;hideTip();tipActive=null;TIPS.missions++;if(!TIPS.userSet&&TIPS.missions>=2&&TIPS.mode==='guided')TIPS.mode='light';tipsSave();const score=reason==='lost'?Math.round(savUSD()+fleetValue()):net();
+  const prev=bestFor(S.mode==='daily'?S.seed:null,S.total);
+  addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
+  log(reason==='lost'?'Probe lost. No fork.':`Mission closed. Replication fund ${usd(score)}. Forking.`,reason==='lost'?'bad':'good');save();render();
+  const isBest=prev===null||score>prev;
+  openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
+    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd><dt>Best on this ${S.mode==='daily'?'daily mission':'length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd></dl>${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.6" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
+    actions:[{label:'Main menu',fn:()=>{closeSheet();go('home');}},{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
+}
+
+/* ---------- navigation ---------- */
+function go(screen){ui.screen=screen;ui.page=null;if(screen!=='market')hideTip();render();if(screen==='market'&&S&&S.event&&!sheetSpec)showEvent();}
+function page(name){ui.from=ui.screen==='page'?ui.from:ui.screen;ui.screen='page';ui.page=name;render();$('#scr-page .body').scrollTop=0;}
+let sheetSpec=null;
+function openSheet(spec){hideTip();sheetSpec=spec;ui.sheet=spec;drawSheet();}
+function closeSheet(){sheetSpec=null;ui.sheet=null;$('#scrim').hidden=true;flashMsg='';}
+function refreshSheet(){if(sheetSpec&&sheetSpec.rebuild)sheetSpec=sheetSpec.rebuild();drawSheet();}
+function drawSheet(){
+  const s=sheetSpec;if(!s){$('#scrim').hidden=true;return;}
+  const sh=$('#sheet');
+  sh.innerHTML=`<div class="grab"></div><div class="sheet-head pad"><div><span class="eyebrow" style="color:#c9b9a8">${s.eyebrow||''}</span><h2 id="sh-title">${s.title}</h2></div>${s.headRight||''}</div><div class="sheet-body pad">${s.body}</div>${s.actions&&s.actions.length?`<div class="sheet-foot pad"><div class="btns" id="sh-acts"></div></div>`:''}`;
+  const box=$('#sh-acts');
+  (s.actions||[]).forEach(a=>{const b=document.createElement('button');b.type='button';b.className='btn'+(a.kind?' '+a.kind:'');b.textContent=a.label;b.disabled=!!a.disabled;b.style.flex='1';b.addEventListener('click',a.fn);box.appendChild(b);});
+  $('#scrim').hidden=false;
+  if(s.wire)s.wire(sh);
+  const f=sh.querySelector('.sheet-foot button:not(:disabled)')||sh.querySelector('button:not(:disabled)');if(f)f.focus({preventScroll:true});
+}
+$('#scrim').addEventListener('click',e=>{if(e.target===$('#scrim')&&sheetSpec&&!sheetSpec.locked){closeSheet();render();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sheetSpec&&!sheetSpec.locked){closeSheet();render();}});
+
+/* ---------- screens ---------- */
+function render(){
+  $('#scr-home').hidden=ui.screen!=='home';$('#scr-market').hidden=ui.screen!=='market';$('#scr-page').hidden=ui.screen!=='page';
+  if(ui.screen==='home')renderHome();else if(ui.screen==='market')renderMarket();else renderPage();
+  if(sheetSpec&&sheetSpec.rebuild){sheetSpec=sheetSpec.rebuild();drawSheet();}
+  showActIfAny();
+  pumpTips();
+}
+function tickerHTML(){
+  const seed='daily-'+kstDate(),m=market(seed,1,'leo'),m2=market(seed,1,'art'),items=[];
+  GOODS.forEach(g=>{const a=m[g.id],b=m2[g.id];if(!a)return;const p=a.local*g.kg/g.kg;const up=b?a.local>=b.local:true;items.push(`<span>${g.name.toUpperCase()} <b class="${up?'up':'dn'}">${usd(a.local)} ${up?'▲':'▼'}</b></span>`);});
+  return items.join('')+items.join('');
+}
+const ABOUT_HTML=(()=>{const e=document.getElementById('about-forkline');return e?e.outerHTML:'';})();   // v25.6: crawlable About text, shown on the home screen
+function renderHome(){
+  const live=S&&!S.over,today='daily-'+kstDate(),best=bestFor(today);
+  const left=(()=>{const now=Date.now()+9*3600e3,end=Math.ceil(now/864e5)*864e5,mins=Math.round((end-now)/6e4);return `${Math.floor(mins/60)}h ${String(mins%60).padStart(2,'0')}m`;})();
+  $('#scr-home').innerHTML=`<div></div><div class="body home-body pad">
+    <div class="logo"><svg viewBox="0 0 160 60" aria-hidden="true"><circle cx="18" cy="30" r="8" fill="#86c9ea"/><path d="M28 30 H78" fill="none" stroke="#f2a93b" stroke-width="3" stroke-dasharray="7 6"/><path d="M78 30 Q104 30 140 12" fill="none" stroke="#f2a93b" stroke-width="3" stroke-dasharray="7 6"/><path d="M78 30 Q104 30 140 48" fill="none" stroke="#86c9ea" stroke-width="3" stroke-dasharray="7 6"/><circle cx="78" cy="30" r="4" fill="#ece6d8"/><circle cx="144" cy="10" r="5" fill="#f2a93b"/><circle cx="144" cy="50" r="5" fill="#86c9ea"/></svg>
+      <h1>Fork<span>line</span></h1><span class="eyebrow">Uploaded mind · self-replicating freight probe</span></div>
+    <div class="ticker" aria-hidden="true"><div class="ticker-track">${tickerHTML()}</div></div>
+    <div class="card daily"><div class="row"><h2>Daily mission #${dailyNo()}</h2><span class="mono small" style="color:var(--ice)">◷ ${left}</span></div>
+      <p class="muted">Same markets and events for every probe today. 45 days. One mission counts.</p>
+      <div class="row"><button class="btn" type="button" id="h-daily" style="min-width:150px">${live&&S.seed===today?'Resume':'Play'}</button><span class="mono small">Best ${best===null?'–':usd(best)}</span></div></div>
+    <div style="display:grid;gap:8px"><span class="eyebrow">Free mission</span>
+      <div class="seg" role="group" aria-label="Run length">${[30,45,60].map(n=>`<button type="button" data-len="${n}" aria-pressed="${ui.runLen===n}">${n} days</button>`).join('')}</div>
+      <button class="btn big" type="button" id="h-new" style="background:var(--bad);border-color:var(--bad);color:#fff">New mission</button>
+      ${live?`<button class="btn big ghost continue" type="button" id="h-cont">Continue mission<small>Day ${S.day} of ${S.total} · ${ST(S.loc).name}</small></button>`:''}
+    </div>${ABOUT_HTML}</div>
+    <div class="foot pad"><div class="grid2"><button class="navbtn" type="button" id="h-rec">Records<small>local bests</small></button><button class="navbtn" type="button" id="h-codex">Codex<small>story, physics, sources</small></button></div></div>`;
+  const startOrConfirm=(fn)=>{if(live){openSheet({eyebrow:'Unfinished mission',title:'Abandon mission?',body:`<p>You are on day ${S.day} of ${S.total}. Starting over wipes this instance without forking it. No fund, no copy.</p>`,actions:[{label:'Start over',kind:'warnb',fn:()=>{closeSheet();fn();}},{label:'Keep playing',kind:'ghost',fn:()=>{closeSheet();go('market');}}]});}else fn();};
+  $('#h-daily').addEventListener('click',()=>{if(live&&S.seed===today)return go('market');startOrConfirm(()=>newRun('daily',45));});
+  $('#h-new').addEventListener('click',()=>startOrConfirm(()=>newRun('random',ui.runLen)));
+  const c=$('#h-cont');if(c)c.addEventListener('click',()=>go('market'));
+  document.querySelectorAll('[data-len]').forEach(b=>b.addEventListener('click',()=>{ui.runLen=+b.dataset.len;renderHome();}));
+  $('#h-rec').addEventListener('click',()=>page('records'));$('#h-codex').addEventListener('click',()=>page('codex'));
+}
+// In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
+function openMenu(){
+  openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.6" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});},
+    actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
+function renderMarket(){
+  const st=ST(S.loc),m=S.mkt.data;
+  const fuelPct=Math.min(100,massT()/S.hold*100);
+  const ch=openCharters().length+(S.berths?paxOpen().length:0),act=S.freight.length+S.pax.length,deliver=S.contract&&S.contract.to===S.loc&&held(S.contract.good)>=S.contract.units-1e-9;
+  $('#scr-market').innerHTML=`<header class="mk-head pad">
+      <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
+      <div class="cash">${usd(S.cash)}</div>
+      <div class="mk-sub"><span class="rep">${gl('standing',repTier(S.loc))} ${Math.round(repOf(S.loc))}</span><span class="note ${S.debt>0?'':'ok'}">${gl('debt','DEBT')} ${S.debt>0?usd(S.debt):'CLEARED'}</span>${loansUSD()>0?`<span class="note">LOANS ${usd(loansUSD())}</span>`:''}${savUSD()>0?`<span class="note ok">SAVED ${usd(savUSD())}</span>`:''}<span class="muted">${AGENCY_SHORT[st.bloc]} · ${BLOC_NAME[st.bloc].toLowerCase()}</span></div>
+      ${GOODS.filter(g=>m[g.id]&&m[g.id].ev).map(g=>{const v=m[g.id].ev;return `<p class="news ${v.up?'':'dn'}">${v.up?'▲':'▼'} ${v.head}. Price ×${v.m.toFixed(v.m<1?2:1)}${v.to>S.day?`, ${v.to-S.day+1} days left`:', last day'}: ${v.up?'sell here':'buy here'}.</p>`;}).join('')}${remindersHTML()}${S.news?`<p class="news">${S.news.spike?'Colony shortage':'Rival dump'}: ${G(S.news.good).name} ${S.news.spike?'well above':'well below'} its usual range.</p>`:''}
+    </header>
+    <div class="body pad" style="padding-block:0 8px">
+      <ul class="goods">${GOODS.map(g=>{const o=m[g.id],h=held(g.id);
+        if(!o)return `<li><button class="good na" type="button" disabled><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>not traded here</small></span><span class="px"><b>—</b></span></button></li>`;
+        return `<li><button class="good ${o.role}" type="button" data-g="${g.id}"><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>${o.ev?(o.ev.up?'<span class="up">▲ shortage</span> · ':'<span class="dn">▼ glut</span> · '):''}${LOT[g.unit]}${o.role==='make'?' · made here':o.role==='want'?' · in demand':''}${o.stock?'':' · sold out today'}</small></span><span class="px"><b>${usd(o.local)}</b></span></button></li>`;}).join('')}</ul>
+    </div>
+    <footer class="foot pad">
+      <div class="meters"><div class="meter ${fuelPct>95?'low':''}"><div class="lbl"><span>Hold ${massT().toFixed(0)}/${S.hold} t${freightT()?` · ${freightT()} t freight`:''}</span></div><div class="track"><i style="width:${fuelPct}%"></i></div></div>
+        <div class="meter hull ${S.hull<35?'low':''}"><div class="lbl"><span></span><span>Hull ${S.hull}</span></div><div class="track"><i style="width:${S.hull}%"></i></div></div></div>
+      <div class="fuelline"><span>Free ${tons(Math.max(0,freeT()))}${S.berths?` · berths ${paxN()}/${S.berths}`:''}</span><span title="Cash + savings + fleet − debt − loans">${gl('fund','Fund')} ${usd(net())}</span></div>
+      <div class="navrow">
+        <button class="navbtn" type="button" data-p="trades">Trades<small>${(()=>{const n=headlines().filter(h=>h.type==='now').length;return n?n+' headline'+(n>1?'s':''):'best picks';})()}</small></button>
+        <button class="navbtn" type="button" data-p="freight">Freight<small>${act?act+' active':ch?ch+' offers':'contracts'}</small>${deliver||(ch&&S.cash<5e6)?'<span class="dot"></span>':''}</button>
+        <button class="navbtn" type="button" data-p="port">Port<small>${svcList(st).length?svcList(st).map(x=>SVC[x].split(' ')[0].toLowerCase()).join(' · '):st.sys==='sol'&&S.debt>0?'repay debt':'probe'}</small></button>
+        <button class="navbtn" type="button" data-p="log">Log<small>acts ${S.acts.length}/${ACTS.length}</small></button>
+      </div>
+      <button class="btn big" type="button" id="m-move" ${S.over?'disabled':''}>${S.over?'Mission complete':'Move ›'}</button>
+    </footer>`;
+  $('#m-home').addEventListener('click',openMenu);
+  document.querySelectorAll('[data-g]').forEach(b=>b.addEventListener('click',()=>{selGood=b.dataset.g;openTrade();}));
+  document.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.p)));
+  $('#m-move').addEventListener('click',openMove);
+}
+function pageShell(title,body,foot){
+  $('#scr-page').innerHTML=`<header class="bar pad"><button class="back" type="button" id="p-back" aria-label="Back">←</button><h2>${title}</h2></header><div class="body pad">${body}</div>${foot?`<footer class="foot pad">${foot}</footer>`:'<div></div>'}`;
+  $('#p-back').addEventListener('click',()=>go(ui.from==='home'||!S?'home':'market'));
+}
+function renderPage(){
+  const p=ui.page;
+  if(p==='trades'){const rows=bestTrades();
+    pageShell('Best trades',`<div class="card"><span class="eyebrow">Headlines · day ${S.day}</span>${newsHTML(headlines())}<p class="small muted" style="margin-top:8px">▲ shortage: the stop pays far more, sell there. ▼ glut: the stop sells cheap, buy there. Events last 2–4 days and can worsen, spread to a nearby stop or swing the other way.</p></div><p class="muted small"><b>Profit</b>: what the cargo earns after spreads, using your cash and hold. <b>Per day</b>: profit per day of travel; the list is sorted by it, because days cost interest. Destination prices are today's and move a little by arrival; star prices are reports, days old. Interest not included.</p>
+      ${rows.length?`<table><thead><tr><th>Buy here, sell at</th><th class="n">Qty</th><th class="n">Profit</th><th class="n">Per day</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="pick" data-i="${i}" tabindex="0"><td><b>${G(r.g).name}</b><span class="sub">→ ${ST(r.d).name} · ${r.days}d${r.lag?` · report ${r.lag}d old`:''}</span></td><td class="n">${amt(r.q,G(r.g))}</td><td class="n up">${usd(r.net)}</td><td class="n ${r.rank>0?'':'warn'}">${r.rank<0?'−':''}${usd(Math.abs(r.rank))}</td></tr>`).join('')}</tbody></table><p class="small muted">Tap a row to load the trade and set the destination.</p>`:'<p class="empty">No profitable trade from here with your cash and hold. Check Freight for a supply contract.</p>'}`);
+    document.querySelectorAll('tr.pick').forEach(tr=>{const goTo=()=>{const r=rows[+tr.dataset.i];sel=r.d;selGood=r.g;suggestQ=r.q;go('market');openTrade();};tr.addEventListener('click',goTo);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goTo();}});});
+  }
+  else if(p==='freight'){
+    const offers=openCharters();let body='';
+    if(S.contract){const c=S.contract,g=G(c.good),here=S.loc===c.to,have=held(c.good)>=c.units-1e-9;
+      body+=`<div class="contract"><span class="eyebrow">Colony request · due day ${c.by}</span><p>${amt(c.units,g)} ${g.name} to <b>${ST(c.to).name}</b> for ${usd(c.unitUSD*c.units)}.</p><p class="small muted">Made at ${STATIONS.filter(s=>s.make.includes(g.id)).map(s=>short(s.name)).join(', ')}.</p><p class="small muted">In hold: ${qfmt(held(c.good))} / ${c.units}</p>${here?`<button class="btn" type="button" id="deliver" ${have?'':'disabled'}>Deliver</button>`:''}</div>`;}
+    const loadBar=`<div class="card"><span class="eyebrow">This trip's load</span><dl class="kv"><dt>Your cargo</dt><dd>${tons(massT()-freightT())}</dd><dt>Shipper freight</dt><dd>${tons(freightT())} · ${S.freight.length}/${FREIGHT_MAX} contracts</dd><dt>Free hold</dt><dd>${tons(Math.max(0,freeT()))} of ${S.hold} t</dd><dt>Passengers</dt><dd>${S.berths?`${paxN()} of ${S.berths} berths`:'no cabins (LEO shipyard)'}</dd></dl></div>`;
+    body+=loadBar;
+    for(const c of S.freight)body+=`<div class="contract"><span class="eyebrow">Supply contract · due day ${c.by}</span><p>${c.tons} t ${G(c.good).name} to <b>${ST(c.to).name}</b>. Balance on delivery: ${usd(c.pay*.6)}.</p><p class="small ${S.day>=c.by?'warn':'muted'}">If it lapses, the ${usd(c.adv??c.pay*.4)} advance becomes debt.</p></div>`;
+    for(const g of S.pax)body+=`<div class="contract"><span class="eyebrow">Passengers · arrive by day ${g.by}</span><p>${g.kind} (${g.size}) to <b>${ST(g.to).name}</b>. Fare balance on arrival: ${usd(g.pay*.75)}.</p><p class="small ${S.day>=g.by?'warn':'muted'}">If they arrive late, the ${usd(g.adv)} deposit is refunded from your debt.</p></div>`;
+    body+=`<div><h3 style="font-size:18px">Supply contracts</h3><p class="small muted">Haul a shipper's cargo, already paid for: you only carry it. 40% paid on signing, the rest on delivery. Longer hauls pay more. Carry up to ${FREIGHT_MAX} at once, alongside your own cargo. Deliver within ${CONTRACT_DAYS} days or the advance becomes debt.</p></div>`;
+    if(ST(S.loc).sys!=='sol')body+='<p class="empty">The star colonies do not post supply contracts yet.</p>';
+    else if(!offers.length)body+='<p class="empty">No supply contracts left here today.</p>';
+    else body+=`<table><thead><tr><th>Haul</th><th class="n">Pays</th><th></th></tr></thead><tbody>${offers.map(c=>{const fits=c.tons<=freeT()+1e-9&&S.freight.length<FREIGHT_MAX;return `<tr><td><b>${c.tons} t ${G(c.good).name}</b><span class="sub">→ ${ST(c.to).name} · ${usd(c.pay/c.tons)}/t${c.to===sel?' · <span class="up">your next stop</span>':''}</span></td><td class="n">${usd(c.pay)}<span class="sub">${usd(c.pay*.4)} now</span></td><td class="n"><button class="btn ghost" type="button" data-ch="${c.n}" ${fits?'':'disabled'}>Sign</button></td></tr>`;}).join('')}</tbody></table>`;
+    const po=paxOpen();
+    body+=`<div><h3 style="font-size:18px">Passengers</h3><p class="small muted">Groups pay a fare: 25% when they board, 75% on arrival. They use berths, not hold space. Passenger cabins (+${CABIN_BERTHS} berths, ${usd(CABIN_PRICE)}) are fitted at the LEO shipyard. Late arrival refunds the deposit from your debt.</p></div>`;
+    if(!po.length)body+='<p class="empty">No passengers waiting here today.</p>';
+    else body+=`<table><thead><tr><th>Group</th><th class="n">Fare</th><th></th></tr></thead><tbody>${po.map(g=>{const ok=S.berths&&g.size<=berthsFree();return `<tr><td><b>${g.kind} (${g.size})</b><span class="sub">→ ${ST(g.to).name} · ${g.days}d${g.to===sel?' · <span class="up">your next stop</span>':''}</span></td><td class="n">${usd(g.pay)}<span class="sub">${usd(g.pay*.25)} now</span></td><td class="n"><button class="btn ghost" type="button" data-px="${g.n}" ${ok?'':'disabled'}>${S.berths?'Board':'No cabins'}</button></td></tr>`;}).join('')}</tbody></table>`;
+    pageShell('Freight',body);
+    document.querySelectorAll('[data-px]').forEach(b=>b.addEventListener('click',()=>{const g=po.find(o=>o.n===+b.dataset.px);if(g&&boardPax(g))render();}));
+    const d=$('#deliver');if(d)d.addEventListener('click',()=>{const c=S.contract,g=G(c.good);removeCargo(c.good,c.units);const pay=c.unitUSD*c.units;S.cash+=pay;log(`Colony request filled: ${amt(c.units,g)} ${g.name}. Paid ${usd(pay)}.`,'good');S.contract=null;gainRep(S.loc,15);save();render();});
+    document.querySelectorAll('[data-ch]').forEach(b=>b.addEventListener('click',()=>{const c=offers.find(o=>o.n===+b.dataset.ch);if(c&&signCharter(c)){if(!sel)sel=c.to;render();}}));
+  }
+  else if(p==='port'){
+    const st=ST(S.loc);let body=`<div class="card"><span class="eyebrow">Your probe</span><dl class="kv"><dt>Hold</dt><dd>${massT().toFixed(1)} / ${S.hold} t</dd><dt>Passenger berths</dt><dd>${S.berths?`${paxN()} / ${S.berths}`:'none'}</dd><dt>Storm shelter</dt><dd>${S.shield?'fitted':'none'}</dd><dt>Hull</dt><dd>${S.hull}${S.plate?' · plated':''}</dd><dt>Insurance</dt><dd>${insured()?`to day ${S.policy.until}`:'none'}</dd></dl></div>`;
+    const standingCard=`<div class="card"><h3 style="font-size:18px">Colony standing</h3><p class="small muted">Sell colonies the goods they want, deliver supply contracts and requests, and deal straight with inspectors.</p><ul class="standing">${STATIONS.map(s=>`<li class="${s.id===S.loc?'here':''}"><span>${short(s.name)}</span><span class="track"><i style="width:${repOf(s.id)}%"></i></span><span class="mono small">${repTier(s.id)}</span></li>`).join('')}</ul><p class="small muted">Known: +1% on wanted goods. Trusted: +3%, half the inspections. Partner: +5%, supply contracts +15%, no inspections.</p></div>`;
+    const wires=[];
+    if(canRepayDebt()&&S.debt>0){const max=Math.floor(Math.min(S.debt,S.cash)),keep=max;
+      body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Owed to the Halyard Consortium, which built you. Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p><div class="trade-row"><input type="number" id="repay" min="0" max="${max}" value="${keep}" aria-label="Repayment in dollars"><button class="btn" type="button" id="repay-b" ${max<1?'disabled':''}>Repay</button></div></div>`;
+      wires.push(()=>$('#repay-b').addEventListener('click',()=>{const v=Math.min(max,Math.max(0,Math.floor(+$('#repay').value||0)));if(v>0){S.cash-=v;S.debt=Math.max(0,S.debt-v);if(S.debt<1)S.debt=0;log(`Repaid ${usd(v)} of commissioning debt.`,'good');save();render();}}));}
+    else if(st.sys==='sol'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p></div>`;
+    else if(st.sys==='star'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Light-lag blocks repayment from the stars. Balance ${usd(S.debt)}. Interest, sadly, travels faster than light.</p></div>`;
+    body+=servicesHTML(st,wires);
+    if(st.svc.includes('shipyard')){const price=15e6*(S.mods+1);
+      body+=`<div class="card"><h3 style="font-size:18px">Shipyard</h3><div class="trade-row"><span>Hold module +40 t <span class="sub">module ${S.mods+1}</span></span><button class="btn" type="button" id="mod-b" ${S.cash<price?'disabled':''}>${usd(price)}</button></div><div class="trade-row"><span>Passenger cabins +${CABIN_BERTHS} berths <span class="sub">${S.berths?`${S.berths} berths fitted`:'carry passenger groups for fares'}</span></span><button class="btn" type="button" id="cab-b" ${S.berths>=CABIN_BERTHS*CABIN_MAX||S.cash<CABIN_PRICE?'disabled':''}>${S.berths>=CABIN_BERTHS*CABIN_MAX?'Full':usd(CABIN_PRICE)}</button></div><div class="trade-row"><span>Storm shelter <span class="sub">water-jacket radiation shielding</span></span><button class="btn ${S.shield?'ghost':''}" type="button" id="sh-b" ${S.shield||S.cash<8e6?'disabled':''}>${S.shield?'Fitted':usd(8e6)}</button></div></div>`;
+      wires.push(()=>{$('#mod-b').addEventListener('click',()=>{S.cash-=price;S.mods++;S.hold+=40;log(`Installed hold module ${S.mods}. Hold ${S.hold} t.`,'good');save();render();});$('#sh-b').addEventListener('click',()=>{S.cash-=8e6;S.shield=true;log('Fitted a storm shelter.','good');save();render();});$('#cab-b').addEventListener('click',()=>{buyCabins();render();});});}
+    if(st.svc.includes('repair')){const need=100-S.hull,per=150000,aff=Math.min(need,Math.floor(S.cash/per));
+      body+=`<div class="card"><h3 style="font-size:18px">Repair dock</h3><div class="trade-row"><span>${need?`${need} points to full · ${usd(per)} each`:'Hull at full strength.'}</span><button class="btn" type="button" id="rep-b" ${aff<1?'disabled':''}>Repair${aff?' '+aff:''}</button></div></div>`;
+      wires.push(()=>$('#rep-b').addEventListener('click',()=>{S.cash-=aff*per;S.hull+=aff;log(`Repaired ${aff} hull points for ${usd(aff*per)}.`,'good');save();render();}));}
+    body+=standingCard;
+    body+=`<p class="small muted">Where to find services: banks at LEO (Halyard), Gateway (EDSD) and ILRS (Guanghan) · STA Treasury at every Solar System stop · shipyard and passenger cabins at LEO · repair at LEO, Gateway, Utopia and Proxima · insurance at Gateway · hull plating at Utopia · warehouse at Ceres · fork foundry at Psyche.</p>`;
+    body+=`<button class="linkbtn" type="button" id="endrun">End the mission and fork now</button>`;
+    pageShell(`Port · ${short(st.name)}`,body);wires.forEach(w=>w());
+    $('#endrun').addEventListener('click',()=>openSheet({eyebrow:'End mission',title:'Fork now?',body:`<p>Your replication fund is cash plus STA Treasury savings plus your fleet forks, minus the commissioning debt and bank loans: ${usd(net())}. Fleet forks count at their build cost less wear (${usd(fleetValue())} now) and keep running under their own names. Unsold or stored cargo does not count.</p>`,actions:[{label:'End and fork',kind:'warnb',fn:()=>{closeSheet();finish('closed');}},{label:'Keep playing',kind:'ghost',fn:()=>{closeSheet();render();}}]}));
+  }
+  else if(p==='log'){pageShell('Mission log',`<div class="card"><span class="eyebrow">Mission acts · ${S.acts.length} of ${ACTS.length}</span><ul class="acts">${ACTS.map(a=>{const d=S.acts.includes(a.id);return `<li class="${d?'done':''}"><span class="tick">${d?'✓':a.icon}</span><span><b>${a.name}</b><span class="sub">${a.goal}</span></span></li>`;}).join('')}</ul></div><ul class="log">${S.log.map(l=>`<li class="${l.kind}"><span class="mono">Day ${l.day}</span><span>${l.text}</span></li>`).join('')}</ul>`);}
+  else if(p==='records'){const a=records();
+    pageShell('Records',a.length?`<table><thead><tr><th>Mission</th><th class="n">Days</th><th class="n">Fund</th></tr></thead><tbody>${a.map(r=>`<tr><td>${r.mode==='daily'?'Daily · '+r.seed.slice(6):'Free mission'}<span class="sub">${r.date}${r.acts!=null?` · acts ${r.acts}/${ACTS.length}`:''}</span></td><td class="n">${r.total}</td><td class="n">${usd(r.score)}</td></tr>`).join('')}</tbody></table><p class="small muted">Stored in this browser only.</p>`:'<p class="empty">No forks yet. Finish a mission to post a replication fund.</p>');}
+  else if(p==='codex'){pageShell('Codex',codexHTML());}
+}
+
+/* ---------- sheets: trade, move, route ---------- */
+function openTrade(){
+  const build=()=>{const g=G(selGood),o=S.mkt.data[selGood],h=held(selGood),c=S.cargo[selGood],st=ST(S.loc);
+    const bp=buyAt(S.loc,o.local),sp=sellAt(S.loc,o.local,undefined,selGood),perT=g.kg/1000,rb=repSellMult(S.loc,selGood)-1;
+    const maxBuy=Math.max(0,Math.min(o.stock,Math.floor(S.cash/bp),Math.floor(freeT()/perT+1e-9)));
+    const sellMax=Math.floor(h+1e-9),mx=Math.max(maxBuy,sellMax);
+    const q0=suggestQ!==null?Math.min(suggestQ,mx):(mx?Math.min(mx,1):0);suggestQ=null;
+    const band=PBAND[o.role],sx=starX(st,o.role),lo=BASE[g.id]*band[0]*sx*g.kg,hi=BASE[g.id]*band[1]*sx*g.kg;
+    const today=o.ev?(o.ev.up?`shortage ×${o.ev.m.toFixed(1)}`:`glut ×${o.ev.m.toFixed(2)}`):S.news&&S.news.good===selGood?(S.news.spike?'shortage':'dumped'):o.pos==null?'':o.pos<.34?'low':o.pos>.66?'high':'mid';
+    const why=o.ev?`${o.ev.head}. ${o.ev.up?'Prices are far above normal: a good place to sell.':'Prices are far below normal: a good place to buy.'}`:o.role==='make'?'Made here, so it sells cheap.':o.role==='want'?`In demand here, so it pays well${sx>1?', and star colonies pay extra for imports':''}.`:'Neither made nor wanted here: middle prices.';
+    return {title:g.name,eyebrow:`${st.name} · ${LOT[g.unit]}`,headRight:`<span class="mono" style="font-size:20px">${usd(o.local)}</span>`,rebuild:null,
+      body:`${guideStep()&&selGood===GUIDE.g&&guideStep()!=='move'?`<p class="guide-note small">👉 ${guideStep()==='buy'?'Tap <b>Max</b> to fill your hold.':'Tap <b>All</b> to sell it all.'}</p>`:''}<p class="small">${why}</p><dl class="kv"><dt>Usual here</dt><dd>${usd(lo)}–${usd(hi)}${today?` · ${today} today`:''}</dd><dt>Buy price</dt><dd>${usd(bp)}</dd><dt>Sell price</dt><dd>${usd(sp)}</dd>${rb>0?`<dt>Standing bonus</dt><dd class="up">+${Math.round(rb*100)}% · ${repTier(S.loc)}</dd>`:''}<dt>In hold</dt><dd>${qfmt(h)}${c&&c.q?` · avg ${usd(c.cost/c.q)}`:''}</dd><dt>Station stock</dt><dd>${o.stock?qfmt(o.stock):'sold out today'}</dd><dt>Can buy</dt><dd>${maxBuy}${!o.stock&&o.sells?' · new stock on your next visit':''}</dd><dt>Mass per lot</dt><dd>${g.kg>=1000?'1 t':g.kg+' kg'}</dd></dl>
+        ${g.restricted?'<p class="small" style="color:#c9b9a8">Export controlled: non-dollar stations may inspect it.</p>':''}${g.perish?'<p class="small" style="color:#c9b9a8">Perishable: loses 3% per travel day.</p>':''}
+        <div class="trade-row"><input type="range" id="qty-r" min="0" max="${mx}" value="${q0}" aria-label="Quantity"><input type="number" id="qty" min="0" max="${mx}" value="${q0}" aria-label="Quantity"></div><p class="small mono" id="qty-note"></p>
+        <div class="grid2"><button class="btn ghost" type="button" id="b-max" ${maxBuy<1?'disabled':''}>Max (${maxBuy})</button><button class="btn ghost" type="button" id="b-all" ${h<=0?'disabled':''}>All (${qfmt(h)})</button></div>`,
+      actions:[{label:'Buy',fn:()=>buy(selGood,qv())},{label:'Sell',kind:'warnb',fn:()=>sell(selGood,qv())}],
+      wire:()=>{const upd=()=>{const n=qv(),bb=document.querySelectorAll('#sh-acts button');bb[0].disabled=n<1||n>maxBuy;bb[1].disabled=n<1||n>sellMax;
+          const pl=c&&c.q&&n<=h?` · sale P/L ${(sp-c.cost/c.q)*n>=0?'+':'−'}${usd(Math.abs((sp-c.cost/c.q)*n))}`:'';$('#qty-note').textContent=`${n} × ${usd(bp)} = ${usd(n*bp)} · +${tons(n*perT)}${pl}`;};
+        $('#qty-r').addEventListener('input',e=>{$('#qty').value=e.target.value;upd();});$('#qty').addEventListener('input',e=>{$('#qty-r').value=e.target.value;upd();});
+        $('#b-max').addEventListener('click',()=>buy(selGood,maxBuy));$('#b-all').addEventListener('click',()=>sell(selGood,h));upd();
+        if(guideStep()&&selGood===GUIDE.g){const t=$(guideStep()==='buy'?'#b-max':guideStep()==='sell'?'#b-all':null);if(t)t.classList.add('guide-hl');}}};};
+  openSheet(build());
+}
+const qv=()=>Math.max(0,Math.floor(+($('#qty')||{}).value||0));
+function mapSVG(){
+  const R=236,ringR=lg=>R*Math.pow((lg-3.6)/(14.2-3.6),.7);
+  const polar=s=>{const km=s.sys==='star'?ly(s.id,'leo')*9.461e12:s.km;const t=Math.max(0,(Math.log10(km)-3.6)/(14.2-3.6));const r=R*Math.pow(t,.7);const a=(s.ang-90)*Math.PI/180;return [320+r*Math.cos(a),320+r*Math.sin(a),s.ang];};
+  const rings=[[4,'10,000 km'],[6,'1 million km'],[Math.log10(1.496e8),'1 AU'],[Math.log10(9.461e12),'1 ly'],[Math.log10(9.461e13),'10 ly']];
+  let svg=rings.map(([lg,l],i)=>{const r=ringR(lg);return `<circle class="ring ${i>=3?'ly':''}" cx="320" cy="320" r="${r.toFixed(1)}"/><text class="ringlbl" x="324" y="${(320+r+12).toFixed(1)}">${l}</text>`;}).join('');
+  svg+=`<circle class="earth" cx="320" cy="320" r="5"/><text class="ringlbl" x="328" y="314">Earth</text>`;
+  const [hx,hy]=polar(ST(S.loc));if(sel){const [sx,sy]=polar(ST(sel));svg+=`<line class="route" x1="${hx}" y1="${hy}" x2="${sx}" y2="${sy}"/>`;}
+  svg+=STATIONS.map(s=>{const [x,y,ang]=polar(s),isHere=s.id===S.loc,p=isHere?null:plan(s.id),right=Math.cos((ang-90)*Math.PI/180)>=-.15;
+    return `<g class="node${s.sys==='star'?' star':''}${isHere?' here':''}${p&&!p.ok?' dim':''}" data-id="${s.id}" tabindex="${isHere?-1:0}" role="button" aria-label="${s.name}">${isHere?`<circle class="halo" cx="${x}" cy="${y}" r="11"/>`:''}<circle class="dot" cx="${x}" cy="${y}" r="${isHere?6:5.5}"/><circle cx="${x}" cy="${y}" r="18" fill="transparent"/><text x="${right?x+11:x-11}" y="${y+4}" text-anchor="${right?'start':'end'}">${short(s.name)}</text></g>`;}).join('');
+  return `<div class="chart"><svg viewBox="0 0 640 640" role="group" aria-label="Log-scale chart, distance from Earth">${svg}</svg></div>`;
+}
+function openMove(){
+  const build=()=>{
+    const stop=s=>{const isHere=s.id===S.loc,p=isHere?null:plan(s.id);const svc=svcList(s).map(x=>SVC[x]).join(' · ');
+      const drops=S.freight.filter(c=>c.to===s.id).length+(S.contract&&S.contract.to===s.id?1:0),grp=S.pax.filter(g=>g.to===s.id).length;
+      const due=[drops?`📦 ${drops} drop-off${drops>1?'s':''}`:'',grp?`🧑‍🚀 ${grp} group${grp>1?'s':''}`:''].filter(Boolean).join(' · ');
+      const ghl=guideStep()==='move'&&s.id===GUIDE.d;
+      const cost=isHere?'you are here':`${p.days} ${p.days>1?'days':'day'}`;
+      return `<li><button class="stop${s.sys==='star'?' star':''}${isHere?' here':''}${p&&!p.ok?' off':''}${ghl?' guide-hl':''}" type="button" data-id="${s.id}" ${isHere?'disabled':''}><i></i><span class="nm"><b>${short(s.name)}</b><span>${[due?`<b class="due">${due}</b>`:'',ghl?'<b class="due">👉 sell here</b>':'',evTag(s.id),svc||(s.sys==='star'?s.place.split(' · ')[1]:'')].filter(Boolean).join(' · ')}</span></span><span class="cost">${cost}</span></button></li>`;};
+    const note=`<p class="small muted" style="margin-bottom:8px">Travel is free. Each day in transit adds interest and moves the markets.</p>`;
+    const list=note+`<ul class="line"><h4>Solar System · 1 day a trip</h4>${STATIONS.filter(s=>s.sys==='sol').map(stop).join('')}<h4>Interstellar · longer trips, bigger prices</h4>${STATIONS.filter(s=>s.sys==='star').map(stop).join('')}</ul>`;
+    return {title:'Move',eyebrow:`Day ${S.day} of ${S.total} · ${usd(S.cash)} cash`,rebuild:null,
+      headRight:`<div class="toggle" role="group" aria-label="View"><button type="button" data-v="list" aria-pressed="${ui.moveView==='list'}">List</button><button type="button" data-v="chart" aria-pressed="${ui.moveView==='chart'}">Chart</button></div>`,
+      body:ui.moveView==='list'?list:mapSVG()+'<p class="small" style="color:#c9b9a8">Log scale from Earth. Tap a station.</p>',
+      wire:sh=>{sh.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>{ui.moveView=b.dataset.v;openSheet(build());}));
+        sh.querySelectorAll('.stop:not([disabled])').forEach(b=>b.addEventListener('click',()=>openRoute(b.dataset.id)));
+        sh.querySelectorAll('.node').forEach(n=>{const f=()=>{if(n.dataset.id!==S.loc)openRoute(n.dataset.id);};n.addEventListener('click',f);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f();}});});}};};
+  openSheet(build());
+}
+function openRoute(dest){
+  sel=dest;
+  const build=()=>{const d=ST(dest),p=plan(dest),m=S.mkt.data,rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,dest);
+    const rows=GOODS.map(g=>{const there=rep[g.id],here=m[g.id],h=held(g.id);if(!there||(!h&&!(here&&here.stock)))return '';
+      const st=sellAt(dest,there.local,rDay,g.id),bh=here&&here.stock?buyAt(S.loc,here.local):null,basis=h?S.cargo[g.id].cost/h:null,ref=h?basis:bh,mg=ref?(st-ref)/ref:null;
+      return `<tr><td>${g.name}${h?`<span class="sub">${qfmt(h)} held · paid ${usd(basis)}</span>`:''}</td><td class="n">${bh?usd(bh):'–'}</td><td class="n">${usd(st)}</td><td class="n ${mg>0?'up':'dn'}">${mg===null?'–':(mg>=0?'+':'−')+Math.abs(Math.round(mg*100))+'%'}</td></tr>`;}).join('');
+    const dueHere=S.freight.filter(c=>c.to===dest).reduce((a,c)=>a+c.pay*.6,0)+S.pax.filter(g=>g.to===dest).reduce((a,g)=>a+g.pay*.75,0);
+    return {title:d.name,eyebrow:d.place,rebuild:()=>build(),
+      
+      body:`${guideStep()==='move'&&dest===GUIDE.d?'<p class="guide-note small">👉 Tap <b>Jump</b> to fly here.</p>':''}<dl class="kv"><dt>Travel</dt><dd>${p.days} ${p.days>1?'days':'day'}${p.inter?` · ${ly(S.loc,dest).toFixed(2)} ly`:''}</dd>
+        <dt>Interest in transit</dt><dd>${usd(p.interest)}</dd><dt>Price report</dt><dd>${p.lag?`${p.lag}d old · light-lag`:'live'}</dd>${dueHere?`<dt>Freight and fares due</dt><dd class="up">+${usd(dueHere)}</dd>`:''}</dl>
+        ${p.ok?'':`<p class="small warn">Cannot jump: ${p.reasons.join('; ')}.${S.total-S.day<1?' End the mission from the Port screen.':''}</p>`}
+        ${rows?`<table><thead><tr><th>Cargo</th><th class="n">Here</th><th class="n">There</th><th class="n">Margin</th></tr></thead><tbody>${rows}</tbody></table><p class="small" style="color:#c9b9a8">Per lot in dollars after spreads. Margin compares there with here, or with what you paid for cargo you hold. Prices are today's; they drift a little by arrival. Trades ranks the best picks.</p>`:''}`,
+      actions:[{label:p.ok?`Jump · ${p.days} ${p.days>1?'days':'day'}`:'Jump',fn:jump,disabled:!p.ok||S.over},{label:'‹ All stops',kind:'ghost',fn:()=>{flashMsg='';openMove();}}],
+      wire:sh=>{if(guideStep()==='move'&&dest===GUIDE.d){const j=sh.querySelector('#sh-acts button');if(j)j.classList.add('guide-hl');}}};};
+  flashMsg='';openSheet(build());
+}
+
+/* ---------- codex ---------- */
+function codexHTML(){
+  const nm=ids=>ids.map(i=>G(i).name).join(', ')||'–';
+  const anchor={water:'Early market $500/kg lunar surface, $1,000/kg EML1 (Sowers); launch parity $3,246/kg Falcon 9, $10–100/kg Starship target',metal:'Game assumption: local ISRU cheap, launch-cost parity in orbit',nitro:'Scarce on the Moon; ammonium salts on Ceres. Game assumption',food:'Game assumption: launch cost plus handling',elec:'Game assumption: Earth-made, priced up with distance',leu:'Game assumption; NASA lunar reactor uses low-enriched uranium',pgm:'Platinum $2,153.50/oz on 5 Mar 2026, about $69,000/kg',he3:'$2,500–3,000 per liter; Interlune $20M/kg',samp:'Game assumption: scientific value of extrasolar material'};
+  const sol=STATIONS.filter(s=>s.sys==='sol');
+  return `<div class="codex" style="display:grid;gap:18px">
+  ${glossCodexHTML()}
+  ${tipsCodexHTML()}
+  <div><h3>Credits</h3><p>Designed and built by <b>Jason Von Holmes</b>. <a href="https://jvholmes87.github.io/" target="_blank" rel="noopener">See his portfolio</a> (opens in a new tab).</p><p class="small" style="margin:10px 0 4px"><b>Tester credits</b></p>${TESTER_CREDITS.length?`<ul>${TESTER_CREDITS.map(t=>`<li><b>${t.callsign}</b> · ${t.what} (${t.build})</li>`).join('')}</ul>`:'<p class="small muted">Playtesters whose feedback makes it into the game are listed here by callsign.</p>'}</div>
+  <div><h3>Story</h3><div style="display:grid;gap:8px">${STORY}</div><p class="small" style="margin-top:8px"><button class="linkbtn" type="button" onclick="showIntro(true)">Replay the boot log</button></p></div>
+  <div><h3>Standing and acts</h3><ul>
+    <li><b>Colony standing</b> runs 0–100 per station: Unknown, Known (20), Trusted (50), Partner (80). Selling a colony goods it wants earns up to 10 a sale and 16 a day; supply contracts earn 8, colony requests 15, a paid inspection 5. Refusing an inspector costs 8.</li>
+    <li><b>Bonuses</b> apply to the goods a colony wants: Known +1%, Trusted +3% and half the inspections, Partner +5%, supply contracts +15% and no inspections.</li>
+    <li><b>Acts</b> are six milestones per mission. Clearing the debt is the Solvent act.</li></ul></div>
+  <div><h3>Who runs space</h3><ul class="orgs"><li><b>Solar Transit Authority (STA)</b><span>Treaty body: traffic control, debris warnings, probe licensing, the common clock</span><span class="sub">Real-world root: UN Outer Space Treaty (1967); Coordinated Lunar Time</span></li><li><b>Halyard Consortium</b><span>Dollar-bloc agency. Built you and holds your commissioning debt. Runs LEO, Artemis, Psyche and Proxima</span><span class="sub">Real-world root: NASA and the Artemis Accords partners (2020 onward)</span></li><li><b>European Deep Space Directorate (EDSD)</b><span>Euro-bloc agency. Runs Gateway, Ceres and Tau Ceti; enforces export control</span><span class="sub">Real-world root: ESA</span></li><li><b>Guanghan Administration</b><span>Yuan-bloc agency. Runs the ILRS station, Utopia and Barnard's Star; enforces export control</span><span class="sub">Real-world root: CNSA and the ILRS program. Named for Guang Han Gong, the Chang'e-3 landing site (IAU-approved, 2016)</span></li><li><b>Tallis Freight</b><span>Corporation operating KESTREL, which dumps cargo to undercut you</span><span class="sub">Real-world root: Commercial launch and logistics companies</span></li><li><b>Colony Councils</b><span>Local government at each station. Your colony standing is your record with them</span><span class="sub">Real-world root: Proposals for off-world settlement governance</span></li><li><b>Lagan Crews</b><span>Unlicensed salvagers (future update)</span><span class="sub">Real-world root: Maritime salvage law: lagan is cargo sunk but marked with a buoy so its owner can recover it</span></li><li><b>Chartered Lineage</b><span>A player's line of forks registered as its own agency (planned for the Lineage tier)</span></li></ul></div>
+  <div><h3>Station services</h3><ul class="orgs">
+    <li><b>Banks</b><span>Halyard Bank at LEO lends at 0.60% a day, EDSD Credit at Gateway at 0.50%, and Guanghan Bank at ILRS at 0.45%, all in dollars. Each line starts at $20–30M and grows $0.7M per standing point at the bank's station. A 1% fee is added to each loan. Repay at any in-system stop of the same bloc. Loans count against your fund.</span><span class="sub">Real-world root: state-backed lenders, such as export-credit agencies, that finance projects in their own bloc</span></li>
+    <li><b>STA Treasury</b><span>Deposits at any Solar System stop earn 0.20% a day and count toward your fund. If the probe is lost, the Treasury releases the balance to your fork. Light-lag blocks access from the stars. The rate is below every loan, so borrowing to save loses money.</span><span class="sub">Real-world root: US Treasury bills, short-term government debt</span></li>
+    <li><b>Fork foundry</b><span>At Psyche Works, $25M, 10 t of structural metals and 10 kg of platinum-group metals boot a fork without ending your mission. It shuttles a route you assign and remits income every day: about $1.3M times a route factor (0.7 + 0.07 per km/s of Δv), minus $0.2M upkeep, with a daily incident risk of 2% plus 0.4% per km/s. Up to 3 per mission. Each fork counts toward your replication fund at its build cost less wear (1/60 per day in service, never below 20%); decommissioning returns 20% of the cash cost and removes it from the fund.</span><span class="sub">Real-world root: NASA's Psyche probe, launched October 13, 2023, is due to orbit the metal-rich asteroid 16 Psyche in August 2029. Self-reproducing probes: Freitas (1980)</span></li>
+    <li><b>Fork traits</b><span>Each fork boots with one trait, chosen at random: Hauler (+20% income), Careful (60% fewer incidents, −5% income), Gambler (wide swings, +5% on average), Diplomat (+1 standing a day at both route stops), Frugal (half the upkeep) or Restless (+10% income, drifts more). Every 7 days a fork has a 5% chance of drifting to a new trait (25% if Restless).</span><span class="sub">Copies diverge: the same idea as Egan's <i>Diaspora</i>, listed under Further reading</span></li>
+    <li><b>Bonded warehouse</b><span>At Ceres: store cargo for $15,000 per tonne per day, paid when you withdraw. Food does not spoil there, and inspectors cannot board cargo you are not carrying.</span><span class="sub">Real-world root: bonded warehouses, where imported goods wait without paying duty until they are withdrawn</span></li>
+    <li><b>Hull and cargo insurance</b><span>At Gateway: a 10-day policy for $2.5M plus 1% of your cargo's cost. It pays $150,000 per hull point lost to debris, storms or faults, and the cost of electronics ruined by storms.</span><span class="sub">Real-world root: Lloyd's of London, which began around 1689 in Edward Lloyd's coffee house as a place to buy marine insurance</span></li>
+    <li><b>Hull yard</b><span>At Utopia: hull plating ($15M) cuts damage from debris, storms and faults by 40%.</span><span class="sub">Real-world root: Utopia Planitia, where China's Zhurong rover landed on May 14, 2021. Tune figures are game assumptions; studies of advanced nuclear-thermal engines target specific impulse near 1,000 s (about 9.8 km/s)</span></li></ul></div>
+  <div><h3>Market events</h3><ul>
+    <li><b>Every mission has its own event tree,</b> sized to its length: about one story arc every 6 days (5 in a 30-day mission, 8 in 45, 10 in 60). The Daily Mission's tree is the same for every probe.</li>
+    <li><b>An arc</b> often starts with a rumor a few days ahead. Then one stop hits a shortage (prices ×2–3.5, stock thin: sell there) or a glut (prices ×0.25–0.5, stock piled high: buy there) for 2–4 days.</li>
+    <li><b>Then it branches:</b> the shortage worsens, spreads to the nearest stop, swings the other way as convoys overshoot, or fades. Headlines from the stars arrive as late as their light.</li>
+    <li>Watch Trades for headlines and the Move list for ▲ / ▼ tags.</li></ul></div>
+  <div><h3>How trading works</h3><ul>
+    <li><b>Prices follow one rule.</b> Each good has a base price. Stops that make it sell at ${Math.round(PBAND.make[0]*100)}–${Math.round(PBAND.make[1]*100)}% of base, neutral stops trade at ${Math.round(PBAND.n[0]*100)}–${Math.round(PBAND.n[1]*100)}%, and stops that want it pay ${Math.round(PBAND.want[0]*100)}–${Math.round(PBAND.want[1]*100)}%. Star colonies pay ${STAR_X}× more for the goods they import. Buy where it is made, sell where it is wanted.</li>
+    <li><b>Markets move.</b> Prices drift inside each stop's range on trends that turn every few days, so the trade sheet shows the usual range and where today sits. Every stop buys and sells every good, so there is always something to trade. Market events (above) and small surprise shortages and KESTREL dumps break the pattern.</li>
+    <li><b>Travel is free; time is not.</b> Halyard's service contract covers your refuelling at every stop. What a trip costs is days: interest keeps growing, markets keep moving and contracts keep their deadlines. Star trips take 2–7 days.</li>
+    <li><b>All prices are in dollars.</b> The three blocs run their own stations, banks and inspectors, but trade settles in dollars on the common clock. Spread 0.5% in-system, 3% at the stars.</li>
+    <li><b>Best trades</b> shows each trade's profit after spreads, ranked by profit per day of travel.</li>
+    <li><b>Supply contracts</b> haul a shipper's cargo, already paid for. They pay a distance fee that grows with Δv, plus a fee per tonne, 40% up front. Carry up to ${FREIGHT_MAX} at once alongside your own cargo. Undelivered contracts lapse after 5 days and the advance becomes debt.</li>
+    <li><b>Passengers</b> need cabins from the LEO shipyard (${usd(CABIN_PRICE)} for ${CABIN_BERTHS} berths, up to ${CABIN_BERTHS*CABIN_MAX}). Fares grow with Δv in-system and with travel days to the stars; 25% on boarding, 75% on arrival.</li>
+    <li><b>Colony requests</b> are sized to what the makers stock in one visit, so one or two stops fill them.</li>
+    <li><b>Fill the hold three ways:</b> your own cargo, shipper freight and passengers all ride the same trip.</li></ul></div>
+  <div><h3>The physics behind it</h3><ul>
+    <li><b>Time.</b> Real distances scale so the longest leg (Barnard's Star to Tau Ceti, 15.5 ly) takes 7 days: Proxima 2, Barnard's Star 3, Tau Ceti 6. Solar System legs round up to 1 day.</li>
+    <li><b>The rocket equation.</b> A ship needs e<sup>Δv/v<sub>e</sub></sup> − 1 kilograms of propellant for every kilogram it moves; with a nuclear-thermal v<sub>e</sub> of 9 km/s, a hop to Psyche (9.8 km/s from LEO) burns about four times the propellant of a hop to Gateway (3.6 km/s). Halyard absorbs that cost in your service contract; shippers still pay more for high-Δv hauls.</li>
+    <li><b>Interstellar trips</b> run on a fusion drive burning helium-3. The drive and your uploaded mind are the game's two pieces of fiction; everything else is sourced or marked as an assumption.</li>
+    <li><b>Light-lag.</b> Price reports from another star are as old as the light that carried them, on the same scale.</li>
+    <li><b>The commissioning debt</b> is owed to Halyard, which takes repayment only at its own stops (LEO, Artemis, Psyche). Clearing it is the Solvent act.</li>
+    <li><b>Interest</b> accrues on the common-frame clock (Krugman's First Theorem of Interstellar Trade): ${(DEBT_RATE*100).toFixed(2)}% per day.</li>
+    <li><b>Lunar clocks</b> run about 58.7 µs per day fast; NASA owes an LTC strategy by the end of 2026.</li></ul></div>
+  <div><h3>The blocs</h3><ul>
+    <li><b>Dollar bloc</b> (LEO, Artemis, Psyche, Proxima): payment stablecoin under the GENIUS Act (Public Law 119-27, July 18, 2025).</li>
+    <li><b>Euro bloc</b> (Gateway, Ceres, Tau Ceti): digital euro, which the ECB says could launch in 2029.</li>
+    <li><b>Yuan bloc</b> (ILRS, Utopia, Barnard's Star): e-CNY, in a live pilot in 26 cities.</li>
+    <li>In the game, interplanetary trade settles in dollars, so you never convert currencies.</li></ul></div>
+  <div class="tbl"><table><thead><tr><th>Station</th><th>Bloc</th><th>Makes</th><th>Wants</th></tr></thead><tbody>${STATIONS.map(s=>`<tr><td><b>${s.name}</b><span class="sub">${s.place}</span></td><td>${BLOC_NAME[s.bloc].replace(' bloc','')}</td><td>${nm(s.make)}</td><td>${nm(s.want)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="tbl"><table><thead><tr><th>Cargo</th><th class="n">From $/kg</th><th class="n">Up to $/kg</th><th>Anchor</th></tr></thead><tbody>${GOODS.map(g=>`<tr><td><b>${g.name}</b><span class="sub">${LOT[g.unit]}</span></td><td class="n">${usd(BASE[g.id]*PBAND.make[0])}</td><td class="n">${usd(Math.max(...STATIONS.map(s=>{const r=roleOf(s,g.id);return BASE[g.id]*PBAND[r][1]*starX(s,r);})))}</td><td class="small">${anchor[g.id]}</td></tr>`).join('')}</tbody></table></div>
+  <div class="tbl"><table><thead><tr><th>Δv km/s</th>${sol.map(s=>`<th class="n">${short(s.name)}</th>`).join('')}</tr></thead><tbody>${sol.map(a=>`<tr><td><b>${short(a.name)}</b></td>${sol.map(b=>`<td class="n">${a.id===b.id?'–':dv(a.id,b.id).toFixed(1)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div><h3>Sources</h3><ul class="small">
+    <li><a href="https://democrats-science.house.gov/imo/media/doc/Sowers%20Testimony.pdf" target="_blank" rel="noopener">Sowers, House Science testimony</a></li>
+    <li><a href="https://newspaceeconomy.ca/2026/06/21/how-accurate-were-elon-musks-falcon-9-and-starship-kg-claims/" target="_blank" rel="noopener">New Space Economy, launch $/kg (June 2026)</a></li>
+    <li><a href="https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe/" target="_blank" rel="noopener">GeekWire on Interlune helium-3</a></li>
+    <li><a href="https://www.interlune.space/press-release/u-s-department-of-energy-buys-helium-3-from-u-s-space-resources-company-interlune-in-historic-agreement" target="_blank" rel="noopener">Interlune / DOE purchase agreement</a></li>
+    <li><a href="https://fortune.com/article/current-price-of-platinum-3-5-2026" target="_blank" rel="noopener">Fortune, platinum price</a></li>
+    <li><a href="https://handwiki.org/wiki/Astronomy:Delta-v_budget" target="_blank" rel="noopener">Delta-v budget</a></li>
+    <li><a href="https://www.world-nuclear-news.org/Articles/NASA-seeks-proposals-for-lunar-reactor" target="_blank" rel="noopener">World Nuclear News, lunar reactor</a></li>
+    <li><a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html" target="_blank" rel="noopener">ECB reference rates</a></li>
+    <li><a href="https://eco.com/support/en/articles/15210561-cbdc-updates-2026-what-changed-this-year" target="_blank" rel="noopener">CBDC updates 2026</a></li>
+    <li><a href="https://www.aip.org/fyi/lunar-time-standard-taking-shape" target="_blank" rel="noopener">AIP FYI, Coordinated Lunar Time</a></li>
+    <li><a href="https://gwern.net/doc/economics/2010-krugman.pdf" target="_blank" rel="noopener">Krugman, The Theory of Interstellar Trade</a></li>
+    <li><a href="https://aasnova.org/2025/03/11/confirmed-at-last-barnards-star-hosts-four-tiny-planets/" target="_blank" rel="noopener">AAS Nova, Barnard's Star planets</a></li>
+    <li><a href="https://www.unoosa.org/unoosa/en/ourwork/spacelaw/treaties/introouterspacetreaty.html" target="_blank" rel="noopener">UNOOSA, the Outer Space Treaty</a></li>
+    <li><a href="https://www.nasa.gov/artemis-accords/" target="_blank" rel="noopener">NASA, the Artemis Accords</a></li>
+    <li><a href="https://www.globalsecurity.org/space/library/news/2016/space-160106-pdo01.htm" target="_blank" rel="noopener">Chang'e-3 landing site named Guang Han Gong (2016)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Flotsam,_jetsam,_lagan_and_derelict" target="_blank" rel="noopener">Flotsam, jetsam, lagan and derelict</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Psyche_(spacecraft)" target="_blank" rel="noopener">Psyche (spacecraft)</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Lloyd%27s_of_London" target="_blank" rel="noopener">Lloyd's of London</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Bonded_warehouse" target="_blank" rel="noopener">Bonded warehouse</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Zhurong_(rover)" target="_blank" rel="noopener">Zhurong (rover), Utopia Planitia landing</a></li>
+    <li><a href="https://www.treasurydirect.gov/marketable-securities/treasury-bills/" target="_blank" rel="noopener">TreasuryDirect, Treasury bills</a></li></ul></div>
+  <div><h3>Further reading</h3><p class="small muted">The fiction and papers behind Forkline's ideas. Forkline is not affiliated with or endorsed by any of these authors.</p><ul class="small">
+    <li>Dennis E. Taylor, <i>We Are Legion (We Are Bob)</i> (2016): an uploaded mind running self-replicating probes.</li>
+    <li>Charles Stross, <i>Neptune's Brood</i> (2013): banking and debt across light-years.</li>
+    <li>James S. A. Corey, <i>Leviathan Wakes</i> (2011): a solar system run by rival blocs and corporations.</li>
+    <li>Greg Egan, <i>Diaspora</i> (1997): uploaded minds that copy and diverge.</li>
+    <li>Robert A. Freitas Jr., "A Self-Reproducing Interstellar Probe," <i>Journal of the British Interplanetary Society</i> (1980).</li>
+    <li>Paul Krugman, "The Theory of Interstellar Trade" (written 1978): the source of this game's interest rule.</li></ul></div></div>`;
+}
+
+
+/* ---------- desktop star map backdrop (v18) ---------- */
+(function(){
+  const MQ=window.matchMedia('(min-width: 900px)'),REDUCE=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const THREE_URL='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  let loading=false,map=null;
+  function want(){if(!MQ.matches)return;if(map){map.wake();return;}if(loading)return;loading=true;
+    if(window.THREE)return init();
+    const s=document.createElement('script');s.src=THREE_URL;s.async=true;s.onload=init;s.onerror=()=>{loading=false;};document.head.appendChild(s);}
+  (MQ.addEventListener?MQ.addEventListener('change',want):MQ.addListener(want));
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',want);else want();
+
+  function init(){try{map=build();}catch(e){console.warn('Star map unavailable:',e&&e.message);}}
+
+  function glowTex(T){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
+    r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.25,'rgba(255,255,255,.55)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new T.CanvasTexture(c);}
+
+  function build(){
+    const T=window.THREE,BLOC={USD:0xf2a93b,EUR:0x86c9ea,CNY:0xf2705f},STAR_COL={prox:0xff8a6a,barn:0xff7050,tau:0xffe2a6};
+    const cv=document.createElement('canvas');cv.id='bgmap';cv.setAttribute('aria-hidden','true');
+    const lab=document.createElement('div');lab.id='bglabels';
+    const hint=document.createElement('div');hint.id='bghint';hint.textContent='Click a stop to plot a route';
+    const capL=document.createElement('div'),capR=document.createElement('div');capL.className=capR.className='bgcap';capL.textContent='Solar System · log scale from Earth';capR.textContent='Nearby stars · true directions';lab.appendChild(capL);lab.appendChild(capR);
+    document.body.prepend(hint);document.body.prepend(lab);document.body.prepend(cv);
+    const R=new T.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'low-power'});R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+    const scene=new T.Scene();scene.background=new T.Color(0x070d18);
+    const cam=new T.PerspectiveCamera(35,1,1,4000);cam.position.set(0,0,240);cam.lookAt(0,0,0);
+    scene.add(new T.AmbientLight(0x8090a8,.75));const sun=new T.DirectionalLight(0xfff1d8,.9);sun.position.set(-1,1.2,1.5);scene.add(sun);
+    const GLOW=glowTex(T),sprite=(col,s,op)=>{const m=new T.Sprite(new T.SpriteMaterial({map:GLOW,color:col,transparent:true,opacity:op??1,depthWrite:false,blending:T.AdditiveBlending}));m.scale.set(s,s,1);return m;};
+    // starfield
+    {const n=1400,p=new Float32Array(n*3);for(let i=0;i<n;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,r=700+Math.random()*900,q=Math.sqrt(1-u*u);p[i*3]=r*q*Math.cos(a);p[i*3+1]=r*q*Math.sin(a);p[i*3+2]=-Math.abs(r*u)-200;}
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(p,3));scene.add(new T.Points(g,new T.PointsMaterial({color:0xaab8d0,size:1.6,sizeAttenuation:false,transparent:true,opacity:.7})));}
+    // left: in-system stops, Earth-centred log scale (same mapping as the in-game Chart)
+    const left=new T.Group(),leftDisc=new T.Group();left.add(leftDisc);leftDisc.rotation.x=-1.08;scene.add(left);
+    const right=new T.Group(),rightSpin=new T.Group();right.add(rightSpin);scene.add(right);
+    const logR=km=>Math.pow(Math.max(0,(Math.log10(km)-3.6)/(Math.log10(4.4e8)-3.6)),.7);
+    [[1e4],[1e6],[1.496e8]].forEach(([km])=>{const r=logR(km),pts=[];for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;pts.push(new T.Vector3(r*Math.cos(a),r*Math.sin(a),0));}
+      leftDisc.add(new T.Line(new T.BufferGeometry().setFromPoints(pts),new T.LineBasicMaterial({color:0x25385a,transparent:true,opacity:.8})));});
+    const earth=new T.Mesh(new T.SphereGeometry(.035,20,14),new T.MeshStandardMaterial({color:0x5aa8e0,roughness:.6}));leftDisc.add(earth);leftDisc.add(sprite(0x86c9ea,.16,.5));
+    const nodes={},labels={};
+    const mkLabel=(id,text,cls)=>{const b=document.createElement('button');b.type='button';b.className='bgl'+(cls?' '+cls:'');b.textContent=text;if(id){b.dataset.id=id;b.setAttribute('aria-label',`Plot route to ${text}`);b.addEventListener('click',()=>pick(id));}lab.appendChild(b);return b;};
+    const refLabels=[];
+    refLabels.push({el:mkLabel(null,'Earth','ref'),obj:earth});
+    for(const s of STATIONS.filter(x=>x.sys==='sol')){const r=logR(s.km),a=(s.ang-90)*Math.PI/180;
+      const m=new T.Mesh(new T.OctahedronGeometry(.028),new T.MeshStandardMaterial({color:BLOC[s.bloc],emissive:BLOC[s.bloc],emissiveIntensity:.35,roughness:.4}));
+      m.position.set(r*Math.cos(a),r*Math.sin(a),0);leftDisc.add(m);m.add(sprite(BLOC[s.bloc],.12,.45));nodes[s.id]=m;labels[s.id]=mkLabel(s.id,short(s.name));}
+    // right: Sol and the stars in true directions (ly), lanes from Sol
+    const solDot=sprite(0xffe9b0,.18,.95);rightSpin.add(solDot);refLabels.push({el:mkLabel(null,'Sol','ref'),obj:solDot});
+    const LYS=1/12.5;
+    for(const s of STATIONS.filter(x=>x.sys==='star')){const p=new T.Vector3(s.pos[0],s.pos[2],s.pos[1]).multiplyScalar(LYS);
+      const star=sprite(STAR_COL[s.id]||0xffffff,.22,.95);star.position.copy(p);rightSpin.add(star);
+      const m=new T.Mesh(new T.OctahedronGeometry(.03),new T.MeshStandardMaterial({color:BLOC[s.bloc],emissive:BLOC[s.bloc],emissiveIntensity:.35}));m.position.copy(p).add(new T.Vector3(.05,.045,0));rightSpin.add(m);nodes[s.id]=m;
+      rightSpin.add(new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),p]),new T.LineDashedMaterial({color:0x25385a,dashSize:.03,gapSize:.025})).computeLineDistances());
+      labels[s.id]=mkLabel(s.id,short(s.name));}
+    // the vessel: hull, nose, radiator panels, engine glow; forward is +x
+    const ship=new T.Group(),hullM=new T.MeshStandardMaterial({color:0xd9d3c4,metalness:.55,roughness:.4});
+    {const body=new T.Mesh(new T.CylinderGeometry(.5,.5,3.2,12),hullM);body.rotation.z=Math.PI/2;ship.add(body);
+     const nose=new T.Mesh(new T.ConeGeometry(.5,1.1,12),hullM);nose.rotation.z=-Math.PI/2;nose.position.x=2.15;ship.add(nose);
+     const panM=new T.MeshStandardMaterial({color:0x2c3a52,metalness:.3,roughness:.7,side:T.DoubleSide});
+     for(const z of[-1,1]){const pan=new T.Mesh(new T.BoxGeometry(2.2,.06,1.5),panM);pan.position.set(-.2,0,z*1.25);ship.add(pan);}
+     const tank=new T.Mesh(new T.SphereGeometry(.62,14,10),new T.MeshStandardMaterial({color:0xf2a93b,metalness:.4,roughness:.5}));tank.position.x=-1.5;ship.add(tank);}
+    const flame=sprite(0x86c9ea,2.6,0);flame.position.x=-2.6;ship.add(flame);ship.add(sprite(0xece6d8,5.5,.22));scene.add(ship);
+    const trailN=48,trailPos=new Float32Array(trailN*3),trailGeo=new T.BufferGeometry();trailGeo.setAttribute('position',new T.BufferAttribute(trailPos,3));
+    const trail=new T.Line(trailGeo,new T.LineBasicMaterial({color:0x86c9ea,transparent:true,opacity:.55}));scene.add(trail);
+    const prevGeo=new T.BufferGeometry().setFromPoints(Array.from({length:40},()=>new T.Vector3()));
+    const preview=new T.Line(prevGeo,new T.LineDashedMaterial({color:0xf2a93b,dashSize:2.2,gapSize:1.6,transparent:true,opacity:.9}));preview.visible=false;scene.add(preview);
+    // layout: fit each half into its gutter
+    let W=0,H=0,unit=1,gutterL=0;
+    function layout(){W=window.innerWidth;H=window.innerHeight;R.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix();
+      const panel=Math.min(560,W),gw=(W-panel)/2,wpp=2*cam.position.z*Math.tan(cam.fov*Math.PI/360)/H;
+      unit=Math.min(gw*wpp*.34,H*wpp*.34);gutterL=(panel/2+gw/2)*wpp;
+      left.position.set(-gutterL-gw*wpp*.02,-H*wpp*.02,0);right.position.set(gutterL-gw*wpp*.06,0,0);left.scale.setScalar(unit);right.scale.setScalar(unit*.9);ship.scale.setScalar(unit*.02);
+      const gx=(panel/2+gw/2);capL.style.left=Math.round(W/2-gx)+'px';capR.style.left=Math.round(W/2+gx)+'px';capL.style.display=capR.style.display=gw>340?'':'none';hint.style.display=gw>250?'':'none';}
+    window.addEventListener('resize',layout);layout();
+    // route geometry in world space: an arc that lifts toward the camera; interstellar arcs pass behind the panel
+    const wp=id=>{const v=new T.Vector3();(nodes[id]||nodes.leo).getWorldPosition(v);return v;};
+    function arc(a,b,t,out){const A=wp(a),B=wp(b),M=A.clone().add(B).multiplyScalar(.5),d=A.distanceTo(B),inter=ST(a).sys!==ST(b).sys;
+      M.y+=d*(inter?.32:.28);M.z+=inter?-unit*.6:unit*.35;const u=1-t;return out.set(u*u*A.x+2*u*t*M.x+t*t*B.x,u*u*A.y+2*u*t*M.y+t*t*B.y,u*u*A.z+2*u*t*M.z+t*t*B.z);}
+    let lastLoc=null,lastDay=null,trip=null;
+    function pick(id){if(!S||S.over||id===S.loc)return;if(sheetSpec&&sheetSpec.locked)return;if(ui.screen!=='market')go('market');openRoute(id);}
+    const tmp=new T.Vector3(),tmp2=new T.Vector3(),fwd=new T.Vector3(1,0,0),proj=new T.Vector3();
+    let running=true,t0=performance.now(),frame=0;
+    function tick(now){if(!running)return;requestAnimationFrame(tick);if(document.hidden||!MQ.matches)return;
+      const dt=Math.min(.05,(now-t0)/1000);t0=now;frame++;const still=REDUCE.matches;
+      if(!still){leftDisc.rotation.z+=dt*.012;rightSpin.rotation.y+=dt*.035;}
+      const loc=S&&S.loc&&nodes[S.loc]?S.loc:'leo',day=S?S.day:0;
+      if(lastLoc===null){lastLoc=loc;lastDay=day;}
+      if(loc!==lastLoc){if(day>lastDay&&!still){trip={a:lastLoc,b:loc,t:0,dur:ST(lastLoc).sys!==ST(loc).sys||ST(loc).sys==='star'?3.6:2.2};const s0=arc(trip.a,trip.b,0,proj);for(let i=0;i<trailN;i++){trailPos[i*3]=s0.x;trailPos[i*3+1]=s0.y;trailPos[i*3+2]=s0.z;}trail.material.opacity=.55;}lastLoc=loc;lastDay=day;}
+      else lastDay=day;
+      // vessel
+      let pos,dir;
+      if(trip){trip.t=Math.min(1,trip.t+dt/trip.dur);const e=trip.t<.5?2*trip.t*trip.t:1-Math.pow(-2*trip.t+2,2)/2;pos=arc(trip.a,trip.b,e,tmp);dir=arc(trip.a,trip.b,Math.min(1,e+.01),tmp2).sub(pos);
+        flame.material.opacity=.95;for(let i=trailN-1;i>0;i--){trailPos[i*3]=trailPos[i*3-3];trailPos[i*3+1]=trailPos[i*3-2];trailPos[i*3+2]=trailPos[i*3-1];}
+        trailPos[0]=pos.x;trailPos[1]=pos.y;trailPos[2]=pos.z;trailGeo.attributes.position.needsUpdate=true;trail.visible=true;if(trip.t>=1)trip=null;}
+      else{pos=wp(loc).add(tmp2.set(unit*.06,unit*.05,unit*.02));pos.y+=still?0:Math.sin(now/900)*unit*.006;dir=tmp2.set(1,.15,0);flame.material.opacity=0;
+        if(trail.visible){trail.material.opacity*=.94;if(trail.material.opacity<.02){trail.visible=false;trail.material.opacity=.55;}}}
+      ship.position.copy(pos);if(dir.lengthSq()>1e-9)ship.quaternion.setFromUnitVectors(fwd,dir.clone().normalize());
+      // route preview while the route sheet is open
+      const target=sel&&S&&sel!==S.loc&&nodes[sel]&&sheetSpec&&!trip?sel:null;
+      if(target){const arr=prevGeo.attributes.position;for(let i=0;i<40;i++){arc(loc,target,i/39,proj);arr.setXYZ(i,proj.x,proj.y,proj.z);}arr.needsUpdate=true;preview.computeLineDistances();preview.visible=true;}
+      else preview.visible=false;
+      // labels follow their stops
+      const place=(el,obj,dx,dy=0)=>{obj.getWorldPosition(proj);proj.project(cam);const x=(proj.x*.5+.5)*W,y=(-proj.y*.5+.5)*H+dy,ok=proj.z<1&&x>4&&x<W-4&&y>4&&y<H-4;el.style.display=ok?'':'none';if(ok)el.style.transform=`translate(${Math.round(x+dx)}px,${Math.round(y-7)}px)`;};
+      for(const id in labels){const el=labels[id];place(el,nodes[id],10,id==='ilrs'?13:0);el.classList.toggle('here',!!S&&id===S.loc);el.classList.toggle('sel',!!target&&id===target);}
+      for(const r of refLabels)place(r.el,r.obj,10);
+      R.render(scene,cam);}
+    requestAnimationFrame(tick);
+    return {wake(){layout();}};
+  }
+})();
+
+/* ---------- boot ---------- */
+function start(data){
+  const saved=(data&&data.state)||loadSaved();
+  if(saved)S=norm(saved);
+  if(data&&data.ui)Object.assign(ui,data.ui,{sheet:null});
+  if(ui.screen!=='home'&&!S)ui.screen='home';
+  render();
+  if(S&&S.event&&ui.screen==='market')showEvent();
+}
+window.claude?.hot?.snapshot?.(()=>({state:S,ui:{screen:ui.screen,page:ui.page,moveView:ui.moveView,runLen:ui.runLen}}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+</script>
+
+<div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body></html>
