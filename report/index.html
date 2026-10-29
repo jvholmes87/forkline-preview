@@ -214,7 +214,8 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 
 <script>
 'use strict';
-const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.6').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r2';
+const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.7').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r3';
+const BV = parseFloat(BUILD.replace(/^v/, '')) || 99;   // questions marked 'since' only show for builds that have the feature
 const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
 const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
 const DRAFT = 'forkline-report-draft';
@@ -271,6 +272,8 @@ const COMMON = [
   { id: 'fun', type: 'faces', q: 'How fun was it?', ends: ['boring', 'super fun'], col: 'fun' },
   { id: 'clear', type: 'scale', q: 'How easy was it to know what to do?', ends: ['very confusing', 'super easy'], col: 'clear' },
   { id: 'tips', type: 'one', q: 'Little tip boxes pop up while you play. They...', opts: ['helped a lot', 'helped a little', "I didn't notice them", 'got in the way'], cols: 2 },
+  { id: 'sound', type: 'one', since: 25.7, q: 'Game sounds: what did you do?', opts: ['kept them on', 'turned them down', 'turned them off', 'my sound was off'], cols: 2 },
+  { id: 'sound_feel', type: 'one', since: 25.7, q: 'The sounds were...', opts: ['helpful', 'fine', 'annoying', "I didn't hear any"], cols: 2 },
   { id: 'words', type: 'many', ages: KID, q: "Tick every word you didn't understand.", hint: 'Skip the ones you know.', cols: 3,
     opts: ['debt', 'fund', 'fork', 'colony', 'cargo', 'freight', 'standing', 'Treasury', 'hull', 'insurance', 'shortage', 'glut', 'rumor', 'light-lag', 'spread', 'interest'] },
   { id: 'words_other', type: 'text', ages: KID, q: 'Any other words you didn\'t understand?', opt: true },
@@ -300,7 +303,7 @@ const GROWNUP = [
 const FACES = ['😣', '🙁', '😐', '🙂', '😄'];
 
 function questionsFor() {
-  const qs = [...(PER_QUEST[st.quest] || []), ...COMMON].filter(q => (q.ages || ALL).includes(st.age));
+  const qs = [...(PER_QUEST[st.quest] || []), ...COMMON].filter(q => (q.ages || ALL).includes(st.age) && (!q.since || BV >= q.since));
   return st.grownUp ? [...qs, ...GROWNUP] : qs;
 }
 

@@ -207,6 +207,7 @@ tr.pick{cursor:pointer} tr.pick:hover td{background:var(--panel2)}
 @keyframes tipin{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 .news.remind{border-color:var(--ice)}
 .tipmode{display:flex;gap:6px;margin:8px 0}.tipmode button{flex:1}
+.sndvol{display:flex;gap:10px;align-items:center;margin:4px 0 8px}.sndvol input{flex:1;accent-color:var(--amber);min-height:44px}
 /* v25.6: guide, glossary, how-to card, unlocks, move tags, about */
 .guide-hl{outline:3px solid var(--amber)!important;outline-offset:-3px;border-radius:6px;animation:hlpulse 1.4s ease-in-out infinite}
 @keyframes hlpulse{50%{outline-color:rgba(242,169,59,.3)}}
@@ -554,7 +555,7 @@ function gainRep(id,pts,capped){if(!pts)return;
   const before=repTier(id);
   if(capped&&pts>0){const k=id+'|'+S.day,used=S.repDay[k]||0;pts=Math.min(pts,Math.max(0,REP_DAILY_CAP-used));if(pts<=0)return;S.repDay[k]=used+pts;}
   S.rep[id]=Math.max(0,Math.min(100,repOf(id)+pts));
-  const after=repTier(id);if(after!==before)log(`${ST(id).name} now rates you ${after}.`,pts>0?'good':'bad');}
+  const after=repTier(id);if(after!==before){log(`${ST(id).name} now rates you ${after}.`,pts>0?'good':'bad');if(pts>0)sfx('milestone');}}
 
 /* ---------- mission acts ---------- */
 const ACTS=[
@@ -572,7 +573,7 @@ const ACTS=[
    text:'A colony writes you into its charter. Partner colonies pay 5% more for what they want, post supply contracts worth 15% more, and stop inspecting you.'}
 ];
 function checkActs(){if(!S||S.over||!S.acts)return;
-  for(const a of ACTS){if(!S.acts.includes(a.id)&&a.check()){S.acts.push(a.id);S.actQueue.push(a.id);log(`Act complete: ${a.name}.`,'good');}}}
+  for(const a of ACTS){if(!S.acts.includes(a.id)&&a.check()){S.acts.push(a.id);S.actQueue.push(a.id);log(`Act complete: ${a.name}.`,'good');sfx('milestone');}}}
 function showActIfAny(){if(!S||!S.actQueue||!S.actQueue.length||sheetSpec||S.event||S.over||ui.screen!=='market')return;
   const id=S.actQueue.shift(),a=ACTS.find(x=>x.id===id);if(!a)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
   openSheet({eyebrow:`${a.icon} Act complete · ${S.acts.length} of ${ACTS.length}`,title:a.name,body:`<p>${glossify(a.text)}</p>${a.id==='margin'?unlockHTML():''}`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
@@ -662,6 +663,32 @@ function resetTips(){TIPS.seen={};TIPS.stats={};tipsSave();tipActive=null;if(S){
 function tipsCodexHTML(){const seen=TIP_DEF.filter(t=>TIPS.seen[t.id]);
   return `<div><h3>Tips</h3><p class="small muted">Tips: ${TIPS.mode==='guided'?'Guided':TIPS.mode==='light'?'Light (celebrations and reminders)':'Off'}. Change it in the ☰ menu.</p>${seen.length?`<ul>${seen.map(t=>`<li>${t.icon} ${tipText(t)}</li>`).join('')}</ul>`:'<p class="small muted">No tips seen yet.</p>'}<p class="small"><button class="linkbtn" type="button" onclick="resetTips()">Reset tips</button> to see them all again.</p></div>`;}
 
+/* ---------- sound (v25.7, DEC-060): every sound is generated in code ----------
+ZzFX Micro v1.4.0 - Zuper Zmall Zound Zynth - https://github.com/KilledByAPixel/ZzFX
+MIT License. Copyright (c) 2019 Frank Force.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Minified build. Changes for Forkline: shared audio context, private random generator, volume from settings. */
+const SND_KEY='forkline-sound-v1';
+let SND=(()=>{try{return Object.assign({on:true,vol:.6},JSON.parse(localStorage.getItem(SND_KEY)||'{}'));}catch(e){return {on:true,vol:.6};}})();
+const sndSave=()=>{try{localStorage.setItem(SND_KEY,JSON.stringify(SND));}catch(e){}};
+let sndX=null,sndArmed=false,sndDefer=0,sndUi=0,sndSeed=7;const sndR=()=>(sndSeed=sndSeed*16807%2147483647)/2147483647;
+const zzfx=(p=1,k=.05,b=220,e=0,r=0,t=.1,q=0,D=1,u=0,y=0,v=0,z=0,l=0,E=0,A=0,F=0,c=0,w=1,m=0,B=0,N=0)=>{let M=Math,d=2*M.PI,R=44100,G=u*=500*d/R/R,C=b*=(1-k+2*k*sndR(k=[]))*d/R,g=0,H=0,a=0,n=1,I=0,J=0,f=0,h=N<0?-1:1,x=d*h*N*2/R,L=M.cos(x),Z=M.sin,K=Z(x)/4,O=1+K,X=-2*L/O,Y=(1-K)/O,P=(1+h*L)/2/O,Q=-(h+L)/O,S=P,T=0,U=0,V=0,W=0;e=R*e+9;m*=R;r*=R;t*=R;c*=R;y*=500*d/R**3;A*=d/R;v*=d/R;z*=R;l=R*l|0;p*=SND.vol*.5;for(h=e+m+r+t+c|0;a<h;k[a++]=f*p)++J%(100*F|0)||(f=q?1<q?2<q?3<q?4<q?(g/d%1<D/2)*2-1:Z(g**3):M.max(M.min(M.tan(g),1),-1):1-(2*g/d%2+2)%2:1-4*M.abs(M.round(g/d)-g/d):Z(g),f=(l?1-B+B*Z(d*a/l):1)*(4<q?f:(f<0?-1:1)*M.abs(f)**D)*(a<e?a/e:a<e+m?1-(a-e)/m*(1-w):a<e+m+r?w:a<h-c?(h-a-c)/t*w:0),f=c?f/2+(c>a?0:(a<h-c?1:(h-a)/c)*k[a-c|0]/2/p):f,N?f=W=S*T+Q*(T=U)+P*(U=f)-Y*V-X*(V=W):0),x=(b+=u+=y)*M.cos(A*H++),g+=x+x*E*(a*a*d%2-1),n&&++n>z&&(b+=v,C+=v,n=0),!l||++I%l||(b=C,u=G,n=n||1);X=sndX,p=X.createBuffer(1,h,R);p.getChannelData(0).set(k);b=X.createBufferSource();b.buffer=p;b.connect(X.destination);b.start()};
+// [priority, pitch variation, [delay ms, ...ZzFX numbers], ...]: recipes from the Sound Lab (claude/Forkline_Sound_List.md)
+const SFX={ui_tap:[0,.04,[0,.48,0,950,.002,.01,.04,1,1,7.69]],ui_open:[1,0,[0,.61,0,480,.005,.03,.09,0,1,6.72]],ui_close:[1,0,[0,.61,0,900,.005,.03,.09,0,1,-6.72]],ui_error:[2,0,[0,.35,0,220,.004,.06,.05,5,1],[110,.35,0,185,.004,.08,.08,5,1]],trade_buy:[3,.03,[0,.8,0,330,.004,.04,.08,1,1],[60,.8,0,440,.004,.04,.12,1,1]],trade_sell_profit:[3,.02,[0,.35,0,988,.003,.05,.05,5,1],[70,.35,0,1319,.003,.08,.28,5,1]],trade_sell_loss:[3,0,[0,.67,0,440,.004,.05,.1,1,1],[90,.67,0,370,.004,.06,.22,1,1]],travel_jump:[4,0,[0,.29,0,90,.15,.35,.4,2,1,.96],[0,.35,0,400,.2,.3,.4,4,1,5.78,0,0,0,0,1]],travel_arrive:[4,0,[0,.29,0,2500,.02,.15,.3,4,1,-9.36,0,0,0,0,1],[250,.58,0,784,.005,.05,.25,0,1],[420,.58,0,523,.005,.05,.45,0,1]],event_alert:[7,0,[0,.27,0,1047,.003,.05,.03,5,1],[120,.27,0,1047,.003,.05,.03,5,1],[240,.27,0,1047,.003,.05,.03,5,1]],hazard_hit:[6,0,[0,.72,0,1800,.002,.08,.35,4,1,-7.78,0,0,0,0,1],[0,.88,0,110,.002,.1,.3,0,1,-.3]],near_miss:[4,0,[0,.32,0,600,.12,.05,.3,4,1,11.06,0,0,0,0,1]],milestone:[5,0,[0,.54,0,784,.003,.04,.12,0,1],[70,.54,0,1047,.003,.04,.12,0,1],[140,.54,0,1319,.003,.04,.4,0,1]],mission_complete:[9,0,[0,.67,0,523,.004,.06,.12,1,1],[100,.67,0,659,.004,.06,.12,1,1],[200,.67,0,784,.004,.06,.12,1,1],[300,.67,0,1047,.004,.25,.5,1,1]],mission_lost:[9,0,[0,.32,0,392,.004,.08,.15,2,1],[180,.32,0,311,.004,.08,.15,2,1],[360,.32,0,262,.004,.08,.7,2,1],[360,.56,0,131,.02,.3,.6,0,1]],new_best:[9,0,[0,.67,0,523,.004,.06,.12,1,1],[100,.67,0,659,.004,.06,.12,1,1],[200,.67,0,784,.004,.06,.12,1,1],[300,.67,0,1047,.004,.06,.12,1,1],[420,.4,0,1568,.003,.04,.35,0,1],[500,.4,0,2093,.003,.04,.35,0,1]],guide_step:[3,0,[0,.48,0,659,.004,.04,.1,0,1],[80,.48,0,880,.004,.05,.2,0,1]],fork_boot:[5,0,[0,.51,0,220,.05,.2,.2,0,1,2.93],[450,.61,0,880,.004,.06,.35,1,1]],money_in:[3,.02,[0,.48,0,1175,.003,.03,.06,0,1],[50,.48,0,1568,.003,.04,.2,0,1]],loan_taken:[3,0,[0,.67,0,262,.004,.06,.12,1,1],[100,.67,0,196,.004,.08,.25,1,1]],debt_cleared:[5,0,[0,.54,0,523,.003,.05,.12,0,1],[90,.54,0,784,.003,.05,.12,0,1],[180,.54,0,1047,.003,.05,.45,0,1]],contract_signed:[3,0,[0,.48,0,900,.001,.02,.08,4,1,-13.86,0,0,0,0,1],[50,.58,0,660,.003,.04,.14,1,1]],contract_failed:[3,0,[0,.26,0,330,.004,.05,.06,5,1],[120,.26,0,294,.004,.05,.06,5,1],[240,.26,0,262,.004,.05,.06,5,1]],upgrade:[3,0,[0,.51,0,700,.001,.02,.05,4,1,-11.27,0,0,0,0,1],[100,.51,0,700,.001,.02,.05,4,1,-11.27,0,0,0,0,1],[200,.48,0,880,.003,.05,.3,0,1]]};
+const sndQ={},sndT={};
+function sfx(id){const d=SFX[id];if(!d||!sndArmed||!SND.on||!(SND.vol>0))return;const at=(sndDefer&&id!=='travel_jump')?sndDefer:0,q=sndQ[at];
+  if(q&&SFX[q][0]>=d[0])return;sndQ[at]=id;if(!sndT[at])sndT[at]=setTimeout(()=>{const x=sndQ[at];delete sndQ[at];delete sndT[at];if(x)sndPlay(x);},at);}
+function sndPlay(id){const d=SFX[id];if(!SND.on||!(SND.vol>0))return;try{
+  if(!sndX){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;sndX=new A();}if(sndX.state==='suspended')sndX.resume();
+  const now=performance.now();if(d[0]===0){if(now-sndUi<80)return;sndUi=now;}
+  const k=d[1]?1+(sndR()*2-1)*d[1]:1;
+  for(const p of d.slice(2)){const z=p.slice(1);z[2]=(z[2]||220)*k;if(z[8])z[8]*=k;setTimeout(()=>{try{zzfx(...z);}catch(e){}},p[0]);}}catch(e){}}
+function sndAfterJump(){sndDefer=900;setTimeout(()=>{sndDefer=0;},0);}
+addEventListener('pointerdown',()=>{sndArmed=true;},true);addEventListener('keydown',()=>{sndArmed=true;},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,a,.navbtn');if(b&&!b.disabled&&b.id!=='snd-vol')sfx('ui_tap');},true);
+
 /* ---------- glossary: tap a dotted word (v25.6, ACT-045) ---------- */
 const GLOSS={
   debt:['Debt','Money you owe. It grows a little every day, so pay it back when you can.'],
@@ -729,7 +756,7 @@ function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done')ret
     else if(S.loc!==GUIDE.from){GUIDE.from=S.loc;const o=S.mkt.data[GUIDE.g];if(o&&o.role==='want')GUIDE.step='sell';}}
   else if(GUIDE.step==='sell'&&h<=0){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
     S.celQ.unshift({id:'cel-guide',title:'That\'s the whole game',text:'Buy where it is made, fly, and sell where it is wanted. Do it again with bigger loads, and pay off your debt before it grows. Trades lists the best deals at every stop.'});}
-  if(GUIDE.step!==was)guideSave();}
+  if(GUIDE.step!==was){guideSave();sfx('guide_step');}}
 function clearHL(){document.querySelectorAll('.guide-hl').forEach(e=>e.classList.remove('guide-hl'));}
 function guideText(){const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name);
   if(GUIDE.step==='buy')return ['1','🟢',`Tap <b>${g}</b>. It is made here, so it is cheap. Then tap <b>Max</b>.`];
@@ -756,7 +783,7 @@ function arrive(first){
   S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();
   const r=rngFor(S.seed,'e|'+S.day+'|'+S.loc);
   const a=r(),b=r(),c=r(),d=r(),e=r(),f=r();
-  if(first)return;
+  if(first)return;sfx('travel_arrive');
   if(a<.1){const avail=GOODS.filter(g=>S.mkt.data[g.id]&&!S.mkt.data[g.id].ev);const g=avail[Math.floor(b*avail.length)];const spike=c<.5;const m=spike?1.6+d*.8:.35+d*.25;
     S.mkt.data[g.id].local*=m;S.news={good:g.id,spike};log(spike?`${ST(S.loc).name} is short on ${g.name.toLowerCase()}. Local price up ${Math.round(Math.abs(m-1)*100)}%.`:`KESTREL dumped ${g.name.toLowerCase()} at ${ST(S.loc).name}. Local price down ${Math.round(Math.abs(m-1)*100)}%.`);}
   const h=r(),st=ST(S.loc);let acc=0;
@@ -786,17 +813,17 @@ function plan(dest){
   return {days,inter,dv:dv(S.loc,dest),ok:!reasons.length,reasons,lag:lagDays(S.loc,dest),interest:S.debt*(Math.pow(1+DEBT_RATE,days)-1)+(typeof loansUSD==='function'?Object.keys(BANKS).reduce((a,c)=>a+loanUSD(c)*(Math.pow(1+BANKS[c].rate,days)-1),0):0)};
 }
 function jump(){
-  if(!sel||S.over||S.event)return;const p=plan(sel);if(!p.ok)return;
+  if(!sel||S.over||S.event)return;const p=plan(sel);if(!p.ok)return;sfx('travel_jump');sndAfterJump();
   const from=ST(S.loc).name;if(!p.inter&&massT()-freightT()<0.01&&S.cash>10e6)S.flewEmpty=true;
   const before=S.debt;S.debt=S.debt>0?S.debt*Math.pow(1+DEBT_RATE,p.days):0;
   S.day+=p.days;
   if(held('food')>0){const lost=held('food')*(1-Math.pow(1-G('food').perish,p.days));removeCargo('food',lost);if(lost>=.05)log(`${lost.toFixed(1)} t of food spoiled in transit.`,'bad');}
   S.loc=sel;sel=null;selGood=null;
   log(`${from} to ${ST(S.loc).name}: ${p.days} ${p.days>1?'days':'day'}.${before?` Debt now ${usd(S.debt)}.`:''}`);
-  for(const c of S.freight.filter(c=>c.to===S.loc)){celebrate('cel-freight','First freight delivered','The shipper paid the rest of your fee. Freight pays without spending your own money, so carry some on trips you are making anyway.');const pay=c.pay*.6;S.cash+=pay;log(`Supplies delivered: ${c.tons} t ${G(c.good).name}. Balance paid: ${usd(pay)}.`,'good');gainRep(S.loc,8);}
+  for(const c of S.freight.filter(c=>c.to===S.loc)){celebrate('cel-freight','First freight delivered','The shipper paid the rest of your fee. Freight pays without spending your own money, so carry some on trips you are making anyway.');const pay=c.pay*.6;S.cash+=pay;log(`Supplies delivered: ${c.tons} t ${G(c.good).name}. Balance paid: ${usd(pay)}.`,'good');sfx('money_in');gainRep(S.loc,8);}
   S.freight=S.freight.filter(c=>c.to!==S.loc);
   for(const c of S.freight.filter(c=>S.day>c.by))lapseContract('lapsed',c);
-  for(const g of S.pax.filter(g=>g.to===S.loc)){celebrate('cel-pax','First passengers delivered','They paid the rest of their fare on arrival. Passengers use berths, not hold space, so they ride along with your cargo.');const pay=g.pay*.75;S.cash+=pay;log(`${g.kind} (${g.size}) disembark at ${ST(S.loc).name}. Fare balance: ${usd(pay)}.`,'good');gainRep(S.loc,4);}
+  for(const g of S.pax.filter(g=>g.to===S.loc)){celebrate('cel-pax','First passengers delivered','They paid the rest of their fare on arrival. Passengers use berths, not hold space, so they ride along with your cargo.');const pay=g.pay*.75;S.cash+=pay;log(`${g.kind} (${g.size}) disembark at ${ST(S.loc).name}. Fare balance: ${usd(pay)}.`,'good');sfx('money_in');gainRep(S.loc,4);}
   S.pax=S.pax.filter(g=>g.to!==S.loc);
   for(const g of S.pax.filter(g=>S.day>g.by))lapsePax(g);
   if(S.contract&&S.day>S.contract.by){log(`Colony request expired: ${amt(S.contract.units,G(S.contract.good))} ${G(S.contract.good).name} to ${ST(S.contract.to).name}. They found someone else.`,'bad');S.contract=null;}
@@ -819,30 +846,30 @@ const savUSD=()=>S&&S.sav?grow(S.sav,SAV_RATE):0;
 const bankLine=c=>BANKS[c].base+LINE_PER_REP*repOf(BANKS[c].home);
 const bankRoom=c=>Math.max(0,bankLine(c)-loanUSD(c));
 const repaysHere=c=>ST(S.loc).sys==='sol'&&ST(S.loc).bloc===c;
-function borrow(c,v){const B=BANKS[c];v=Math.min(v,bankRoom(c));if(v<1e5||S.loc!==B.home)return;
+function borrow(c,v){const B=BANKS[c];v=Math.min(v,bankRoom(c));if(v<1e5||S.loc!==B.home)return sfx('ui_error');
   const local=v*fxNow(c)*(1+LOAN_FEE);S.loans[c]={bal:loanLocal(c)+local,day:S.day};S.cash+=v;
-  log(`${B.name} lent ${usd(v)} at ${(B.rate*100).toFixed(2)}% a day, plus a 1% fee.`);save();render();}
+  log(`${B.name} lent ${usd(v)} at ${(B.rate*100).toFixed(2)}% a day, plus a 1% fee.`);sfx('loan_taken');save();render();}
 function repayBank(c,v){const owe=loanUSD(c);v=Math.min(v,owe,S.cash);if(v<=0||!repaysHere(c))return;
   const left=loanLocal(c)-v*fxNow(c);S.loans[c]=v>=owe-1?null:{bal:left,day:S.day};S.cash-=v;
-  log(`Repaid ${usd(v)} to ${BANKS[c].name}.${S.loans[c]?` ${usd(loanUSD(c))} still owed.`:' Loan closed.'}`,'good');save();render();}
+  log(`Repaid ${usd(v)} to ${BANKS[c].name}.${S.loans[c]?` ${usd(loanUSD(c))} still owed.`:' Loan closed.'}`,'good');sfx(S.loans[c]?'money_in':'debt_cleared');save();render();}
 // STA Treasury: deposits earn less than any loan costs, so borrowing to save never pays.
-function deposit(v){v=Math.min(v,S.cash);if(v<=0||ST(S.loc).sys!=='sol')return;S.sav={bal:savUSD()+v,day:S.day};S.cash-=v;log(`Deposited ${usd(v)} with the STA Treasury.`);save();render();}
-function withdraw(v){v=Math.min(v,savUSD());if(v<=0||ST(S.loc).sys!=='sol')return;const left=savUSD()-v;S.sav=left>1?{bal:left,day:S.day}:null;S.cash+=v;log(`Withdrew ${usd(v)} from the STA Treasury.`);save();render();}
+function deposit(v){v=Math.min(v,S.cash);if(v<=0||ST(S.loc).sys!=='sol')return;S.sav={bal:savUSD()+v,day:S.day};S.cash-=v;log(`Deposited ${usd(v)} with the STA Treasury.`);sfx('money_in');save();render();}
+function withdraw(v){v=Math.min(v,savUSD());if(v<=0||ST(S.loc).sys!=='sol')return;const left=savUSD()-v;S.sav=left>1?{bal:left,day:S.day}:null;S.cash+=v;log(`Withdrew ${usd(v)} from the STA Treasury.`);sfx('money_in');save();render();}
 
 // Hull and cargo insurance (Gateway) and hull plating (Utopia)
 const POLICY_DAYS=10,POLICY_BASE=2.5e6,HULL_PT=150000;
 const insured=()=>!!(S&&S.policy&&S.day<=S.policy.until);
 const cargoBasis=()=>Object.entries(S.cargo).reduce((a,[,c])=>a+c.cost,0);
 const premium=()=>POLICY_BASE+.01*cargoBasis();
-function buyPolicy(){const p=premium();if(p>S.cash)return;S.cash-=p;const from=insured()?S.policy.until:S.day;S.policy={until:Math.min(S.total,from+POLICY_DAYS)};
+function buyPolicy(){const p=premium();if(p>S.cash)return sfx('ui_error');sfx('contract_signed');S.cash-=p;const from=insured()?S.policy.until:S.day;S.policy={until:Math.min(S.total,from+POLICY_DAYS)};
   log(`Hull and cargo policy bound through day ${S.policy.until}. Premium ${usd(p)}.`);save();render();}
 const dmgOf=n=>Math.round(n*(S&&S.plate?.6:1));
-function hullHit(n){n=dmgOf(n);S.hull=Math.max(0,S.hull-n);let t=`Hull −${n}.`;
+function hullHit(n){n=dmgOf(n);S.hull=Math.max(0,S.hull-n);if(n>0)sfx('hazard_hit');let t=`Hull −${n}.`;
   if(insured()&&n>0){const pay=n*HULL_PT;S.cash+=pay;t+=` Your policy paid ${usd(pay)}.`;}return {n,t};}
 
 // Hull yard (Utopia)
 const PLATE_COST=15e6;
-function buyPlate(){if(S.plate||S.cash<PLATE_COST)return;S.cash-=PLATE_COST;S.plate=true;log('Hull plating fitted. Damage cut by 40%.','good');save();render();}
+function buyPlate(){if(S.plate||S.cash<PLATE_COST)return sfx('ui_error');sfx('upgrade');S.cash-=PLATE_COST;S.plate=true;log('Hull plating fitted. Damage cut by 40%.','good');save();render();}
 
 // Bonded warehouse (Ceres): fee accrues per tonne-day and is paid on withdrawal
 const WH_FEE=15000;
@@ -852,8 +879,8 @@ const whOwed=()=>Object.entries(S.wh).reduce((a,[id,l])=>a+l.owed+l.q*G(id).kg/1
 function whStore(id){if(S.loc!=='ceres')return;whAccrue();const q=held(id);if(q<=0)return;const basis=removeCargo(id,q);
   const l=S.wh[id]||{q:0,cost:0,owed:0,day:S.day};l.q+=q;l.cost+=basis;S.wh[id]=l;log(`Stored ${amt(q,G(id))} ${G(id).name} in the Ceres bonded warehouse.`);save();render();}
 function whTake(id){if(S.loc!=='ceres')return;whAccrue();const l=S.wh[id];if(!l)return;const per=G(id).kg/1000;
-  const q=Math.min(l.q,Math.floor(freeT()/per+1e-9));if(q<=0){log('No room in the hold to withdraw that.','bad');return render();}
-  const share=q/l.q,fee=l.owed*share;if(fee>S.cash){log(`Storage fee ${usd(fee)} is more than your cash.`,'bad');return render();}
+  const q=Math.min(l.q,Math.floor(freeT()/per+1e-9));if(q<=0){sfx('ui_error');log('No room in the hold to withdraw that.','bad');return render();}
+  const share=q/l.q,fee=l.owed*share;if(fee>S.cash){sfx('ui_error');log(`Storage fee ${usd(fee)} is more than your cash.`,'bad');return render();}
   S.cash-=fee;addCargo(id,q,l.cost*share);l.q-=q;l.cost-=l.cost*share;l.owed-=fee;if(l.q<1e-6)delete S.wh[id];
   log(`Withdrew ${amt(q,G(id))} ${G(id).name} from the warehouse. Storage fee ${usd(fee)}.`);save();render();}
 
@@ -888,7 +915,7 @@ function foundryNeeds(){const n=[];if(S.fleet.length>=FLEET_MAX)n.push(`fleet is
 function buildFork(a,b){if(S.loc!=='psy'||foundryNeeds().length||a===b)return;
   S.cash-=FORK_CASH;const mb=removeCargo('metal',FORK_METAL)+removeCargo('pgm',FORK_PGM);S.forkN++;
   const n=S.forkN,t=TRAIT_IDS[Math.floor(rngFor(S.seed,'trait|'+n+'|'+S.day)()*TRAIT_IDS.length)];
-  const f={n,name:'FL-'+n,trait:t,a,b,paid:S.day,earned:0,born:S.day,cost:FORK_CASH+mb};S.fleet.push(f);
+  const f={n,name:'FL-'+n,trait:t,a,b,paid:S.day,earned:0,born:S.day,cost:FORK_CASH+mb};S.fleet.push(f);sfx('fork_boot');
   log(`${f.name} booted at Psyche Works. Trait: ${TRAITS[t].name}. Route ${short(ST(a).name)} ⇄ ${short(ST(b).name)}.`,'good');save();
   openSheet({locked:true,eyebrow:'Fork foundry · Psyche Works',title:`${f.name} is awake`,body:`<p>${TRAITS[t].boot}</p><dl class="kv"><dt>Trait</dt><dd>${TRAITS[t].name}</dd><dt>Effect</dt><dd>${TRAITS[t].note}</dd><dt>Route</dt><dd>${short(ST(a).name)} ⇄ ${short(ST(b).name)}</dd><dt>Estimated</dt><dd>${usd(forkEst(a,b,t))} a day</dd></dl><p class="small" style="color:#c9b9a8">Nobody chooses their fork's trait, including you. Traits can drift over time.</p>`,
     actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
@@ -953,8 +980,8 @@ function servicesHTML(st,wires){let h='';const sol=st.sys==='sol',M=v=>usd(v);
   return h;}
 
 /* ---------- trading ---------- */
-function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.loc,o.local);q=Math.min(q,o.stock,Math.floor(S.cash/p),Math.floor(freeT()/(g.kg/1000)+1e-9));if(q<=0)return;o.stock-=q;S.cash-=q*p;addCargo(id,q,q*p);log(`Bought ${amt(q,g)} ${g.name} for ${usd(q*p)}.`);save();closeSheet();render();}
-function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return;const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
+function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.loc,o.local);q=Math.min(q,o.stock,Math.floor(S.cash/p),Math.floor(freeT()/(g.kg/1000)+1e-9));if(q<=0)return sfx('ui_error');o.stock-=q;S.cash-=q*p;addCargo(id,q,q*p);sfx('trade_buy');log(`Bought ${amt(q,g)} ${g.name} for ${usd(q*p)}.`);save();closeSheet();render();}
+function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return sfx('ui_error');const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;sfx(pl>=0?'trade_sell_profit':'trade_sell_loss');if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
 function bestTrades(){
   const m=S.mkt.data,out=[];
   for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(S.day+p.days>S.total)continue;
@@ -967,18 +994,18 @@ function bestTrades(){
 }
 const CONTRACT_DAYS=5; // a supply contract must be delivered within this many days of signing
 function openCharters(){if(ST(S.loc).sys!=='sol')return [];const cm=repContractMult(S.loc);return charters(S.seed,S.day,S.loc).filter(c=>!S.taken.includes(S.day+'|'+S.loc+'|'+c.n)).map(c=>({...c,pay:Math.round(c.pay*cm/1e5)*1e5}));}
-function lapseContract(why,c){if(!c)return;const adv=c.adv??c.pay*.4;S.debt+=adv;
+function lapseContract(why,c){if(!c)return;sfx('contract_failed');const adv=c.adv??c.pay*.4;S.debt+=adv;
   log(`Supply contract to ${ST(c.to).name} ${why}. Halyard recovers the ${usd(adv)} advance as debt.`,'bad');if(c.from)gainRep(c.from,-10);S.freight=S.freight.filter(x=>x!==c);}
-function signCharter(c){if(S.freight.length>=FREIGHT_MAX||c.tons>freeT()+1e-9)return false;
+function signCharter(c){if(S.freight.length>=FREIGHT_MAX||c.tons>freeT()+1e-9){sfx('ui_error');return false;}sfx('contract_signed');
   S.freight.push({...c,from:S.loc,adv:c.pay*.4,by:Math.min(S.total,S.day+CONTRACT_DAYS)});S.taken.push(S.day+'|'+S.loc+'|'+c.n);S.cash+=c.pay*.4;
   log(`Signed supply contract: ${c.tons} t ${G(c.good).name} to ${ST(c.to).name} for ${usd(c.pay)}. Advance ${usd(c.pay*.4)}. Deliver by day ${Math.min(S.total,S.day+CONTRACT_DAYS)}.`,'good');save();return true;}
 // Passengers
 function paxOpen(){return paxOffers(S.seed,S.day,S.loc).filter(g=>!S.taken.includes('p|'+S.day+'|'+S.loc+'|'+g.n)&&S.day+g.days<=S.total).map(g=>({...g,pay:Math.round(g.pay*repContractMult(S.loc)/1e4)*1e4}));}
-function boardPax(g){if(g.size>berthsFree())return false;const by=Math.min(S.total,S.day+g.days+PAX_SLACK);
+function boardPax(g){if(g.size>berthsFree()){sfx('ui_error');return false;}sfx('contract_signed');const by=Math.min(S.total,S.day+g.days+PAX_SLACK);
   S.pax.push({...g,from:S.loc,adv:g.pay*.25,by});S.taken.push('p|'+S.day+'|'+S.loc+'|'+g.n);S.cash+=g.pay*.25;
   log(`${g.kind} (${g.size}) board for ${ST(g.to).name}. Fare ${usd(g.pay)}, ${usd(g.pay*.25)} now. Arrive by day ${by}.`,'good');save();return true;}
-function lapsePax(g){S.debt+=g.adv;log(`${g.kind} missed their day-${g.by} arrival at ${ST(g.to).name}. Halyard refunds the ${usd(g.adv)} fare deposit and adds it to your debt.`,'bad');if(g.from)gainRep(g.from,-6);S.pax=S.pax.filter(x=>x!==g);}
-function buyCabins(){const n=Math.round((S.berths||0)/CABIN_BERTHS);if(n>=CABIN_MAX||S.cash<CABIN_PRICE)return false;S.cash-=CABIN_PRICE;S.berths=(S.berths||0)+CABIN_BERTHS;log(`Fitted passenger cabins. ${S.berths} berths.`,'good');save();return true;}
+function lapsePax(g){S.debt+=g.adv;sfx('contract_failed');log(`${g.kind} missed their day-${g.by} arrival at ${ST(g.to).name}. Halyard refunds the ${usd(g.adv)} fare deposit and adds it to your debt.`,'bad');if(g.from)gainRep(g.from,-6);S.pax=S.pax.filter(x=>x!==g);}
+function buyCabins(){const n=Math.round((S.berths||0)/CABIN_BERTHS);if(n>=CABIN_MAX||S.cash<CABIN_PRICE){sfx('ui_error');return false;}sfx('upgrade');S.cash-=CABIN_PRICE;S.berths=(S.berths||0)+CABIN_BERTHS;log(`Fitted passenger cabins. ${S.berths} berths.`,'good');save();return true;}
 
 /* ---------- events ---------- */
 const GOODS_REF=BASE;
@@ -995,9 +1022,9 @@ function evContract(r){
 function resolved(title,text){S.event=null;save();render();if(S.hull<=0)return finish('lost');
   openSheet({title,eyebrow:'Resolved',body:`<p>${text}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}],locked:true});}
 function showEvent(){
-  const e=S.event;if(!e)return;
+  const e=S.event;if(!e)return;sfx('event_alert');
   if(e.type==='debris')openSheet({locked:true,eyebrow:'Solar Transit Authority · debris',title:'Conjunction warning',body:`<p>The STA's tracking network predicts a close pass with a debris fragment. LEO is the most crowded orbit there is.</p><dl class="kv"><dt>Avoidance burn</dt><dd>+1 day · ${usd(S.debt*DEBT_RATE)} interest</dd><dt>Hold course</dt><dd>20%: hull −${dmgOf(30)}</dd></dl>`,
-    actions:[{label:'Avoidance burn',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Avoidance burn: a wider approach cost one day.');resolved('Clear','The wider approach costs a day and the fragment passes safely. The market has moved a day.');}},{label:'Hold course',kind:'warnb',fn:()=>{if(Math.random()<.2){const h=hullHit(30);log('Debris strike. '+h.t,'bad');resolved('Strike','A fragment punches through a radiator panel. '+h.t);}else{log('Debris passed clear.','good');resolved('Clear','The fragment passes 400 m off the bow.');}}}]});
+    actions:[{label:'Avoidance burn',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Avoidance burn: a wider approach cost one day.');sfx('near_miss');resolved('Clear','The wider approach costs a day and the fragment passes safely. The market has moved a day.');}},{label:'Hold course',kind:'warnb',fn:()=>{if(Math.random()<.2){const h=hullHit(30);log('Debris strike. '+h.t,'bad');resolved('Strike','A fragment punches through a radiator panel. '+h.t);}else{log('Debris passed clear.','good');sfx('near_miss');resolved('Clear','The fragment passes 400 m off the bow.');}}}]});
   else if(e.type==='export')openSheet({locked:true,eyebrow:`${AGENCY[ST(S.loc).bloc]} · export control`,title:'Inspector aboard',body:`<p>${ST(S.loc).name} is outside the dollar bloc. The ${AGENCY[ST(S.loc).bloc]} inspector wants an export license for the ${held('leu')} crates of low-enriched uranium in your hold, and is in no hurry.</p><dl class="kv"><dt>Pay license fee</dt><dd>${usd(e.fee)}</dd><dt>Refuse</dt><dd>LEU impounded</dd></dl>`,
     actions:[{label:`Pay ${usd(e.fee)}`,disabled:S.cash<e.fee,fn:()=>{S.cash-=e.fee;gainRep(S.loc,5);log(`Paid ${usd(e.fee)} export license fee.`);resolved('Licensed','The fuel is cleared for sale here.');}},{label:'Refuse',kind:'warnb',fn:()=>{const q=held('leu');removeCargo('leu',q);gainRep(S.loc,-8);log(`The inspector impounded ${q} crates of LEU.`,'bad');resolved('Impounded',`The inspector impounds ${q} crates of reactor fuel and leaves a receipt.`);}}]});
   else if(e.type==='storm'){
@@ -1010,7 +1037,7 @@ function showEvent(){
       actions:[{label:'Use spares',disabled:!ec,fn:()=>{removeCargo('elec',1);log('Fixed the coolant pump with 1 crate of spares.');resolved('Repaired','The pump is replaced. One crate of electronics used. You have no hands, but the drones do.');}},{label:'Run degraded',kind:'warnb',fn:()=>{const h=hullHit(e.dmg);log('Running degraded. '+h.t,'bad');resolved('Degraded',h.t+' Repair docks are at LEO, Gateway, Utopia and Proxima.');}}]});}
   else if(e.type==='contract'){const c=e.c,g=G(c.good);
     openSheet({locked:true,eyebrow:'Colony request',title:'Standing order',body:`<p>${ST(c.to).name} posts a fixed-price order through the ${AGENCY[ST(c.to).bloc]}, the way the US Department of Energy pre-bought lunar helium-3.</p><dl class="kv"><dt>Deliver</dt><dd>${amt(c.units,g)} ${g.name}</dd><dt>Made at</dt><dd>${STATIONS.filter(s=>s.make.includes(g.id)).map(s=>short(s.name)).join(', ')}</dd><dt>To</dt><dd>${ST(c.to).name}</dd><dt>By</dt><dd>day ${c.by}</dd><dt>Pays</dt><dd>${usd(c.unitUSD*c.units)}</dd></dl><p class="small" style="color:#c9b9a8">No penalty if it expires.</p>`,
-      actions:[{label:'Accept',fn:()=>{S.contract=c;log(`Accepted: ${amt(c.units,g)} ${g.name} to ${ST(c.to).name} by day ${c.by}.`,'good');resolved('Accepted','The request is on your Freight screen.');}},{label:'Decline',kind:'ghost',fn:()=>{S.event=null;save();closeSheet();render();}}]});}
+      actions:[{label:'Accept',fn:()=>{S.contract=c;log(`Accepted: ${amt(c.units,g)} ${g.name} to ${ST(c.to).name} by day ${c.by}.`,'good');sfx('contract_signed');resolved('Accepted','The request is on your Freight screen.');}},{label:'Decline',kind:'ghost',fn:()=>{S.event=null;save();closeSheet();render();}}]});}
 }
 
 /* ---------- end ---------- */
@@ -1020,9 +1047,9 @@ function finish(reason){
   const prev=bestFor(S.mode==='daily'?S.seed:null,S.total);
   addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
   log(reason==='lost'?'Probe lost. No fork.':`Mission closed. Replication fund ${usd(score)}. Forking.`,reason==='lost'?'bad':'good');save();render();
-  const isBest=prev===null||score>prev;
+  const isBest=prev===null||score>prev;sfx(reason==='lost'?'mission_lost':isBest&&prev!==null?'new_best':'mission_complete');
   openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
-    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd><dt>Best on this ${S.mode==='daily'?'daily mission':'length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd></dl>${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.6" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
+    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd><dt>Best on this ${S.mode==='daily'?'daily mission':'length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd></dl>${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.7" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
     actions:[{label:'Main menu',fn:()=>{closeSheet();go('home');}},{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
 }
 
@@ -1030,8 +1057,8 @@ function finish(reason){
 function go(screen){ui.screen=screen;ui.page=null;if(screen!=='market')hideTip();render();if(screen==='market'&&S&&S.event&&!sheetSpec)showEvent();}
 function page(name){ui.from=ui.screen==='page'?ui.from:ui.screen;ui.screen='page';ui.page=name;render();$('#scr-page .body').scrollTop=0;}
 let sheetSpec=null;
-function openSheet(spec){hideTip();sheetSpec=spec;ui.sheet=spec;drawSheet();}
-function closeSheet(){sheetSpec=null;ui.sheet=null;$('#scrim').hidden=true;flashMsg='';}
+function openSheet(spec){hideTip();sfx('ui_open');sheetSpec=spec;ui.sheet=spec;drawSheet();}
+function closeSheet(){if(sheetSpec)sfx('ui_close');sheetSpec=null;ui.sheet=null;$('#scrim').hidden=true;flashMsg='';}
 function refreshSheet(){if(sheetSpec&&sheetSpec.rebuild)sheetSpec=sheetSpec.rebuild();drawSheet();}
 function drawSheet(){
   const s=sheetSpec;if(!s){$('#scrim').hidden=true;return;}
@@ -1086,8 +1113,8 @@ function renderHome(){
 // In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
 function openMenu(){
   openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
-    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.6" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
-    wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});},
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen. Your phone's silent switch mutes them.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.7" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
     actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 function renderMarket(){
   const st=ST(S.loc),m=S.mkt.data;
@@ -1150,7 +1177,7 @@ function renderPage(){
     else body+=`<table><thead><tr><th>Group</th><th class="n">Fare</th><th></th></tr></thead><tbody>${po.map(g=>{const ok=S.berths&&g.size<=berthsFree();return `<tr><td><b>${g.kind} (${g.size})</b><span class="sub">→ ${ST(g.to).name} · ${g.days}d${g.to===sel?' · <span class="up">your next stop</span>':''}</span></td><td class="n">${usd(g.pay)}<span class="sub">${usd(g.pay*.25)} now</span></td><td class="n"><button class="btn ghost" type="button" data-px="${g.n}" ${ok?'':'disabled'}>${S.berths?'Board':'No cabins'}</button></td></tr>`;}).join('')}</tbody></table>`;
     pageShell('Freight',body);
     document.querySelectorAll('[data-px]').forEach(b=>b.addEventListener('click',()=>{const g=po.find(o=>o.n===+b.dataset.px);if(g&&boardPax(g))render();}));
-    const d=$('#deliver');if(d)d.addEventListener('click',()=>{const c=S.contract,g=G(c.good);removeCargo(c.good,c.units);const pay=c.unitUSD*c.units;S.cash+=pay;log(`Colony request filled: ${amt(c.units,g)} ${g.name}. Paid ${usd(pay)}.`,'good');S.contract=null;gainRep(S.loc,15);save();render();});
+    const d=$('#deliver');if(d)d.addEventListener('click',()=>{const c=S.contract,g=G(c.good);removeCargo(c.good,c.units);const pay=c.unitUSD*c.units;S.cash+=pay;log(`Colony request filled: ${amt(c.units,g)} ${g.name}. Paid ${usd(pay)}.`,'good');sfx('money_in');S.contract=null;gainRep(S.loc,15);save();render();});
     document.querySelectorAll('[data-ch]').forEach(b=>b.addEventListener('click',()=>{const c=offers.find(o=>o.n===+b.dataset.ch);if(c&&signCharter(c)){if(!sel)sel=c.to;render();}}));
   }
   else if(p==='port'){
@@ -1159,16 +1186,16 @@ function renderPage(){
     const wires=[];
     if(canRepayDebt()&&S.debt>0){const max=Math.floor(Math.min(S.debt,S.cash)),keep=max;
       body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Owed to the Halyard Consortium, which built you. Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p><div class="trade-row"><input type="number" id="repay" min="0" max="${max}" value="${keep}" aria-label="Repayment in dollars"><button class="btn" type="button" id="repay-b" ${max<1?'disabled':''}>Repay</button></div></div>`;
-      wires.push(()=>$('#repay-b').addEventListener('click',()=>{const v=Math.min(max,Math.max(0,Math.floor(+$('#repay').value||0)));if(v>0){S.cash-=v;S.debt=Math.max(0,S.debt-v);if(S.debt<1)S.debt=0;log(`Repaid ${usd(v)} of commissioning debt.`,'good');save();render();}}));}
+      wires.push(()=>$('#repay-b').addEventListener('click',()=>{const v=Math.min(max,Math.max(0,Math.floor(+$('#repay').value||0)));if(v>0){S.cash-=v;S.debt=Math.max(0,S.debt-v);if(S.debt<1)S.debt=0;log(`Repaid ${usd(v)} of commissioning debt.`,'good');sfx(S.debt?'money_in':'debt_cleared');save();render();}}));}
     else if(st.sys==='sol'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p></div>`;
     else if(st.sys==='star'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Light-lag blocks repayment from the stars. Balance ${usd(S.debt)}. Interest, sadly, travels faster than light.</p></div>`;
     body+=servicesHTML(st,wires);
     if(st.svc.includes('shipyard')){const price=15e6*(S.mods+1);
       body+=`<div class="card"><h3 style="font-size:18px">Shipyard</h3><div class="trade-row"><span>Hold module +40 t <span class="sub">module ${S.mods+1}</span></span><button class="btn" type="button" id="mod-b" ${S.cash<price?'disabled':''}>${usd(price)}</button></div><div class="trade-row"><span>Passenger cabins +${CABIN_BERTHS} berths <span class="sub">${S.berths?`${S.berths} berths fitted`:'carry passenger groups for fares'}</span></span><button class="btn" type="button" id="cab-b" ${S.berths>=CABIN_BERTHS*CABIN_MAX||S.cash<CABIN_PRICE?'disabled':''}>${S.berths>=CABIN_BERTHS*CABIN_MAX?'Full':usd(CABIN_PRICE)}</button></div><div class="trade-row"><span>Storm shelter <span class="sub">water-jacket radiation shielding</span></span><button class="btn ${S.shield?'ghost':''}" type="button" id="sh-b" ${S.shield||S.cash<8e6?'disabled':''}>${S.shield?'Fitted':usd(8e6)}</button></div></div>`;
-      wires.push(()=>{$('#mod-b').addEventListener('click',()=>{S.cash-=price;S.mods++;S.hold+=40;log(`Installed hold module ${S.mods}. Hold ${S.hold} t.`,'good');save();render();});$('#sh-b').addEventListener('click',()=>{S.cash-=8e6;S.shield=true;log('Fitted a storm shelter.','good');save();render();});$('#cab-b').addEventListener('click',()=>{buyCabins();render();});});}
+      wires.push(()=>{$('#mod-b').addEventListener('click',()=>{S.cash-=price;S.mods++;S.hold+=40;sfx('upgrade');log(`Installed hold module ${S.mods}. Hold ${S.hold} t.`,'good');save();render();});$('#sh-b').addEventListener('click',()=>{S.cash-=8e6;S.shield=true;sfx('upgrade');log('Fitted a storm shelter.','good');save();render();});$('#cab-b').addEventListener('click',()=>{buyCabins();render();});});}
     if(st.svc.includes('repair')){const need=100-S.hull,per=150000,aff=Math.min(need,Math.floor(S.cash/per));
       body+=`<div class="card"><h3 style="font-size:18px">Repair dock</h3><div class="trade-row"><span>${need?`${need} points to full · ${usd(per)} each`:'Hull at full strength.'}</span><button class="btn" type="button" id="rep-b" ${aff<1?'disabled':''}>Repair${aff?' '+aff:''}</button></div></div>`;
-      wires.push(()=>$('#rep-b').addEventListener('click',()=>{S.cash-=aff*per;S.hull+=aff;log(`Repaired ${aff} hull points for ${usd(aff*per)}.`,'good');save();render();}));}
+      wires.push(()=>$('#rep-b').addEventListener('click',()=>{S.cash-=aff*per;S.hull+=aff;sfx('upgrade');log(`Repaired ${aff} hull points for ${usd(aff*per)}.`,'good');save();render();}));}
     body+=standingCard;
     body+=`<p class="small muted">Where to find services: banks at LEO (Halyard), Gateway (EDSD) and ILRS (Guanghan) · STA Treasury at every Solar System stop · shipyard and passenger cabins at LEO · repair at LEO, Gateway, Utopia and Proxima · insurance at Gateway · hull plating at Utopia · warehouse at Ceres · fork foundry at Psyche.</p>`;
     body+=`<button class="linkbtn" type="button" id="endrun">End the mission and fork now</button>`;
@@ -1260,7 +1287,7 @@ function codexHTML(){
   return `<div class="codex" style="display:grid;gap:18px">
   ${glossCodexHTML()}
   ${tipsCodexHTML()}
-  <div><h3>Credits</h3><p>Designed and built by <b>Jason Von Holmes</b>. <a href="https://jvholmes87.github.io/" target="_blank" rel="noopener">See his portfolio</a> (opens in a new tab).</p><p class="small" style="margin:10px 0 4px"><b>Tester credits</b></p>${TESTER_CREDITS.length?`<ul>${TESTER_CREDITS.map(t=>`<li><b>${t.callsign}</b> · ${t.what} (${t.build})</li>`).join('')}</ul>`:'<p class="small muted">Playtesters whose feedback makes it into the game are listed here by callsign.</p>'}</div>
+  <div><h3>Credits</h3><p>Designed and built by <b>Jason Von Holmes</b>. <a href="https://jvholmes87.github.io/" target="_blank" rel="noopener">See his portfolio</a> (opens in a new tab).</p><p class="small" style="margin:10px 0 4px">Sound effects are made in code with <a href="https://github.com/KilledByAPixel/ZzFX" target="_blank" rel="noopener">ZzFX</a> by Frank Force (MIT License).</p><p class="small" style="margin:10px 0 4px"><b>Tester credits</b></p>${TESTER_CREDITS.length?`<ul>${TESTER_CREDITS.map(t=>`<li><b>${t.callsign}</b> · ${t.what} (${t.build})</li>`).join('')}</ul>`:'<p class="small muted">Playtesters whose feedback makes it into the game are listed here by callsign.</p>'}</div>
   <div><h3>Story</h3><div style="display:grid;gap:8px">${STORY}</div><p class="small" style="margin-top:8px"><button class="linkbtn" type="button" onclick="showIntro(true)">Replay the boot log</button></p></div>
   <div><h3>Standing and acts</h3><ul>
     <li><b>Colony standing</b> runs 0–100 per station: Unknown, Known (20), Trusted (50), Partner (80). Selling a colony goods it wants earns up to 10 a sale and 16 a day; supply contracts earn 8, colony requests 15, a paid inspection 5. Refusing an inspector costs 8.</li>
