@@ -136,7 +136,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <main>
   <div class="wrap hero">
     <div>
-      <span class="status"><i></i>Beta · v25.8 · updated Oct 30, 2026</span>
+      <span class="status"><i></i>Beta · v25.8.1 · updated Oct 30, 2026</span>
       <h1>Fork<span>line</span>: a free space trading game</h1>
       <p class="lede">A free, turn-based space trading game for phone and PC. You're a freight probe that starts with a loan. Buy where goods are made, sell where they're wanted, and pay off the debt before the interest grows.</p>
       <div class="ctas">
@@ -175,7 +175,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
           <li>The Daily Mission now counts your first run of the day. Play it again as practice as often as you like; practice runs don't change your counted score.</li>
           <li>Share your Daily result with no routes or prices, so it won't spoil the day for anyone.</li>
           <li>Calm view in the ☰ menu: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</li>
-          <li>Local records restart with this build, because star pay changes scores.</li></ul></div></div>
+          <li>Local records restart with this build, because star pay changes scores.</li>
+          <li>v25.8.1: tester credits in the Codex, and the tester count on this page now updates itself.</li></ul></div></div>
         <div class="rel"><div class="ver">v25.7<small>Oct 29, 2026</small></div><div><h3>Sound</h3><ul>
           <li>Short sound effects for trades, jumps, arrivals, events and the end of a mission, made in code so the game stays small.</li>
           <li>Turn sound on or off and set the volume in the ☰ menu. Everything a sound tells you is also on screen.</li></ul></div></div>
@@ -259,6 +260,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
         <div class="card"><p class="who">A young tester (8–12)</p><p class="q">Didn't know what the job was at first, and nine game words were unclear.</p><p class="a">→ v25.6: a guided first trade and tap-to-explain words.</p></div>
         <div class="card"><p class="who">Orbit-Falcon-74</p><p class="q">Not much of a gamer and found the game hard to follow.</p><p class="a">→ v25.6: plain-words explanations and a clearer goal from the first screen.</p></div>
         <div class="card"><p class="who">Estarie</p><p class="q">Too many words and numbers at the start, with no pictures to show the goal. Asked for a tutorial.</p><p class="a">→ v25.6: guided first trade, icons and less text. v25.8: a calm view with bigger text and buy/sell signs.</p></div>
+        <div class="card"><p class="who">Meteor-Owl-99</p><p class="q">Prices and strategy were hard to follow; asked for a beginner mode with fewer numbers.</p><p class="a">→ v25.8: a Calm view with bigger text, fewer numbers and buy or sell signs.</p></div>
+        <div class="card"><p class="who">Spaceghost</p><p class="q">Wanted more help easing in, and wasn't sure how much control they had over passengers and freight.</p><p class="a">→ Next: we plan an easier start and a clearer Freight screen.</p></div>
         <div class="card"><p class="who">BowtiedPassport</p><p class="q">Checking where each contract goes meant jumping between screens; the outer worlds didn't pay enough for the trip.</p><p class="a">→ v25.6: Move screen shows drop-offs. v25.8: star colonies pay more, and more the farther they are.</p></div>
       </div>
     </div>
@@ -284,14 +287,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       <div>
         <h2>Help us test</h2>
         <p>Play a mission, then send a tester report. It takes about 5 minutes and doesn't ask for your name or email: you make up a space callsign. If your feedback makes it into the game, your callsign can go in the credits.</p>
-        <div class="ctas"><a class="btn primary" href="/play/">Play a mission</a><a class="btn ghost" href="/report/?b=v25.8">Send a tester report</a></div>
+        <div class="ctas"><a class="btn primary" href="/play/">Play a mission</a><a class="btn ghost" href="/report/?b=v25.8.1">Send a tester report</a></div>
         <p class="sub" style="margin:0 0 10px">Adults can join the crew list at the end of a report for occasional updates.</p>
         <p class="sub" style="margin:0"><b style="color:var(--ink)">Beta team, coming soon:</b> we plan to form a beta team that tries big updates before everyone else. The first invitations will go to testers who sent a report and joined the crew list.</p>
       </div>
       <div class="card">
         <p class="eyebrow" style="margin:0 0 8px">Testing goal: 25 testers</p>
-        <p style="font:800 34px/1 var(--f-display);margin:0 0 10px">6 <span style="color:var(--muted);font-size:22px">of 25 testers</span></p>
-        <div class="meter" role="img" aria-label="6 of 25 testers"><i style="width:24%"></i></div>
+        <p style="font:800 34px/1 var(--f-display);margin:0 0 10px"><span id="tm-n">6</span> <span style="color:var(--muted);font-size:22px">of <span id="tm-g">25</span> testers</span></p>
+        <div class="meter" role="img" id="tm-bar" aria-label="6 of 25 testers"><i id="tm-fill" style="width:24%"></i></div>
         <p class="sub" style="margin:10px 0 0">The plan: at 25 testers, we open accounts and cloud saves on the web. At 100 players with accounts, we prepare the Google Play launch, and those first 100 hear about it first. We're looking for players of every age, especially 13 to 17.</p>
       </div>
     </div>
@@ -305,5 +308,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <div>Built to an E for Everyone standard. No pop-up ads, no tracking cookies.</div>
   </div>
 </footer>
+<script>
+/* Tester meter (v25.8.1): the count comes from a count-only database function; the number above stays if it can't load. */
+(function(){fetch('https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/rpc/tester_meter',{method:'POST',headers:{apikey:'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_','Content-Type':'application/json'},body:'{}'})
+  .then(function(r){return r.ok?r.json():null;}).then(function(d){if(!d||typeof d.players!=='number')return;var n=d.players,g=d.goal||25;
+    document.getElementById('tm-n').textContent=n;document.getElementById('tm-g').textContent=g;document.getElementById('tm-fill').style.width=Math.min(100,Math.round(n/g*100))+'%';
+    document.getElementById('tm-bar').setAttribute('aria-label',n+' of '+g+' testers');}).catch(function(){});})();
+</script>
 <div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body>
 </html>
