@@ -18,6 +18,11 @@
 [hidden]{display:none!important}
 html,body{height:100%;background:var(--deep);color:var(--ink)}
 body{margin:0;font:15px/1.45 var(--f-body);overflow:hidden}
+/* calm view (v25.8, ACT-092): bigger text, no motion, fewer numbers, buy/sell cues */
+body.calm{font-size:17px}.calm .small{font-size:15px}.calm .nm small{font-size:13px}.calm .eyebrow{font-size:12px}.calm .good .px b{font-size:18px}.calm .nm b{font-size:17px}
+body.calm *{transition:none!important;animation:none!important}.calm .ticker,.calm .mk-sub .muted,.calm .mk-sub .rep{display:none!important}
+.cue{display:inline-block;font:600 11px/1.6 var(--f-mono);letter-spacing:.04em;padding:0 6px;border-radius:4px;margin-right:4px}.cue.buy{background:rgba(110,190,130,.18);color:var(--good)}.cue.sell{background:rgba(242,169,59,.18);color:var(--amber)}
+.goalline{margin-top:6px;font:600 13px/1.4 var(--f-mono);color:var(--ice)}
 button,input,select{font:inherit;color:inherit}
 a{color:var(--ice)}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -278,7 +283,7 @@ const GOODS = [
   { id: 'leu',   name: 'Reactor fuel (LEU)',   unit: 'crate', kg: 100,  min: 6000,  max: 30000, cap: [3, 12], restricted: true },
   { id: 'pgm',   name: 'Platinum-group metals',unit: 'kg',    kg: 1,    min: 45000, max: 95000, cap: [50, 300] },
   { id: 'he3',   name: 'Helium-3',             unit: '100 g', kg: 0.1,  min: 9e6,   max: 36e6,  cap: [5, 25] },
-  { id: 'samp',  name: 'Exoplanet samples',    unit: '100 g', kg: 0.1,  min: 1e6,   max: 60e6,  cap: [2, 10] }
+  { id: 'samp',  name: 'Exoplanet samples',    unit: '100 g', kg: 0.1,  min: 1e6,   max: 60e6,  cap: [4, 14] }
 ];
 
 const STATIONS = [
@@ -343,9 +348,10 @@ const dv = (a, b) => isInterstellar(a, b) ? 0 : DV[a][b];
 const BASE = { water: 700, metal: 1400, nitro: 3000, food: 5000, elec: 30000, leu: 25000, pgm: 60000, he3: 15e6, samp: 8e6 };
 const PBAND = { make: [0.75, 0.90], n: [0.95, 1.10], want: [1.22, 1.42] };
 const STOCK_MULT = { water: 0.3, metal: 0.3, nitro: 0.3, food: 0.3, elec: 0.3, leu: 0.3, pgm: 0.3 };
-const STAR_X = 1.4, CONTRACT_PER_T = 6000, ROUTE_K = 1e6;   // tuning (DEC-035, DEC-036)
+const STAR_X = 1.4, STAR_K = 0.15, CONTRACT_PER_T = 6000, ROUTE_K = 1e6;   // tuning (DEC-035, DEC-036); STAR_K per extra travel day (v25.8, ACT-091)
 const pMid = r => (PBAND[r][0] + PBAND[r][1]) / 2;
-const starX = (st, role) => st.sys === 'star' && role !== 'make' ? STAR_X : 1;   // star colonies pay more for what they import
+const starX = (st, role) => st.sys === 'star' && role !== 'make' ? STAR_X + STAR_K * (legDays('leo', st.id) - 1) : 1;   // star colonies pay more for what they import, more the farther they are (v25.8)
+const starXTxt = () => STATIONS.filter(s => s.sys === 'star').map(s => `${s.name.replace(/ (Outpost|Station|Survey)$/, '')} ${starX(s, 'want').toFixed(2).replace(/0$/, '')}×`).join(', ');
 const refPrice = (gid, sid) => { const st = ST(sid), r = roleOf(st, gid); return BASE[gid] * pMid(r) * starX(st, r); };   // $/kg, mid-band
 
 // Travel is free (v21): Halyard's service contract covers refuelling. Time is the cost: interest, moving markets, deadlines.
@@ -483,7 +489,7 @@ function charters(seed, day, id) {
 
 
 const $=s=>document.querySelector(s);
-const KEY='drift-trader-v3',REC='forkline-records-v20';   // records restarted with the simple economy (v20); older keys kept untouched
+const KEY='drift-trader-v3',REC='forkline-records-v258';   // records restarted with star pay (v25.8, DEC-033); older keys kept untouched
 let S=null,sel=null,selGood=null,suggestQ=null,flashMsg='';
 const ui={screen:'home',page:null,sheet:null,moveView:'list',runLen:45};
 
@@ -533,6 +539,9 @@ function loadSaved(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');r
 const kstDate=()=>new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
 const dailyNo=()=>Math.floor((Date.parse(kstDate())-Date.parse('2026-10-24'))/864e5)+1;
 function records(){try{return JSON.parse(localStorage.getItem(REC)||'[]');}catch(e){return [];}}
+// v25.8 (DEC-064): the first start of a Daily Mission counts; later starts the same day are practice and never ranked.
+const DAILY_KEY='forkline-daily-v1';
+function dailyCounted(seed){try{if(localStorage.getItem(DAILY_KEY)===seed)return true;}catch(e){}if(S&&S.mode==='daily'&&S.seed===seed&&!S.practice)return true;return records().some(r=>r.seed===seed&&!r.practice);}
 function addRecord(r){try{const a=records();a.push(r);a.sort((x,y)=>y.score-x.score);localStorage.setItem(REC,JSON.stringify(a.slice(0,20)));}catch(e){}}
 function bestFor(seed,total){const a=records().filter(r=>seed?r.seed===seed:(r.mode==='random'&&r.total===total));return a.length?a[0].score:null;}
 function addCargo(id,q,costUSD){const c=S.cargo[id]||{q:0,cost:0};c.q+=q;c.cost+=costUSD;S.cargo[id]=c;}
@@ -670,6 +679,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Minified build. Changes for Forkline: shared audio context, private random generator, volume from settings. */
+const VIEW_KEY='forkline-view-v1';let VIEW=(()=>{try{return Object.assign({calm:false},JSON.parse(localStorage.getItem(VIEW_KEY)||'{}'));}catch(e){return {calm:false};}})();
+const viewApply=()=>{try{document.body.classList.toggle('calm',!!VIEW.calm);}catch(e){}};const viewSave=()=>{try{localStorage.setItem(VIEW_KEY,JSON.stringify(VIEW));}catch(e){}};
+if(document.body)viewApply();else addEventListener('DOMContentLoaded',viewApply);
 const SND_KEY='forkline-sound-v1';
 let SND=(()=>{try{return Object.assign({on:true,vol:.6},JSON.parse(localStorage.getItem(SND_KEY)||'{}'));}catch(e){return {on:true,vol:.6};}})();
 const sndSave=()=>{try{localStorage.setItem(SND_KEY,JSON.stringify(SND));}catch(e){}};
@@ -773,8 +785,9 @@ const guideStep=()=>guideOn()?GUIDE.step:null;
 /* ---------- run lifecycle ---------- */
 function newRun(mode,days){
   const seed=mode==='daily'?'daily-'+kstDate():'run-'+Math.random().toString(36).slice(2,10);
+  const practice=mode==='daily'&&dailyCounted(seed);if(mode==='daily'&&!practice){try{localStorage.setItem(DAILY_KEY,seed);}catch(e){}}
   S={v:3,mode,seed,total:days,day:1,loc:'leo',cash:START.cash,debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
-     cargo:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[]};
+     cargo:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[],practice};
   norm(S);sel=null;selGood=null;
   log(`Boot complete at LEO Exchange. ${usd(START.cash)} in the account and a commissioning debt of ${usd(START.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
   arrive(true);save();go('market');showIntro();
@@ -1024,7 +1037,7 @@ function resolved(title,text){S.event=null;save();render();if(S.hull<=0)return f
 function showEvent(){
   const e=S.event;if(!e)return;sfx('event_alert');
   if(e.type==='debris')openSheet({locked:true,eyebrow:'Solar Transit Authority · debris',title:'Conjunction warning',body:`<p>The STA's tracking network predicts a close pass with a debris fragment. LEO is the most crowded orbit there is.</p><dl class="kv"><dt>Avoidance burn</dt><dd>+1 day · ${usd(S.debt*DEBT_RATE)} interest</dd><dt>Hold course</dt><dd>20%: hull −${dmgOf(30)}</dd></dl>`,
-    actions:[{label:'Avoidance burn',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Avoidance burn: a wider approach cost one day.');sfx('near_miss');resolved('Clear','The wider approach costs a day and the fragment passes safely. The market has moved a day.');}},{label:'Hold course',kind:'warnb',fn:()=>{if(Math.random()<.2){const h=hullHit(30);log('Debris strike. '+h.t,'bad');resolved('Strike','A fragment punches through a radiator panel. '+h.t);}else{log('Debris passed clear.','good');sfx('near_miss');resolved('Clear','The fragment passes 400 m off the bow.');}}}]});
+    actions:[{label:'Avoidance burn',disabled:S.day+1>S.total,fn:()=>{S.day+=1;S.debt*=1+DEBT_RATE;S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};log('Avoidance burn: a wider approach cost one day.');sfx('near_miss');resolved('Clear','The wider approach costs a day and the fragment passes safely. The market has moved a day.');}},{label:'Hold course',kind:'warnb',fn:()=>{if(rngFor(S.seed,'hold|'+S.day+'|'+S.loc)()<.2){const h=hullHit(30);log('Debris strike. '+h.t,'bad');resolved('Strike','A fragment punches through a radiator panel. '+h.t);}else{log('Debris passed clear.','good');sfx('near_miss');resolved('Clear','The fragment passes 400 m off the bow.');}}}]});
   else if(e.type==='export')openSheet({locked:true,eyebrow:`${AGENCY[ST(S.loc).bloc]} · export control`,title:'Inspector aboard',body:`<p>${ST(S.loc).name} is outside the dollar bloc. The ${AGENCY[ST(S.loc).bloc]} inspector wants an export license for the ${held('leu')} crates of low-enriched uranium in your hold, and is in no hurry.</p><dl class="kv"><dt>Pay license fee</dt><dd>${usd(e.fee)}</dd><dt>Refuse</dt><dd>LEU impounded</dd></dl>`,
     actions:[{label:`Pay ${usd(e.fee)}`,disabled:S.cash<e.fee,fn:()=>{S.cash-=e.fee;gainRep(S.loc,5);log(`Paid ${usd(e.fee)} export license fee.`);resolved('Licensed','The fuel is cleared for sale here.');}},{label:'Refuse',kind:'warnb',fn:()=>{const q=held('leu');removeCargo('leu',q);gainRep(S.loc,-8);log(`The inspector impounded ${q} crates of LEU.`,'bad');resolved('Impounded',`The inspector impounds ${q} crates of reactor fuel and leaves a receipt.`);}}]});
   else if(e.type==='storm'){
@@ -1045,13 +1058,21 @@ function finish(reason){
   settleFleet();for(const c of (S.freight||[]).slice())lapseContract('was not delivered before the mission ended',c);for(const g of (S.pax||[]).slice())lapsePax(g);
   S.over=true;S.outcome=reason;hideTip();tipActive=null;TIPS.missions++;if(!TIPS.userSet&&TIPS.missions>=2&&TIPS.mode==='guided')TIPS.mode='light';tipsSave();const score=reason==='lost'?Math.round(savUSD()+fleetValue()):net();
   const prev=bestFor(S.mode==='daily'?S.seed:null,S.total);
-  addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
+  if(!S.practice)addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
   log(reason==='lost'?'Probe lost. No fork.':`Mission closed. Replication fund ${usd(score)}. Forking.`,reason==='lost'?'bad':'good');save();render();
-  const isBest=prev===null||score>prev;sfx(reason==='lost'?'mission_lost':isBest&&prev!==null?'new_best':'mission_complete');
-  openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
-    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd><dt>Best on this ${S.mode==='daily'?'daily mission':'length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd></dl>${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.7" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
-    actions:[{label:'Main menu',fn:()=>{closeSheet();go('home');}},{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
+  const isBest=!S.practice&&(prev===null||score>prev);sfx(reason==='lost'?'mission_lost':isBest&&prev!==null?'new_best':'mission_complete');
+  openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}${S.practice?' · practice run':' · counted run'}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
+    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd>${S.mode==='daily'?`<dt>Today's counted run</dt><dd>${S.practice?(prev===null?'not finished':usd(prev)):usd(score)}</dd>`:`<dt>Best on this length</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd>`}</dl>${S.practice?'<p class="small muted">Practice run: it does not change your counted score. Practice as often as you like.</p>':''}${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.8" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
+    actions:[{label:'Main menu',fn:()=>{closeSheet();go('home');}},...(S.mode==='daily'?[{label:'Share result',kind:'ghost',fn:()=>shareDaily(score,reason)}]:[]),{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
 }
+// v25.8 (ACT-055): spoiler-free Daily result: no routes, goods or prices, so it gives nothing away.
+function shareText(score,reason){const done=S.acts.length,n=ACTS.length;
+  return [`Forkline Daily #${dailyNo()}${S.practice?' (practice)':''}`,`${reason==='lost'?'💥 Probe lost':'🚀 Fund '+usd(score)}`,`📜 Acts ${'🟧'.repeat(done)}${'⬛'.repeat(Math.max(0,n-done))} ${done}/${n}`,
+    `${S.debt>0?'🏦 Debt left '+usd(S.debt):'🏦 Debt cleared'} · 🛡 Hull ${Math.max(0,S.hull)}%`,location.origin+'/play/'].join('\n');}
+function shareDaily(score,reason){const text=shareText(score,reason);
+  openSheet({locked:true,eyebrow:'Daily mission · share',title:'Your result',body:`<p class="small muted">No routes or prices, so it won't spoil today's mission for anyone.</p><textarea id="share-txt" readonly rows="6" style="width:100%;margin-top:10px;background:var(--void);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font:13px/1.5 var(--f-mono);resize:none">${text}</textarea>`,
+    actions:[{label:'Copy',fn:()=>{const b=document.querySelector('#sh-acts button');const ok=()=>{if(b)b.textContent='Copied ✓';};try{navigator.clipboard.writeText(text).then(ok,()=>{const t=$('#share-txt');t.select();document.execCommand('copy');ok();});}catch(e){const t=$('#share-txt');t.select();document.execCommand('copy');ok();}}},
+      ...(navigator.share?[{label:'Share…',kind:'ghost',fn:()=>{navigator.share({text}).catch(()=>{});}}]:[]),{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 
 /* ---------- navigation ---------- */
 function go(screen){ui.screen=screen;ui.page=null;if(screen!=='market')hideTip();render();if(screen==='market'&&S&&S.event&&!sheetSpec)showEvent();}
@@ -1088,15 +1109,15 @@ function tickerHTML(){
 }
 const ABOUT_HTML=(()=>{const e=document.getElementById('about-forkline');return e?e.outerHTML:'';})();   // v25.6: crawlable About text, shown on the home screen
 function renderHome(){
-  const live=S&&!S.over,today='daily-'+kstDate(),best=bestFor(today);
+  const live=S&&!S.over,today='daily-'+kstDate(),best=bestFor(today),counted=dailyCounted(today),liveDaily=live&&S.seed===today;
   const left=(()=>{const now=Date.now()+9*3600e3,end=Math.ceil(now/864e5)*864e5,mins=Math.round((end-now)/6e4);return `${Math.floor(mins/60)}h ${String(mins%60).padStart(2,'0')}m`;})();
   $('#scr-home').innerHTML=`<div></div><div class="body home-body pad">
     <div class="logo"><svg viewBox="0 0 160 60" aria-hidden="true"><circle cx="18" cy="30" r="8" fill="#86c9ea"/><path d="M28 30 H78" fill="none" stroke="#f2a93b" stroke-width="3" stroke-dasharray="7 6"/><path d="M78 30 Q104 30 140 12" fill="none" stroke="#f2a93b" stroke-width="3" stroke-dasharray="7 6"/><path d="M78 30 Q104 30 140 48" fill="none" stroke="#86c9ea" stroke-width="3" stroke-dasharray="7 6"/><circle cx="78" cy="30" r="4" fill="#ece6d8"/><circle cx="144" cy="10" r="5" fill="#f2a93b"/><circle cx="144" cy="50" r="5" fill="#86c9ea"/></svg>
       <h1>Fork<span>line</span></h1><span class="eyebrow">Uploaded mind · self-replicating freight probe</span></div>
     <div class="ticker" aria-hidden="true"><div class="ticker-track">${tickerHTML()}</div></div>
     <div class="card daily"><div class="row"><h2>Daily mission #${dailyNo()}</h2><span class="mono small" style="color:var(--ice)">◷ ${left}</span></div>
-      <p class="muted">Same markets and events for every probe today. 45 days. One mission counts.</p>
-      <div class="row"><button class="btn" type="button" id="h-daily" style="min-width:150px">${live&&S.seed===today?'Resume':'Play'}</button><span class="mono small">Best ${best===null?'–':usd(best)}</span></div></div>
+      <p class="muted">Same markets and events for every probe today. 45 days. ${counted&&!(liveDaily&&!S.practice)?'Your counted run is used. Practice runs are unlimited and never rank.':'Your first start today is the one that counts. Practice as often as you like after.'}</p>
+      <div class="row"><button class="btn" type="button" id="h-daily" style="min-width:150px">${liveDaily?(S.practice?'Resume practice':'Resume'):counted?'Practice':'Play'}</button><span class="mono small">Counted ${best===null?'–':usd(best)}</span></div></div>
     <div style="display:grid;gap:8px"><span class="eyebrow">Free mission</span>
       <div class="seg" role="group" aria-label="Run length">${[30,45,60].map(n=>`<button type="button" data-len="${n}" aria-pressed="${ui.runLen===n}">${n} days</button>`).join('')}</div>
       <button class="btn big" type="button" id="h-new" style="background:var(--bad);border-color:var(--bad);color:#fff">New mission</button>
@@ -1113,23 +1134,23 @@ function renderHome(){
 // In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
 function openMenu(){
   openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
-    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.7" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
-    wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.8" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));sh.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{VIEW.calm=b.dataset.view==='1';viewSave();viewApply();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
     actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 function renderMarket(){
   const st=ST(S.loc),m=S.mkt.data;
   const fuelPct=Math.min(100,massT()/S.hold*100);
   const ch=openCharters().length+(S.berths?paxOpen().length:0),act=S.freight.length+S.pax.length,deliver=S.contract&&S.contract.to===S.loc&&held(S.contract.good)>=S.contract.units-1e-9;
   $('#scr-market').innerHTML=`<header class="mk-head pad">
-      <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
-      <div class="cash">${usd(S.cash)}</div>
+      <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${S.practice?'<b style="color:var(--amber)">Practice run</b> · ':''}${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
+      <div class="cash">${usd(S.cash)}</div>${VIEW.calm?'<p class="goalline">🎯 Buy ⬇ where it is made · fly · sell ⬆ where it is wanted</p>':''}
       <div class="mk-sub"><span class="rep">${gl('standing',repTier(S.loc))} ${Math.round(repOf(S.loc))}</span><span class="note ${S.debt>0?'':'ok'}">${gl('debt','DEBT')} ${S.debt>0?usd(S.debt):'CLEARED'}</span>${loansUSD()>0?`<span class="note">LOANS ${usd(loansUSD())}</span>`:''}${savUSD()>0?`<span class="note ok">SAVED ${usd(savUSD())}</span>`:''}<span class="muted">${AGENCY_SHORT[st.bloc]} · ${BLOC_NAME[st.bloc].toLowerCase()}</span></div>
       ${GOODS.filter(g=>m[g.id]&&m[g.id].ev).map(g=>{const v=m[g.id].ev;return `<p class="news ${v.up?'':'dn'}">${v.up?'▲':'▼'} ${v.head}. Price ×${v.m.toFixed(v.m<1?2:1)}${v.to>S.day?`, ${v.to-S.day+1} days left`:', last day'}: ${v.up?'sell here':'buy here'}.</p>`;}).join('')}${remindersHTML()}${S.news?`<p class="news">${S.news.spike?'Colony shortage':'Rival dump'}: ${G(S.news.good).name} ${S.news.spike?'well above':'well below'} its usual range.</p>`:''}
     </header>
     <div class="body pad" style="padding-block:0 8px">
       <ul class="goods">${GOODS.map(g=>{const o=m[g.id],h=held(g.id);
         if(!o)return `<li><button class="good na" type="button" disabled><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>not traded here</small></span><span class="px"><b>—</b></span></button></li>`;
-        return `<li><button class="good ${o.role}" type="button" data-g="${g.id}"><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>${o.ev?(o.ev.up?'<span class="up">▲ shortage</span> · ':'<span class="dn">▼ glut</span> · '):''}${LOT[g.unit]}${o.role==='make'?' · made here':o.role==='want'?' · in demand':''}${o.stock?'':' · sold out today'}</small></span><span class="px"><b>${usd(o.local)}</b></span></button></li>`;}).join('')}</ul>
+        return `<li><button class="good ${o.role}" type="button" data-g="${g.id}"><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>${VIEW.calm?`${o.role==='make'?'<span class="cue buy">⬇ BUY HERE</span>':o.role==='want'?'<span class="cue sell">⬆ SELL HERE</span>':''}${o.ev?(o.ev.up?'<span class="up">▲ shortage</span>':'<span class="dn">▼ glut</span>'):''}${o.stock?'':' sold out'}`:`${o.ev?(o.ev.up?'<span class="up">▲ shortage</span> · ':'<span class="dn">▼ glut</span> · '):''}${LOT[g.unit]}${o.role==='make'?' · made here':o.role==='want'?' · in demand':''}${o.stock?'':' · sold out today'}`}</small></span><span class="px"><b>${usd(o.local)}</b></span></button></li>`;}).join('')}</ul>
     </div>
     <footer class="foot pad">
       <div class="meters"><div class="meter ${fuelPct>95?'low':''}"><div class="lbl"><span>Hold ${massT().toFixed(0)}/${S.hold} t${freightT()?` · ${freightT()} t freight`:''}</span></div><div class="track"><i style="width:${fuelPct}%"></i></div></div>
@@ -1308,7 +1329,7 @@ function codexHTML(){
     <li><b>Then it branches:</b> the shortage worsens, spreads to the nearest stop, swings the other way as convoys overshoot, or fades. Headlines from the stars arrive as late as their light.</li>
     <li>Watch Trades for headlines and the Move list for ▲ / ▼ tags.</li></ul></div>
   <div><h3>How trading works</h3><ul>
-    <li><b>Prices follow one rule.</b> Each good has a base price. Stops that make it sell at ${Math.round(PBAND.make[0]*100)}–${Math.round(PBAND.make[1]*100)}% of base, neutral stops trade at ${Math.round(PBAND.n[0]*100)}–${Math.round(PBAND.n[1]*100)}%, and stops that want it pay ${Math.round(PBAND.want[0]*100)}–${Math.round(PBAND.want[1]*100)}%. Star colonies pay ${STAR_X}× more for the goods they import. Buy where it is made, sell where it is wanted.</li>
+    <li><b>Prices follow one rule.</b> Each good has a base price. Stops that make it sell at ${Math.round(PBAND.make[0]*100)}–${Math.round(PBAND.make[1]*100)}% of base, neutral stops trade at ${Math.round(PBAND.n[0]*100)}–${Math.round(PBAND.n[1]*100)}%, and stops that want it pay ${Math.round(PBAND.want[0]*100)}–${Math.round(PBAND.want[1]*100)}%. Star colonies pay more for the goods they import, and the farther the star, the more they pay: ${starXTxt()}. They also sell exoplanet samples to bring home. Buy where it is made, sell where it is wanted.</li>
     <li><b>Markets move.</b> Prices drift inside each stop's range on trends that turn every few days, so the trade sheet shows the usual range and where today sits. Every stop buys and sells every good, so there is always something to trade. Market events (above) and small surprise shortages and KESTREL dumps break the pattern.</li>
     <li><b>Travel is free; time is not.</b> Halyard's service contract covers your refuelling at every stop. What a trip costs is days: interest keeps growing, markets keep moving and contracts keep their deadlines. Star trips take 2–7 days.</li>
     <li><b>All prices are in dollars.</b> The three blocs run their own stations, banks and inspectors, but trade settles in dollars on the common clock. Spread 0.5% in-system, 3% at the stars.</li>
@@ -1447,7 +1468,7 @@ function codexHTML(){
     const tmp=new T.Vector3(),tmp2=new T.Vector3(),fwd=new T.Vector3(1,0,0),proj=new T.Vector3();
     let running=true,t0=performance.now(),frame=0;
     function tick(now){if(!running)return;requestAnimationFrame(tick);if(document.hidden||!MQ.matches)return;
-      const dt=Math.min(.05,(now-t0)/1000);t0=now;frame++;const still=REDUCE.matches;
+      const dt=Math.min(.05,(now-t0)/1000);t0=now;frame++;const still=REDUCE.matches||(document.body&&document.body.classList.contains('calm'));
       if(!still){leftDisc.rotation.z+=dt*.012;rightSpin.rotation.y+=dt*.035;}
       const loc=S&&S.loc&&nodes[S.loc]?S.loc:'leo',day=S?S.day:0;
       if(lastLoc===null){lastLoc=loc;lastDay=day;}

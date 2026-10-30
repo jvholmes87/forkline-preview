@@ -214,7 +214,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 
 <script>
 'use strict';
-const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.7').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r3';
+const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.8').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
 const BV = parseFloat(BUILD.replace(/^v/, '')) || 99;   // questions marked 'since' only show for builds that have the feature
 const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
 const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
@@ -292,6 +292,8 @@ const COMMON = [
   { id: 'economy', type: 'text', ages: ['18+'], q: 'Did prices, events and freight feel fair? Anything too strong or too weak?', opt: true },
   { id: 'pay', type: 'one', ages: ['18+'], q: 'Would you pay a one-time price (about $5) to unlock longer missions, an unlimited mission and extra sandbox slots? The full mission stays free.', opts: ['yes', 'maybe', 'no'], cols: 3 },
   { id: 'again', type: 'one', q: 'Would you play again tomorrow?', opts: ['yes!', 'maybe', 'no'], cols: 3 },
+  { id: 'calm', type: 'one', since: 25.8, q: 'Did you try the Calm view in the ☰ menu?', opts: ['yes, I liked it', "yes, but I didn't like it", "no, I didn't need it", "I didn't know about it"], cols: 2, opt: true },
+  { id: 'heard', type: 'one', since: 25.8, q: 'How did you hear about Forkline?', opts: ['X (Twitter)', 'Reddit', 'LinkedIn', 'a friend or family', 'a search', 'somewhere else'], cols: 2, opt: true },
   { id: 'credit', type: 'one', q: 'If your feedback makes it into the game, can we list your callsign in the game credits?', opts: ['Yes, list my callsign', 'No, thanks'], opt: true }
 ];
 const GROWNUP = [
