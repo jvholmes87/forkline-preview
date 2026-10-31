@@ -106,6 +106,8 @@ h1,h2,h3{font-family:var(--f-display);font-weight:800;text-transform:uppercase;l
 .rate p{margin:0;font-size:15px}.rate .stars{display:flex;gap:6px}.rate .star{flex:1;min-height:44px;font-size:24px;line-height:1;background:#0b1424;color:var(--amber);border:1px solid var(--line);border-radius:10px;cursor:pointer}
 .rate .star:hover,.rate .star:focus-visible{border-color:var(--amber)}.rate .ends{display:flex;justify-content:space-between;font:400 11px var(--f-mono);color:var(--muted)}.rate .rate-skip{justify-self:end;min-height:34px;padding:0 12px}
 .ask{margin-top:12px;padding:12px 14px;border-left:3px solid var(--amber);background:#13233b;border-radius:8px;font-size:15px}
+.coach-bub{position:absolute;right:14px;z-index:16;display:flex;align-items:center;gap:6px;min-height:48px;padding:0 16px 0 12px;border-radius:999px;background:#13233b;border:1px solid var(--amber);color:var(--amber);font:600 13px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 6px 18px rgba(0,0,0,.45);cursor:pointer}
+.coach-bub:focus-visible{outline:2px solid var(--amber);outline-offset:2px}.coach-bub[hidden]{display:none}
 .tip .why{display:block;margin-top:4px;font:500 12px/1.4 var(--f-mono);color:var(--muted)}
 .good .px{text-align:right;display:grid;gap:1px}
 .good .px b{font:500 16px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
@@ -681,7 +683,7 @@ function pumpTips(){
   if(!S||S.over||ui.screen!=='market'||sheetSpec||S.event||(S.actQueue&&S.actQueue.length)||rateDue()){hideTip();return;}
   if(S.celQ&&S.celQ.length&&S.celDay!==S.day){const c=S.celQ.shift();S.celDay=S.day;TIPS.seen[c.id]=1;tipStat(c.id,'shown');tipsSave();hideTip();
     return openSheet({eyebrow:'Nice work',title:c.title,body:`<p>${glossify(c.text)}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
-  if(guideOn())return showGuide();
+  if(guideOn()&&!GUIDE.min)return showGuide();
   if(tipActive){if(!TIPS.seen[tipActive.id])return showTip(tipActive);tipActive=null;}
   if(TIPS.mode!=='guided'){hideTip();return;}
   const key=S.day+'|'+S.loc;if(!S.tipArr||S.tipArr.k!==key)S.tipArr={k:key,n:0};
@@ -830,9 +832,16 @@ function showGuide(){const [n,ic,txt0]=guideText(),txt=txt0+(isBeginner()&&GUIDE
   el.dataset.id='guide-'+GUIDE.step;el.className='tip guide';
   el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?(n?`Next move · step ${n} of 3`:'Next move'):`First trade · step ${n} of 3`}</span><p>${GUIDE.re?'<small class="why">Plan updated to fit your last move.</small>':''}${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
   el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';
-  $('#guide-skip').addEventListener('click',()=>{GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
+  $('#guide-skip').addEventListener('click',()=>{if(isBeginner()){GUIDE.min=1;guideSave();hideTip();pumpTips();coachBubble();return;}GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
   clearHL();const t=GUIDE.step==='idle'?null:$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
-const guideStep=()=>guideOn()&&GUIDE.step!=='idle'?GUIDE.step:null;
+const WHISTLE='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="4.5" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 8.2l2.6 1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="15" r="6" fill="currentColor"/><rect x="10" y="9" width="12" height="5.2" rx="1.2" fill="currentColor"/><circle cx="10" cy="15" r="2.1" fill="#13233b"/></svg>';
+function coachBubble(){let b=document.getElementById('coach-bub');const show=!!(S&&isBeginner()&&guideOn()&&GUIDE.min&&ui.screen==='market'&&!sheetSpec&&!S.event);
+  if(!show){if(b)b.hidden=true;return;}
+  if(!b){b=document.createElement('button');b.id='coach-bub';b.type='button';b.className='coach-bub';b.setAttribute('aria-label','Show the coach');b.innerHTML=WHISTLE+'<span>Coach</span>';
+    b.addEventListener('click',()=>{GUIDE.min=0;guideSave();sfx('guide_step');b.hidden=true;guideTick();pumpTips();});}
+  const host=document.getElementById('scr-market');if(b.parentNode!==host)host.appendChild(b);
+  const f=$('#scr-market .foot'),t=$('#tip');b.style.bottom=((f?f.offsetHeight:0)+12+(t&&!t.hidden?t.offsetHeight+8:0))+'px';b.hidden=false;}
+const guideStep=()=>guideOn()&&GUIDE.step!=='idle'&&!GUIDE.min?GUIDE.step:null;
 
 /* ---------- run lifecycle ---------- */
 function newRun(mode,days){
@@ -1156,6 +1165,7 @@ function render(){
   if(sheetSpec&&sheetSpec.rebuild){sheetSpec=sheetSpec.rebuild();drawSheet();}
   showActIfAny();
   pumpTips();
+  coachBubble();
   maybeAutoEnd();
 }
 function tickerHTML(){
