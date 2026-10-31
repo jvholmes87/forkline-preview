@@ -214,7 +214,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 
 <script>
 'use strict';
-const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.8.1').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.9').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
 const BV = parseFloat(BUILD.replace(/^v/, '')) || 99;   // questions marked 'since' only show for builds that have the feature
 const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
 const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
@@ -288,7 +288,7 @@ const COMMON = [
   { id: 'annoying', type: 'text', q: 'What was the most annoying part?', opt: true },
   { id: 'idea', type: 'text', q: 'If you could add or change ONE thing, what would it be?', opt: true },
   { id: 'difficulty', type: 'one', ages: ['13-17', '18+'], q: 'How hard was the game?', opts: ['too easy', 'about right', 'too hard'], cols: 3 },
-  { id: 'length', type: 'one', ages: ['18+'], q: 'Which mission length did you play?', opts: ['30 days', '45 days', '60 days', 'Daily mission'], cols: 2 },
+  { id: 'length', type: 'one', ages: ['18+'], q: 'Which mission did you play?', opts: ['Beginner (7 days)', '30 days', '45 days', '60 days', 'Daily mission'], cols: 2 },
   { id: 'economy', type: 'text', ages: ['18+'], q: 'Did prices, events and freight feel fair? Anything too strong or too weak?', opt: true },
   { id: 'pay', type: 'one', ages: ['18+'], q: 'Would you pay a one-time price (about $5) to unlock longer missions, an unlimited mission and extra sandbox slots? The full mission stays free.', opts: ['yes', 'maybe', 'no'], cols: 3 },
   { id: 'again', type: 'one', q: 'Would you play again tomorrow?', opts: ['yes!', 'maybe', 'no'], cols: 3 },

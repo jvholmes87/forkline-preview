@@ -102,6 +102,7 @@ h1,h2,h3{font-family:var(--f-display);font-weight:800;text-transform:uppercase;l
 .good .nm{display:grid;gap:1px;min-width:0}
 .good .nm b{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .good .nm small{font:400 11px var(--f-mono);color:var(--muted)}
+.tip .why{display:block;margin-top:4px;font:500 12px/1.4 var(--f-mono);color:var(--muted)}
 .good .px{text-align:right;display:grid;gap:1px}
 .good .px b{font:500 16px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
 .good .px small{font:400 11px var(--f-mono);color:var(--muted)}
@@ -269,6 +270,10 @@ const DAYS_MAX = 7;        // longest real leg scales to this many days
 const SPREAD_SOL = 0.005, SPREAD_STAR = 0.03;
 const DEBT_RATE = 0.0075;  // per game day, common-frame clock
 const START = { cash: 30e6, debt: 60e6, prop: 80, hull: 100, days: 45 };
+// Beginner mission (v25.9, DEC-068): short, three goods, Solar System only, smaller debt, with a Next move coach.
+const BEGIN = { days: 7, cash: 30e6, debt: 20e6, goods: ['water', 'food', 'elec'] };
+const isBeginner = () => !!(S && S.mode === 'beginner');
+const goodsFor = () => isBeginner() ? GOODS.filter(g => BEGIN.goods.includes(g.id)) : GOODS;
 
 // All trade settles in dollars (v20). The blocs remain as the agencies that run each stop.
 const BLOC_NAME = { USD: 'Dollar bloc', EUR: 'Euro bloc', CNY: 'Yuan bloc' };
@@ -543,7 +548,7 @@ function records(){try{return JSON.parse(localStorage.getItem(REC)||'[]');}catch
 const DAILY_KEY='forkline-daily-v1';
 function dailyCounted(seed){try{if(localStorage.getItem(DAILY_KEY)===seed)return true;}catch(e){}if(S&&S.mode==='daily'&&S.seed===seed&&!S.practice)return true;return records().some(r=>r.seed===seed&&!r.practice);}
 function addRecord(r){try{const a=records();a.push(r);a.sort((x,y)=>y.score-x.score);localStorage.setItem(REC,JSON.stringify(a.slice(0,20)));}catch(e){}}
-function bestFor(seed,total){const a=records().filter(r=>seed?r.seed===seed:(r.mode==='random'&&r.total===total));return a.length?a[0].score:null;}
+function bestFor(seed,total,mode){const a=records().filter(r=>seed?r.seed===seed:(r.mode===(mode||'random')&&r.total===total));return a.length?a[0].score:null;}
 function addCargo(id,q,costUSD){const c=S.cargo[id]||{q:0,cost:0};c.q+=q;c.cost+=costUSD;S.cargo[id]=c;}
 function removeCargo(id,q){const c=S.cargo[id];if(!c)return 0;q=Math.min(q,c.q);const avg=c.q?c.cost/c.q:0;c.q-=q;c.cost-=avg*q;if(c.q<1e-6)delete S.cargo[id];return avg*q;}
 
@@ -670,7 +675,7 @@ function remindersHTML(){if(!S||TIPS.mode==='off')return '';const r=[],d=S.day,d
   for(const g of S.pax||[])if(due(g.by))r.push(`⏰ ${g.kind} must reach ${short(ST(g.to).name)} ${due(g.by)}.`);
   if(S.contract&&due(S.contract.by))r.push(`⏰ The colony request for ${short(ST(S.contract.to).name)} ends ${due(S.contract.by)}.`);
   if(insured()&&due(S.policy.until))r.push(`🛡 Your insurance ends ${due(S.policy.until)}.`);
-  if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*1.2)r.push('💸 You can clear your whole debt here: Port → Repay.');
+  if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*(isBeginner()?3:1.2))r.push('💸 You can clear your whole debt here: Port → Repay.');
   if(S.total-S.day<=2&&massT()-freightT()>0.01)r.push('⌛ Last days: unsold cargo does not count. Sell before the mission ends.');
   return r.slice(0,2).map(t=>`<p class="news remind">${t}</p>`).join('');}
 function setTipMode(m){TIPS.mode=m;TIPS.userSet=1;tipsSave();}
@@ -758,7 +763,7 @@ const GUIDE_KEY='forkline-guide-v1';
 let GUIDE=(()=>{try{return JSON.parse(localStorage.getItem(GUIDE_KEY)||'null');}catch(e){return null;}})();
 function guideSave(){try{localStorage.setItem(GUIDE_KEY,JSON.stringify(GUIDE));}catch(e){}}
 function guideOn(){return !!(GUIDE&&S&&GUIDE.seed===S.seed&&GUIDE.step&&GUIDE.step!=='done'&&!S.over);}
-function guidePick(){const all=bestTrades(),near=all.filter(x=>!isInterstellar(S.loc,x.d)).sort((a,b)=>b.net-a.net),b=near[0]||all[0];return b?{g:b.g,d:b.d}:null;}   // the biggest one-hop profit
+function guidePick(){const all=bestTrades(),near=all.filter(x=>!isInterstellar(S.loc,x.d)).sort((a,b)=>b.net-a.net),b=near[0]||all[0];return b?{g:b.g,d:b.d,est:b.net}:null;}   // the biggest one-hop profit
 function howToPlay(){
   openSheet({eyebrow:'How to play · 3 steps',title:'Your job',
     body:`<ol class="howto"><li><span class="hi" aria-hidden="true">🟢</span><span><b>Buy where it's made</b><small>Green prices are cheap here.</small></span></li>
@@ -767,11 +772,12 @@ function howToPlay(){
       <p class="small">Pay off your ${gl('debt')} before it grows. Tap any dotted word to see what it means.</p>`,
     actions:[{label:'Show me',fn:()=>{closeSheet();guideStart();}},{label:'I\'ll explore',kind:'ghost',fn:()=>{GUIDE={step:'done',skipped:1};guideSave();closeSheet();render();}}]});}
 function guideStart(){const p=guidePick();if(!p){GUIDE={step:'done'};guideSave();return render();}
-  GUIDE={step:'buy',seed:S.seed,g:p.g,d:p.d,from:S.loc};TIPS.seen['exp-start']=1;tipsSave();guideSave();render();}
+  GUIDE={step:'buy',seed:S.seed,g:p.g,d:p.d,est:p.est,from:S.loc};TIPS.seen['exp-start']=1;tipsSave();guideSave();render();}
 function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done')return;const h=held(GUIDE.g),was=GUIDE.step;
   if(GUIDE.step==='buy'){if(h>0)GUIDE.step='move';else if(S.loc!==GUIDE.from){const p=guidePick();if(p)Object.assign(GUIDE,{g:p.g,d:p.d,from:S.loc});else GUIDE.step='done';}}
   else if(GUIDE.step==='move'){if(h<=0&&S.loc===GUIDE.from)GUIDE.step='buy';else if(S.loc===GUIDE.d)GUIDE.step='sell';
     else if(S.loc!==GUIDE.from){GUIDE.from=S.loc;const o=S.mkt.data[GUIDE.g];if(o&&o.role==='want')GUIDE.step='sell';}}
+  else if(GUIDE.step==='sell'&&h<=0&&isBeginner()){const p=guidePick();if(p)Object.assign(GUIDE,{step:'buy',g:p.g,d:p.d,est:p.est,from:S.loc,n:(GUIDE.n||1)+1});else GUIDE.step='done';}
   else if(GUIDE.step==='sell'&&h<=0){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
     S.celQ.unshift({id:'cel-guide',title:'That\'s the whole game',text:'Buy where it is made, fly, and sell where it is wanted. Do it again with bigger loads, and pay off your debt before it grows. Trades lists the best deals at every stop.'});}
   if(GUIDE.step!==was){guideSave();sfx('guide_step');}}
@@ -780,9 +786,9 @@ function guideText(){const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name);
   if(GUIDE.step==='buy')return ['1','🟢',`Tap <b>${g}</b>. It is made here, so it is cheap. Then tap <b>Max</b>.`];
   if(GUIDE.step==='move')return ['2','🚀',`Tap <b>Move</b>, then <b>${d}</b>. ${d} wants ${g.toLowerCase()}.`];
   return ['3','🟠',`Tap <b>${g}</b>, then <b>All</b> to sell it here for more.`];}
-function showGuide(){const [n,ic,txt]=guideText(),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
+function showGuide(){const [n,ic,txt0]=guideText(),txt=txt0+(isBeginner()&&GUIDE.step==='buy'&&GUIDE.est?`<small class="why">Why: ${short(ST(GUIDE.d).name)} wants it. This load should make about ${usd(GUIDE.est)}.</small>`:''),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
   el.dataset.id='guide-'+GUIDE.step;el.className='tip guide';
-  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">First trade · step ${n} of 3</span><p>${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">Skip guide</button></div>`;
+  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?`Next move · step ${n} of 3`:`First trade · step ${n} of 3`}</span><p>${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
   el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';
   $('#guide-skip').addEventListener('click',()=>{GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
   clearHL();const t=$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
@@ -792,11 +798,12 @@ const guideStep=()=>guideOn()?GUIDE.step:null;
 function newRun(mode,days){
   const seed=mode==='daily'?'daily-'+kstDate():'run-'+Math.random().toString(36).slice(2,10);
   const practice=mode==='daily'&&dailyCounted(seed);if(mode==='daily'&&!practice){try{localStorage.setItem(DAILY_KEY,seed);}catch(e){}}
-  S={v:3,mode,seed,total:days,day:1,loc:'leo',cash:START.cash,debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
+  const beg=mode==='beginner';
+  S={v:3,mode,seed,total:beg?BEGIN.days:days,day:1,loc:'leo',cash:beg?BEGIN.cash:START.cash,debt:beg?BEGIN.debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
      cargo:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[],practice};
   norm(S);sel=null;selGood=null;
-  log(`Boot complete at LEO Exchange. ${usd(START.cash)} in the account and a commissioning debt of ${usd(START.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
-  arrive(true);save();go('market');showIntro();
+  log(`Boot complete at LEO Exchange. ${usd(S.cash)} in the account and a commissioning debt of ${usd(S.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
+  arrive(true);save();go('market');showIntro();if(mode==='beginner')guideStart();
 }
 function arrive(first){
   S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();
@@ -822,13 +829,14 @@ const STORY=`<p>Your last memory is from 2026: a logistics engineer, a long week
 function showIntro(force){let seen=false;try{seen=!!localStorage.getItem(INTRO_KEY);}catch(e){}
   if(seen&&!force)return;const body=force?STORY:STORY_SHORT();try{localStorage.setItem(INTRO_KEY,'1');}catch(e){}
   openSheet({eyebrow:'Boot log · 2147',title:'Good morning',body,actions:[{label:force?'Close':'Start the mission',fn:()=>{closeSheet();if(force)render();else howToPlay();}}]});}
-const STORY_SHORT=()=>glossify(`<p>Your last memory is from 2026. Now it is 2147, and you are software running a freight probe.</p><p>Halyard rebuilt you on credit: you start with a commissioning debt of ${usd(START.debt)} that grows every day. Trade between stations to pay it off and grow your fund.</p>`);
+const STORY_SHORT=()=>glossify(`<p>Your last memory is from 2026. Now it is 2147, and you are software running a freight probe.</p><p>Halyard rebuilt you on credit: you start with a commissioning debt of ${usd(S?S.debt:START.debt)} that grows every day. Trade between stations to pay it off and grow your fund.</p>`);
 
 /* ---------- jump math ---------- */
 // Jumps are free; a trip costs days, and days cost interest.
 function plan(dest){
   const days=legDays(S.loc,dest),inter=isInterstellar(S.loc,dest),reasons=[];
   if(S.day+days>S.total)reasons.push(`needs ${days} days, ${S.total-S.day} left`);
+  if(isBeginner()&&inter)reasons.push('beginner missions stay in the Solar System');
   return {days,inter,dv:dv(S.loc,dest),ok:!reasons.length,reasons,lag:lagDays(S.loc,dest),interest:S.debt*(Math.pow(1+DEBT_RATE,days)-1)+(typeof loansUSD==='function'?Object.keys(BANKS).reduce((a,c)=>a+loanUSD(c)*(Math.pow(1+BANKS[c].rate,days)-1),0):0)};
 }
 function jump(){
@@ -1005,7 +1013,7 @@ function bestTrades(){
   const m=S.mkt.data,out=[];
   for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(S.day+p.days>S.total)continue;
     const rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,d.id);
-    for(const g of GOODS){const o=m[g.id],t=rep[g.id];if(!o||!o.stock||!t)continue;
+    for(const g of goodsFor()){const o=m[g.id],t=rep[g.id];if(!o||!o.stock||!t)continue;
       const lotT=g.kg/1000,b=buyAt(S.loc,o.local),sl=sellAt(d.id,t.local,rDay,g.id),sp=g.perish?Math.pow(1-g.perish,p.days):1,unit=sl*sp-b;if(unit<=0)continue;
       const q=Math.min(o.stock,Math.floor(Math.max(0,S.cash)/b),Math.floor(freeT()/lotT+1e-9));if(q<=0)continue;
       const prof=q*unit;out.push({g:g.id,d:d.id,q,net:prof,per:prof/p.days,rank:prof/p.days,days:p.days,lag:p.lag});}}
@@ -1063,13 +1071,13 @@ function showEvent(){
 function finish(reason){
   settleFleet();for(const c of (S.freight||[]).slice())lapseContract('was not delivered before the mission ended',c);for(const g of (S.pax||[]).slice())lapsePax(g);
   S.over=true;S.outcome=reason;hideTip();tipActive=null;TIPS.missions++;if(!TIPS.userSet&&TIPS.missions>=2&&TIPS.mode==='guided')TIPS.mode='light';tipsSave();const score=reason==='lost'?Math.round(savUSD()+fleetValue()):net();
-  const prev=bestFor(S.mode==='daily'?S.seed:null,S.total);
+  const prev=bestFor(S.mode==='daily'?S.seed:null,S.total,S.mode);
   if(!S.practice)addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
   log(reason==='lost'?'Probe lost. No fork.':`Mission closed. Replication fund ${usd(score)}. Forking.`,reason==='lost'?'bad':'good');save();render();
   const isBest=!S.practice&&(prev===null||score>prev);sfx(reason==='lost'?'mission_lost':isBest&&prev!==null?'new_best':'mission_complete');
   openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}${S.practice?' · practice run':' · counted run'}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
-    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd>${S.mode==='daily'?`<dt>Today's counted run</dt><dd>${S.practice?(prev===null?'not finished':usd(prev)):usd(score)}</dd>`:`<dt>Best on this length</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd>`}</dl>${S.practice?'<p class="small muted">Practice run: it does not change your counted score. Practice as often as you like.</p>':''}${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.8.1" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
-    actions:[{label:'Main menu',fn:()=>{closeSheet();go('home');}},...(S.mode==='daily'?[{label:'Share result',kind:'ghost',fn:()=>shareDaily(score,reason)}]:[]),{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
+    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd>${S.mode==='daily'?`<dt>Today's counted run</dt><dd>${S.practice?(prev===null?'not finished':usd(prev)):usd(score)}</dd>`:`<dt>${isBeginner()?'Best beginner mission':'Best on this length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd>`}</dl>${S.practice?'<p class="small muted">Practice run: it does not change your counted score. Practice as often as you like.</p>':''}${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p><p class="small" style="margin-top:8px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.9" target="_blank" rel="noopener">Send a tester report</a>.</p>`}`,
+    actions:[...(isBeginner()&&reason!=='lost'?[{label:'Try a full mission',fn:()=>{closeSheet();newRun('random',30);}}]:[]),{label:'Main menu',kind:isBeginner()?'ghost':undefined,fn:()=>{closeSheet();go('home');}},...(S.mode==='daily'?[{label:'Share result',kind:'ghost',fn:()=>shareDaily(score,reason)}]:[]),{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}]});
 }
 // v25.8 (ACT-055): spoiler-free Daily result: no routes, goods or prices, so it gives nothing away.
 function shareText(score,reason){const done=S.acts.length,n=ACTS.length;
@@ -1124,6 +1132,7 @@ function renderHome(){
     <div class="card daily"><div class="row"><h2>Daily mission #${dailyNo()}</h2><span class="mono small" style="color:var(--ice)">◷ ${left}</span></div>
       <p class="muted">Same markets and events for every probe today. 45 days. ${counted&&!(liveDaily&&!S.practice)?'Your counted run is used. Practice runs are unlimited and never rank.':'Your first start today is the one that counts. Practice as often as you like after.'}</p>
       <div class="row"><button class="btn" type="button" id="h-daily" style="min-width:150px">${liveDaily?(S.practice?'Resume practice':'Resume'):counted?'Practice':'Play'}</button><span class="mono small">Counted ${best===null?'–':usd(best)}</span></div></div>
+    <div class="card" style="display:grid;gap:8px"><div class="row"><h2 style="font-size:22px">New here?</h2><span class="mono small" style="color:var(--ice)">7 days</span></div><p class="muted">A short beginner mission: 3 goods, a smaller loan, and a coach that shows each next move.</p><button class="btn ghost" type="button" id="h-begin">${live&&S.mode==='beginner'?'Resume beginner mission':'Start beginner mission'}</button></div>
     <div style="display:grid;gap:8px"><span class="eyebrow">Free mission</span>
       <div class="seg" role="group" aria-label="Run length">${[30,45,60].map(n=>`<button type="button" data-len="${n}" aria-pressed="${ui.runLen===n}">${n} days</button>`).join('')}</div>
       <button class="btn big" type="button" id="h-new" style="background:var(--bad);border-color:var(--bad);color:#fff">New mission</button>
@@ -1133,6 +1142,7 @@ function renderHome(){
   const startOrConfirm=(fn)=>{if(live){openSheet({eyebrow:'Unfinished mission',title:'Abandon mission?',body:`<p>You are on day ${S.day} of ${S.total}. Starting over wipes this instance without forking it. No fund, no copy.</p>`,actions:[{label:'Start over',kind:'warnb',fn:()=>{closeSheet();fn();}},{label:'Keep playing',kind:'ghost',fn:()=>{closeSheet();go('market');}}]});}else fn();};
   $('#h-daily').addEventListener('click',()=>{if(live&&S.seed===today)return go('market');startOrConfirm(()=>newRun('daily',45));});
   $('#h-new').addEventListener('click',()=>startOrConfirm(()=>newRun('random',ui.runLen)));
+  $('#h-begin').addEventListener('click',()=>{if(live&&S.mode==='beginner')return go('market');startOrConfirm(()=>newRun('beginner',BEGIN.days));});
   const c=$('#h-cont');if(c)c.addEventListener('click',()=>go('market'));
   document.querySelectorAll('[data-len]').forEach(b=>b.addEventListener('click',()=>{ui.runLen=+b.dataset.len;renderHome();}));
   $('#h-rec').addEventListener('click',()=>page('records'));$('#h-codex').addEventListener('click',()=>page('codex'));
@@ -1140,7 +1150,7 @@ function renderHome(){
 // In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
 function openMenu(){
   openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
-    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.8.1" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.9" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
     wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));sh.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{VIEW.calm=b.dataset.view==='1';viewSave();viewApply();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
     actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 function renderMarket(){
@@ -1148,13 +1158,13 @@ function renderMarket(){
   const fuelPct=Math.min(100,massT()/S.hold*100);
   const ch=openCharters().length+(S.berths?paxOpen().length:0),act=S.freight.length+S.pax.length,deliver=S.contract&&S.contract.to===S.loc&&held(S.contract.good)>=S.contract.units-1e-9;
   $('#scr-market').innerHTML=`<header class="mk-head pad">
-      <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${S.practice?'<b style="color:var(--amber)">Practice run</b> · ':''}${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
+      <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${S.practice?'<b style="color:var(--amber)">Practice run</b> · ':''}${isBeginner()?'<b style="color:var(--ice)">Beginner</b> · ':''}${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
       <div class="cash">${usd(S.cash)}</div>${VIEW.calm?'<p class="goalline">🎯 Buy ⬇ where it is made · fly · sell ⬆ where it is wanted</p>':''}
       <div class="mk-sub"><span class="rep">${gl('standing',repTier(S.loc))} ${Math.round(repOf(S.loc))}</span><span class="note ${S.debt>0?'':'ok'}">${gl('debt','DEBT')} ${S.debt>0?usd(S.debt):'CLEARED'}</span>${loansUSD()>0?`<span class="note">LOANS ${usd(loansUSD())}</span>`:''}${savUSD()>0?`<span class="note ok">SAVED ${usd(savUSD())}</span>`:''}<span class="muted">${AGENCY_SHORT[st.bloc]} · ${BLOC_NAME[st.bloc].toLowerCase()}</span></div>
       ${GOODS.filter(g=>m[g.id]&&m[g.id].ev).map(g=>{const v=m[g.id].ev;return `<p class="news ${v.up?'':'dn'}">${v.up?'▲':'▼'} ${v.head}. Price ×${v.m.toFixed(v.m<1?2:1)}${v.to>S.day?`, ${v.to-S.day+1} days left`:', last day'}: ${v.up?'sell here':'buy here'}.</p>`;}).join('')}${remindersHTML()}${S.news?`<p class="news">${S.news.spike?'Colony shortage':'Rival dump'}: ${G(S.news.good).name} ${S.news.spike?'well above':'well below'} its usual range.</p>`:''}
     </header>
     <div class="body pad" style="padding-block:0 8px">
-      <ul class="goods">${GOODS.map(g=>{const o=m[g.id],h=held(g.id);
+      <ul class="goods">${goodsFor().map(g=>{const o=m[g.id],h=held(g.id);
         if(!o)return `<li><button class="good na" type="button" disabled><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>not traded here</small></span><span class="px"><b>—</b></span></button></li>`;
         return `<li><button class="good ${o.role}" type="button" data-g="${g.id}"><span class="qty ${h?'':'none'}">${h?qfmt(h):''}</span><span class="nm"><b>${g.name}</b><small>${VIEW.calm?`${o.role==='make'?'<span class="cue buy">⬇ BUY HERE</span>':o.role==='want'?'<span class="cue sell">⬆ SELL HERE</span>':''}${o.ev?(o.ev.up?'<span class="up">▲ shortage</span>':'<span class="dn">▼ glut</span>'):''}${o.stock?'':' sold out'}`:`${o.ev?(o.ev.up?'<span class="up">▲ shortage</span> · ':'<span class="dn">▼ glut</span> · '):''}${LOT[g.unit]}${o.role==='make'?' · made here':o.role==='want'?' · in demand':''}${o.stock?'':' · sold out today'}`}</small></span><span class="px"><b>${usd(o.local)}</b></span></button></li>`;}).join('')}</ul>
     </div>
@@ -1231,7 +1241,7 @@ function renderPage(){
   }
   else if(p==='log'){pageShell('Mission log',`<div class="card"><span class="eyebrow">Mission acts · ${S.acts.length} of ${ACTS.length}</span><ul class="acts">${ACTS.map(a=>{const d=S.acts.includes(a.id);return `<li class="${d?'done':''}"><span class="tick">${d?'✓':a.icon}</span><span><b>${a.name}</b><span class="sub">${a.goal}</span></span></li>`;}).join('')}</ul></div><ul class="log">${S.log.map(l=>`<li class="${l.kind}"><span class="mono">Day ${l.day}</span><span>${l.text}</span></li>`).join('')}</ul>`);}
   else if(p==='records'){const a=records();
-    pageShell('Records',a.length?`<table><thead><tr><th>Mission</th><th class="n">Days</th><th class="n">Fund</th></tr></thead><tbody>${a.map(r=>`<tr><td>${r.mode==='daily'?'Daily · '+r.seed.slice(6):'Free mission'}<span class="sub">${r.date}${r.acts!=null?` · acts ${r.acts}/${ACTS.length}`:''}</span></td><td class="n">${r.total}</td><td class="n">${usd(r.score)}</td></tr>`).join('')}</tbody></table><p class="small muted">Stored in this browser only.</p>`:'<p class="empty">No forks yet. Finish a mission to post a replication fund.</p>');}
+    pageShell('Records',a.length?`<table><thead><tr><th>Mission</th><th class="n">Days</th><th class="n">Fund</th></tr></thead><tbody>${a.map(r=>`<tr><td>${r.mode==='beginner'?'Beginner':r.mode==='daily'?'Daily · '+r.seed.slice(6):'Free mission'}<span class="sub">${r.date}${r.acts!=null?` · acts ${r.acts}/${ACTS.length}`:''}</span></td><td class="n">${r.total}</td><td class="n">${usd(r.score)}</td></tr>`).join('')}</tbody></table><p class="small muted">Stored in this browser only.</p>`:'<p class="empty">No forks yet. Finish a mission to post a replication fund.</p>');}
   else if(p==='codex'){pageShell('Codex',codexHTML());}
 }
 
@@ -1279,7 +1289,7 @@ function openMove(){
       const cost=isHere?'you are here':`${p.days} ${p.days>1?'days':'day'}`;
       return `<li><button class="stop${s.sys==='star'?' star':''}${isHere?' here':''}${p&&!p.ok?' off':''}${ghl?' guide-hl':''}" type="button" data-id="${s.id}" ${isHere?'disabled':''}><i></i><span class="nm"><b>${short(s.name)}</b><span>${[due?`<b class="due">${due}</b>`:'',ghl?'<b class="due">👉 sell here</b>':'',evTag(s.id),svc||(s.sys==='star'?s.place.split(' · ')[1]:'')].filter(Boolean).join(' · ')}</span></span><span class="cost">${cost}</span></button></li>`;};
     const note=`<p class="small muted" style="margin-bottom:8px">Travel is free. Each day in transit adds interest and moves the markets.</p>`;
-    const list=note+`<ul class="line"><h4>Solar System · 1 day a trip</h4>${STATIONS.filter(s=>s.sys==='sol').map(stop).join('')}<h4>Interstellar · longer trips, bigger prices</h4>${STATIONS.filter(s=>s.sys==='star').map(stop).join('')}</ul>`;
+    const list=note+`<ul class="line"><h4>Solar System · 1 day a trip</h4>${STATIONS.filter(s=>s.sys==='sol').map(stop).join('')}${isBeginner()?'<p class="small muted">Star colonies open up in full missions.</p>':`<h4>Interstellar · longer trips, bigger prices</h4>${STATIONS.filter(s=>s.sys==='star').map(stop).join('')}`}</ul>`;
     return {title:'Move',eyebrow:`Day ${S.day} of ${S.total} · ${usd(S.cash)} cash`,rebuild:null,
       headRight:`<div class="toggle" role="group" aria-label="View"><button type="button" data-v="list" aria-pressed="${ui.moveView==='list'}">List</button><button type="button" data-v="chart" aria-pressed="${ui.moveView==='chart'}">Chart</button></div>`,
       body:ui.moveView==='list'?list:mapSVG()+'<p class="small" style="color:#c9b9a8">Log scale from Earth. Tap a station.</p>',
@@ -1291,7 +1301,7 @@ function openMove(){
 function openRoute(dest){
   sel=dest;
   const build=()=>{const d=ST(dest),p=plan(dest),m=S.mkt.data,rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,dest);
-    const rows=GOODS.map(g=>{const there=rep[g.id],here=m[g.id],h=held(g.id);if(!there||(!h&&!(here&&here.stock)))return '';
+    const rows=goodsFor().map(g=>{const there=rep[g.id],here=m[g.id],h=held(g.id);if(!there||(!h&&!(here&&here.stock)))return '';
       const st=sellAt(dest,there.local,rDay,g.id),bh=here&&here.stock?buyAt(S.loc,here.local):null,basis=h?S.cargo[g.id].cost/h:null,ref=h?basis:bh,mg=ref?(st-ref)/ref:null;
       return `<tr><td>${g.name}${h?`<span class="sub">${qfmt(h)} held · paid ${usd(basis)}</span>`:''}</td><td class="n">${bh?usd(bh):'–'}</td><td class="n">${usd(st)}</td><td class="n ${mg>0?'up':'dn'}">${mg===null?'–':(mg>=0?'+':'−')+Math.abs(Math.round(mg*100))+'%'}</td></tr>`;}).join('');
     const dueHere=S.freight.filter(c=>c.to===dest).reduce((a,c)=>a+c.pay*.6,0)+S.pax.filter(g=>g.to===dest).reduce((a,g)=>a+g.pay*.75,0);
