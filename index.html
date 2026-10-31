@@ -115,6 +115,18 @@ details .rel{padding:8px 0}
 .said .q{font-size:17px}.said .a{color:var(--muted);font-size:15.5px}
 .who{font:500 13px var(--f-mono);color:var(--amber)}
 .quote{font:700 22px/1.35 var(--f-body);margin:0 0 4px}
+/* players on X */
+.xh{font:800 22px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0 0 10px}
+.xposts{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.xpost{display:grid;gap:10px;align-content:start}
+.xhead{display:flex;gap:10px;align-items:center}
+.xhead b{display:block;font-size:16px}.xhead small{display:block;font:500 12.5px var(--f-mono);color:var(--muted)}
+.xav{width:38px;height:38px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font:800 18px var(--f-display);color:var(--amber);flex:none}
+.xt{font-size:17px;line-height:1.45}
+.xa{color:var(--muted);font-size:15px}
+.xl{font-size:14.5px;justify-self:start}
+.xpost.pending{border-style:dashed}
+.xpost .pend{font:500 11.5px var(--f-mono);color:var(--amber)}
 /* progress */
 .meter{height:12px;background:var(--panel2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}.meter i{display:block;height:100%;background:var(--amber)}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:15px}
@@ -255,10 +267,18 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <div class="wrap">
       <h2>You said, we did</h2>
       <p class="sub">Real feedback from testers and what it changed. Testers are listed by callsign only when they agree to it.</p>
-      <div class="card" style="margin-bottom:16px">
-        <p class="quote">"I was suspicious at first. But this is a fun game."</p>
-        <p class="who">BowtiedPassport, on X</p>
+      <h3 class="xh">Players on X</h3>
+      <div class="xposts">
+        <article class="card xpost"><div class="xhead"><span class="xav" aria-hidden="true">B</span><span><b>BowtiedPassport</b><small>on X · Oct 28, 2026</small></span></div>
+          <p class="xt">I was suspicious at first. But this is a fun game.</p></article>
+        
+        <article class="card xpost pending"><span class="pend">Preview only: waiting for the player's OK</span><div class="xhead"><span class="xav" aria-hidden="true">D</span><span><b>Dekan</b><small>@DekanBro · Oct 31, 2026</small></span></div>
+          <p class="xt">really clean, skipped the tutorial and still got the loop right away. debt pressure works. would love more of a moment on big good/bad trades though, right now it's mostly just a ding. a screen punch or number pop would make those swings hit</p>
+          <p class="xa">→ On our list: a bigger moment for big wins and losses.</p>
+          <a class="xl" href="https://x.com/DekanBro" target="_blank" rel="noopener">View on X ↗</a></article>
+        
       </div>
+      <p class="sub" style="margin:10px 0 26px;font-size:14px">Real posts, shared with each player's OK. Nobody is paid or rewarded for posting.</p>
       <div class="grid2 said">
         <div class="card"><p class="who">A young tester (8–12)</p><p class="q">Didn't know what the job was at first, and nine game words were unclear.</p><p class="a">→ v25.6: a guided first trade and tap-to-explain words.</p></div>
         <div class="card"><p class="who">Orbit-Falcon-74</p><p class="q">Not much of a gamer and found the game hard to follow.</p><p class="a">→ v25.6: plain-words explanations and a clearer goal from the first screen.</p></div>
