@@ -279,7 +279,7 @@ const BEGIN = { days: 7, cash: 30e6, debt: 20e6, goods: ['water', 'food', 'elec'
 const isBeginner = () => !!(S && S.mode === 'beginner');
 const goodsFor = () => isBeginner() ? GOODS.filter(g => BEGIN.goods.includes(g.id)) : GOODS;
 // v25.9.1 end flow (ACT-117): auto end at the last possible move, clarity rating at 75%, report ask at the end.
-const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.9.1', REPORT_URL = 'https://preview.playforkline.com/report/';
+const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.9.1', REPORT_URL = /(^|\.)playforkline\.com$/.test(location.hostname) ? '/report/' : 'https://preview.playforkline.com/report/';
 function askState(){try{return JSON.parse(localStorage.getItem(ASK_KEY)||'{}')||{};}catch(e){return {};}}
 function askSave(o){try{localStorage.setItem(ASK_KEY,JSON.stringify(o));}catch(e){}}
 function askAllowed(){if(!S||S.practice)return false;const a=askState();if(a.sentBuild===ASK_BUILD)return false;if(a.noBuild===ASK_BUILD&&(a.no||0)>=2)return false;if(S.mode==='daily'&&a.dailySeed===S.seed)return false;return true;}
