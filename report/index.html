@@ -94,9 +94,10 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 
   <!-- 1. Welcome -->
   <section class="step" id="s-welcome">
-    <p>Thanks for testing Forkline! Your answers help us make the game fun and easy to learn. It takes about 5 minutes.</p>
+    <p>Thanks for testing Forkline! Your answers help us make the game fun and easy to learn. It takes about 2 minutes.</p>
     <p class="small muted">The report doesn't ask for your name, email or where you live. You'll make up a space callsign instead.</p>
     <p class="small">If your feedback makes it into the game, your callsign can go in the in-game credits.</p>
+    <p class="small" id="from-game" hidden></p>
     <button class="btn" type="button" id="code-go">Start</button>
     <p class="small">Haven't played yet? <a href="../" target="_blank" rel="noopener">Open the game</a>, play a mission, then come back here.</p>
   </section>
@@ -191,7 +192,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
       <button class="btn" type="button" id="crew-go" style="margin-top:8px">Add me</button>
       <p class="ok" id="crew-done" hidden>Almost done: check your inbox for an email from crew@playforkline.com and tap Confirm. Not there in a few minutes? Check spam.</p>
     </div>
-    <a class="btn" href="../" style="display:grid;place-items:center;text-decoration:none">Back to the game</a>
+    <a class="btn" href="../play/" style="display:grid;place-items:center;text-decoration:none">Back to the game</a>
     <button class="btn ghost" type="button" id="again">Send another report</button>
   </section>
 
@@ -214,7 +215,13 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 
 <script>
 'use strict';
-const BUILD = (new URLSearchParams(location.search).get('b') || 'v25.9').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+const QS = new URLSearchParams(location.search);
+const BUILD = (QS.get('b') || 'v25.9.1').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+// v25.9.1: opened from the game's end screen (ACT-117): pre-fill what the game knows, record where the report came from.
+const SRC = /^(rate75|end|menu)$/.test(QS.get('src') || '') ? QS.get('src') : '', GAME_CLEAR = Math.max(0, Math.min(5, parseInt(QS.get('clear') || '0', 10) || 0));
+const MISSION = /^(beginner|daily|30|45|60)$/.test(QS.get('m') || '') ? QS.get('m') : '';
+const MISSION_OPT = { beginner: 'Beginner (7 days)', daily: 'Daily mission', '30': '30 days', '45': '45 days', '60': '60 days' }[MISSION] || '';
+const LOW_CLEAR = GAME_CLEAR >= 1 && GAME_CLEAR <= 3;
 const BV = parseFloat(BUILD.replace(/^v/, '')) || 99;   // questions marked 'since' only show for builds that have the feature
 const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
 const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
@@ -222,6 +229,7 @@ const DRAFT = 'forkline-report-draft';
 const CREW_API = 'https://oaemgwclfilzlycxxccg.supabase.co/functions/v1/crew/join', CONSENT = 'c2';
 const $ = s => document.querySelector(s);
 $('#build').textContent = BUILD;
+if (SRC) { const fg = $('#from-game'); fg.hidden = false; fg.textContent = LOW_CLEAR ? 'Thanks for being honest about how clear the game was. The most useful thing you can tell us is what confused you: those questions come first.' : 'Thanks for finishing a mission! We filled in what the game already knows, so this goes quicker.'; }
 
 const REPORT_API = 'https://oaemgwclfilzlycxxccg.supabase.co/functions/v1/report/submit';
 const TS_SITE = '0x4AAAAAAFqtdFQP-jSLcsR5';   // Cloudflare Turnstile site key (public). Empty = Turnstile off.
@@ -304,8 +312,12 @@ const GROWNUP = [
 ];
 const FACES = ['😣', '🙁', '😐', '🙂', '😄'];
 
+// v25.9.1 (ACT-117): a short report. Only the questions we act on: the two gate scores (fun, clarity), what confused them,
+// where they got stuck, would they play again, one idea, how they found us, and credits. The mission comes from the game when it can.
+const CORE = ['fun', 'clear', 'words', 'unclear', 'stuck', 'stuck_where', 'again', 'idea', 'length', 'heard', 'credit'];
 function questionsFor() {
-  const qs = [...(PER_QUEST[st.quest] || []), ...COMMON].filter(q => (q.ages || ALL).includes(st.age) && (!q.since || BV >= q.since));
+  let qs = [...(PER_QUEST[st.quest] || []), ...COMMON.filter(q => CORE.includes(q.id) && !(q.id === 'length' && MISSION))].filter(q => (q.ages || ALL).includes(st.age) && (!q.since || BV >= q.since));
+  if (LOW_CLEAR) { const first = ['clear', 'unclear', 'words', 'words_other', 'stuck', 'stuck_where']; qs = [...first.map(id => qs.find(q => q.id === id)).filter(Boolean), ...qs.filter(q => !first.includes(q.id))]; }
   return st.grownUp ? [...qs, ...GROWNUP] : qs;
 }
 
@@ -331,7 +343,11 @@ function renderQuestions() {
     }
     f.append(fs);
   });
-  restoreDraft(); progress();
+  restoreDraft(); prefillFromGame(); progress();
+}
+function prefillFromGame() {
+  const set = (name, val) => { if (!val || document.querySelector(`#qform [name="${name}"]:checked`)) return; const inp = [...document.querySelectorAll(`#qform [name="${name}"]`)].find(i => i.value === String(val)); if (inp) inp.checked = true; };
+  set('clear', GAME_CLEAR || ''); set('length', MISSION_OPT);
 }
 $('#qform').addEventListener('input', () => { progress(); saveDraft(); });
 $('#qform').addEventListener('change', () => { progress(); saveDraft(); if (!$('#q-err').hidden && !missing().length) $('#q-err').hidden = true; });
@@ -391,6 +407,7 @@ function setup() {
   for (const [k, v] of Object.entries(QUESTS)) { if (k === 'free' && st.age === '8-12') continue;
     const lab = el('label', { class: 'opt' }); lab.append(el('input', { type: 'radio', name: 'quest', value: k }), document.createTextNode(v)); box.append(lab); }
   try { const cs = localStorage.getItem('forkline-callsign'); if (cs && !$('#callsign').value) $('#callsign').value = cs; } catch (e) {}
+  if (SRC) { const fr = document.querySelector('#quests input[value=free]'); if (fr && !document.querySelector('input[name=quest]:checked')) fr.checked = true; }
   show('s-setup');
 }
 $('#setup-go').addEventListener('click', () => {
@@ -408,7 +425,8 @@ $('#send').addEventListener('click', async () => {
   if (miss.length) { $('#q-err').textContent = `Please answer question${miss.length > 1 ? 's' : ''} ${miss.map(q => questionsFor().indexOf(q) + 1).join(', ')}.`; $('#q-err').hidden = false;
     document.querySelector(`[data-q="${miss[0].id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   $('#q-err').hidden = true;
-  const a = collect(), row = { form_version: FORM, age_band: st.age, under14: st.under14, grown_up_ok: st.grownUp, quest: st.quest, build: BUILD,
+  const a = collect(); if (SRC) a.src = SRC; if (GAME_CLEAR) a.game_clear = GAME_CLEAR; if (MISSION) a.mission = MISSION;
+  const row = { form_version: FORM, age_band: st.age, under14: st.under14, grown_up_ok: st.grownUp, quest: st.quest, build: BUILD,
     callsign: st.callsign, device: st.device, fun: a.fun ?? null, clear: a.clear ?? null, answers: a };
   const b = $('#send'); b.disabled = true; b.textContent = 'Sending…';
   try {
@@ -417,7 +435,8 @@ $('#send').addEventListener('click', async () => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const out = await r.json().catch(() => ({})); st.receipt = out.receipt || '';
     if (window.turnstile && tsReady) { try { turnstile.reset('#ts-box'); } catch (e) {} } tsToken = '';
-    clearDraft(); $('#done-cs').textContent = st.callsign; crewReset(); show('s-done');
+    clearDraft(); try { const k = 'forkline-ask-v1', o = JSON.parse(localStorage.getItem(k) || '{}') || {}; o.sentBuild = BUILD; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {}
+    $('#done-cs').textContent = st.callsign; crewReset(); show('s-done');
   } catch (e) {
     $('#send-note').textContent = String(e.message).includes('429') ? "Too many reports from this connection right now. Your answers are saved on this device: try again in an hour." : String(e.message).includes('403') ? "The bot check didn't pass. Your answers are saved on this device: wait a moment and tap Send again." : "It didn't send. Your answers are saved on this device: check your connection and tap Send again."; $('#send-note').hidden = false;
   } finally { b.disabled = false; b.textContent = 'Send my report'; }
