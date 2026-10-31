@@ -676,7 +676,7 @@ function showTip(t){const el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=
   const g=$('#tip-go');if(g)g.addEventListener('click',()=>{done('acted');t.act[1]();});}
 function pumpTips(){
   guideTick();
-  if(!S||S.over||ui.screen!=='market'||sheetSpec||S.event||(S.actQueue&&S.actQueue.length)){hideTip();return;}
+  if(!S||S.over||ui.screen!=='market'||sheetSpec||S.event||(S.actQueue&&S.actQueue.length)||rateDue()){hideTip();return;}
   if(S.celQ&&S.celQ.length&&S.celDay!==S.day){const c=S.celQ.shift();S.celDay=S.day;TIPS.seen[c.id]=1;tipStat(c.id,'shown');tipsSave();hideTip();
     return openSheet({eyebrow:'Nice work',title:c.title,body:`<p>${glossify(c.text)}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
   if(guideOn())return showGuide();
@@ -696,7 +696,7 @@ function remindersHTML(){if(!S||TIPS.mode==='off')return '';const r=[],d=S.day,d
   if(S.contract&&due(S.contract.by))r.push(`⏰ The colony request for ${short(ST(S.contract.to).name)} ends ${due(S.contract.by)}.`);
   if(insured()&&due(S.policy.until))r.push(`🛡 Your insurance ends ${due(S.policy.until)}.`);
   if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*(isBeginner()?3:1.2))r.push('💸 You can clear your whole debt here: Port → Repay.');
-  if(S.total-S.day<=2&&massT()-freightT()>0.01)r.push('⌛ Last days: unsold cargo does not count. Sell before the mission ends.');
+  if(S.total-S.day<=2&&massT()-freightT()>0.01)r.push('⌛ Last days: when no trip is left, the mission ends and cargo aboard sells at that stop. Finish where it pays well.');
   return r.slice(0,2).map(t=>`<p class="news remind">${t}</p>`).join('');}
 function setTipMode(m){TIPS.mode=m;TIPS.userSet=1;tipsSave();}
 function resetTips(){TIPS.seen={};TIPS.stats={};tipsSave();tipActive=null;if(S){S.celQ=[];S.tipArr=null;}if(ui.screen==='page'&&ui.page==='codex')page('codex');}
@@ -793,26 +793,44 @@ function howToPlay(){
     actions:[{label:'Show me',fn:()=>{closeSheet();guideStart();}},{label:'I\'ll explore',kind:'ghost',fn:()=>{GUIDE={step:'done',skipped:1};guideSave();closeSheet();render();}}]});}
 function guideStart(){const p=guidePick();if(!p){GUIDE={step:'done'};guideSave();return render();}
   GUIDE={step:'buy',seed:S.seed,g:p.g,d:p.d,est:p.est,from:S.loc};TIPS.seen['exp-start']=1;tipsSave();guideSave();render();}
-function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done')return;const h=held(GUIDE.g),was=GUIDE.step;
-  if(GUIDE.step==='buy'){if(h>0)GUIDE.step='move';else if(S.loc!==GUIDE.from){const p=guidePick();if(p)Object.assign(GUIDE,{g:p.g,d:p.d,from:S.loc});else GUIDE.step='done';}}
-  else if(GUIDE.step==='move'){if(h<=0&&S.loc===GUIDE.from)GUIDE.step='buy';else if(S.loc===GUIDE.d)GUIDE.step='sell';
-    else if(S.loc!==GUIDE.from){GUIDE.from=S.loc;const o=S.mkt.data[GUIDE.g];if(o&&o.role==='want')GUIDE.step='sell';}}
-  else if(GUIDE.step==='sell'&&h<=0&&isBeginner()){const p=guidePick();if(p)Object.assign(GUIDE,{step:'buy',g:p.g,d:p.d,est:p.est,from:S.loc,n:(GUIDE.n||1)+1});else GUIDE.step='done';}
-  else if(GUIDE.step==='sell'&&h<=0){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
+const gMemo={};function gm(k,f){if(gMemo.k!==k){gMemo.k=k;gMemo.v=f();}return gMemo.v;}
+function guideHeld(){let b=null;for(const g of goodsFor()){const q=held(g.id);if(q>0){const o=S.mkt.data[g.id],v=q*(o?sellAt(S.loc,o.local,undefined,g.id):1);if(!b||v>b.v)b={g:g.id,v};}}return b&&b.g;}
+function guideSellStop(gid){return gm('s|'+S.seed+'|'+S.day+'|'+S.loc+'|'+gid,()=>{const g=G(gid),o=S.mkt.data[gid],here=o?sellAt(S.loc,o.local,undefined,gid):0;let best=null;
+  for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(!p.ok)continue;const rDay=Math.max(1,S.day-p.lag),t=market(S.seed,rDay,d.id)[gid];if(!t)continue;
+    const v=sellAt(d.id,t.local,rDay,gid)*(g.perish?Math.pow(1-g.perish,p.days):1)*(1-0.03*(p.days-1));if(!best||v>best.v)best={d:d.id,v};}
+  return best&&best.v>here*1.05?best.d:S.loc;});}
+function guideSource(){return gm('o|'+S.seed+'|'+S.day+'|'+S.loc,()=>{let best=null;
+  for(const s of STATIONS){if(s.id===S.loc)continue;const p=plan(s.id);if(!p.ok||S.day+p.days>=S.total)continue;const rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,s.id);
+    for(const g of goodsFor()){const t=rep[g.id];if(!t||t.role!=='make'||!t.stock)continue;const b=buyAt(s.id,t.local,rDay);let hi=0;
+      for(const d of STATIONS){if(d.id===s.id||(isBeginner()&&ST(d.id).sys==='star'))continue;const rd=Math.max(1,S.day-lagDays(S.loc,d.id)),u=market(S.seed,rd,d.id)[g.id];if(u)hi=Math.max(hi,sellAt(d.id,u.local,rd,g.id));}
+      const r=hi/b;if(r>1.1&&(!best||r>best.r))best={d:s.id,g:g.id,r};}}
+  return best;});}
+function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done'||S.over)return;
+  const was=GUIDE.step,wG=GUIDE.g,wD=GUIDE.d,wGo=GUIDE.go,hg=guideHeld();
+  if(hg){GUIDE.started=1;const d=guideSellStop(hg);Object.assign(GUIDE,d===S.loc?{step:'sell',g:hg,d:S.loc,go:0}:{step:'move',g:hg,d,go:0});}
+  else if(!isBeginner()&&GUIDE.started){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
     S.celQ.unshift({id:'cel-guide',title:'That\'s the whole game',text:'Buy where it is made, fly, and sell where it is wanted. Do it again with bigger loads, and pay off your debt before it grows. Trades lists the best deals at every stop.'});}
-  if(GUIDE.step!==was){guideSave();sfx('guide_step');}}
+  else{const p=guidePick();if(p)Object.assign(GUIDE,{step:'buy',g:p.g,d:p.d,est:p.est,from:S.loc,go:0});
+    else{const o=guideSource();if(o)Object.assign(GUIDE,{step:'move',g:o.g,d:o.d,go:1});else if(isBeginner())Object.assign(GUIDE,{step:'idle',g:null,go:0});else GUIDE.step='done';}}
+  const same=GUIDE.step===was&&GUIDE.g===wG&&GUIDE.d===wD,
+    nat=(was==='buy'&&GUIDE.step==='move'&&GUIDE.g===wG)||(was==='move'&&GUIDE.step==='sell'&&S.loc===wD)||(was==='move'&&wGo&&GUIDE.step==='buy'&&S.loc===wD)||(was==='sell'&&GUIDE.step==='buy')||was==='idle'||S.loc===wD&&was==='move'||GUIDE.step==='idle'||GUIDE.step==='done';
+  if(!same){GUIDE.re=nat?0:1;guideSave();sfx('guide_step');}}
 function clearHL(){document.querySelectorAll('.guide-hl').forEach(e=>e.classList.remove('guide-hl'));}
-function guideText(){const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name);
+function guideText(){if(GUIDE.step==='idle')return ['','⏳','Nothing pays well from here in the days you have left. The mission ends by itself when no trip is left, and any cargo aboard sells at that stop.'];
+  const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name),o=S.mkt.data[GUIDE.g];
+  if(GUIDE.step==='move'&&GUIDE.go)return ['1','🚀',`Nothing here pays well today. Tap <b>Move</b>, then <b>${d}</b>. ${g} is made there, so it is cheap.`];
+  const c=S.cargo[GUIDE.g],paid=c&&c.q?c.cost/c.q:0,here=o?sellAt(S.loc,o.local,undefined,GUIDE.g):0;
+  if(GUIDE.step==='sell'&&!(o&&o.role==='want'&&here>paid))return ['3','🟠',`Tap <b>${g}</b>, then <b>All</b>. No stop you can reach pays more for it.`];
   if(GUIDE.step==='buy')return ['1','🟢',`Tap <b>${g}</b>. It is made here, so it is cheap. Then tap <b>Max</b>.`];
   if(GUIDE.step==='move')return ['2','🚀',`Tap <b>Move</b>, then <b>${d}</b>. ${d} wants ${g.toLowerCase()}.`];
   return ['3','🟠',`Tap <b>${g}</b>, then <b>All</b> to sell it here for more.`];}
 function showGuide(){const [n,ic,txt0]=guideText(),txt=txt0+(isBeginner()&&GUIDE.step==='buy'&&GUIDE.est?`<small class="why">Why: ${short(ST(GUIDE.d).name)} wants it. This load should make about ${usd(GUIDE.est)}.</small>`:''),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
   el.dataset.id='guide-'+GUIDE.step;el.className='tip guide';
-  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?`Next move · step ${n} of 3`:`First trade · step ${n} of 3`}</span><p>${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
+  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?(n?`Next move · step ${n} of 3`:'Next move'):`First trade · step ${n} of 3`}</span><p>${GUIDE.re?'<small class="why">Plan updated to fit your last move.</small>':''}${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
   el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';
   $('#guide-skip').addEventListener('click',()=>{GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
-  clearHL();const t=$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
-const guideStep=()=>guideOn()?GUIDE.step:null;
+  clearHL();const t=GUIDE.step==='idle'?null:$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
+const guideStep=()=>guideOn()&&GUIDE.step!=='idle'?GUIDE.step:null;
 
 /* ---------- run lifecycle ---------- */
 function newRun(mode,days){
@@ -1031,7 +1049,7 @@ function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.l
 function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return sfx('ui_error');const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;sfx(pl>=0?'trade_sell_profit':'trade_sell_loss');if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
 function bestTrades(){
   const m=S.mkt.data,out=[];
-  for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(S.day+p.days>S.total)continue;
+  for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(!p.ok)continue;
     const rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,d.id);
     for(const g of goodsFor()){const o=m[g.id],t=rep[g.id];if(!o||!o.stock||!t)continue;
       const lotT=g.kg/1000,b=buyAt(S.loc,o.local),sl=sellAt(d.id,t.local,rDay,g.id),sp=g.perish?Math.pow(1-g.perish,p.days):1,unit=sl*sp-b;if(unit<=0)continue;
