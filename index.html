@@ -69,6 +69,8 @@ img{max-width:100%;height:auto;display:block}
 .top nav a{color:var(--muted);text-decoration:none;font-size:15px}.top nav a:hover{color:var(--ink)}
 .top .play{background:var(--amber);color:var(--amber-ink);font:800 17px/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;border-radius:9px;text-decoration:none}
 @media (max-width:760px){.top nav{display:none}}
+.top .dl{color:var(--ink);text-decoration:none;font-size:15px}.top .play{white-space:nowrap}@media (max-width:420px){.top .wrap{gap:12px}.top .play{padding:9px 12px;font-size:15px}.brand{font-size:21px}}@media (min-width:761px){.top .dl{display:none}}
+@media (max-width:760px){.top .dl{margin-left:auto}}
 /* hero */
 .hero{padding:44px 0 28px;display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center}
 @media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}}
@@ -129,6 +131,7 @@ details .rel{padding:8px 0}
 .xpost .pend{font:500 11.5px var(--f-mono);color:var(--amber)}
 /* progress */
 .meter{height:12px;background:var(--panel2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}.meter i{display:block;height:100%;background:var(--amber)}
+.dlv{display:grid;gap:8px;text-decoration:none;color:var(--ink);padding:12px}.dlv img{aspect-ratio:16/9;object-fit:cover;border-radius:8px;width:100%}.dlv b{font-size:17px;line-height:1.35}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:15px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -139,8 +142,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   <div class="wrap">
     <a class="brand" href="/"><img src="/forkline-icon.svg" alt="" width="34" height="34"><b style="font-weight:800">Fork<span>line</span></b></a>
     <nav aria-label="Sections">
-      <a href="#how">How it plays</a><a href="#new">What's new</a><a href="#next">What's next</a><a href="#seasons">Seasons</a><a href="#said">You said, we did</a><a href="#help">Help test</a>
+      <a href="#how">How it plays</a><a href="#new">What's new</a><a href="#next">What's next</a><a href="#seasons">Seasons</a><a href="#said">You said, we did</a><a href="#help">Help test</a><a href="/devlog/">Devlog</a>
     </nav>
+    <a class="dl" href="/devlog/">Devlog</a>
     <a class="play" href="/play/">Play free</a>
   </div>
 </header>
@@ -308,6 +312,15 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
         <div class="card"><div class="icon" aria-hidden="true">🔒</div><h3>Privacy by default</h3><p>Tester reports ask for no names or emails, and the site uses no tracking cookies.</p></div>
         <div class="card"><div class="icon" aria-hidden="true">🛰️</div><h3>Learn by playing</h3><p>Supply and demand, interest, planning and light-speed delay, built to an E for Everyone standard.</p></div>
       </div>
+    </div>
+  </section>
+
+  <section id="devlog">
+    <div class="wrap">
+      <h2>Devlog</h2>
+      <p class="sub">Watch the game get built: update walkthroughs and one-minute devlogs on what testers said and what changed.</p>
+      <!--devlog-latest--><div class="grid2"><a class="card dlv" href="/devlog/#shorts"><img src="https://i.ytimg.com/vi/WkXERqmQgZE/hqdefault.jpg" alt="" loading="lazy" width="480" height="360"><span class="eyebrow">v25.9 · Short · 0:53</span><b>Players said my space trading game was too hard, so my AI agents built a beginner mode</b></a></div><!--/devlog-latest-->
+      <p style="margin-top:16px"><a href="/devlog/">All devlog videos by category →</a></p>
     </div>
   </section>
 

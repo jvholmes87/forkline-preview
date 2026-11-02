@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forkline Devlog – Videos from a Free Space Trading Game in Development</title>
+<meta name="description" content="Watch Forkline being built: full walkthroughs of each update and one-minute devlogs on what testers said and what changed. Free space trading game in your browser.">
+<link rel="canonical" href="https://preview.playforkline.com/devlog/">
+<meta name="theme-color" content="#0a1322">
+<link rel="icon" type="image/svg+xml" href="/forkline-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Forkline">
+<meta property="og:title" content="Forkline Devlog">
+<meta property="og:description" content="Update walkthroughs and one-minute devlogs from a free space trading game in development.">
+<meta property="og:url" content="https://preview.playforkline.com/devlog/">
+<meta property="og:image" content="https://preview.playforkline.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@jasonvonholmes">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "CollectionPage",
+   "@id": "https://preview.playforkline.com/devlog/",
+   "url": "https://preview.playforkline.com/devlog/",
+   "name": "Forkline devlog",
+   "description": "Video devlog for Forkline, a free space trading game in your browser: update walkthroughs and short devlogs.",
+   "isPartOf": {
+    "@id": "https://preview.playforkline.com/#website"
+   },
+   "about": {
+    "@id": "https://preview.playforkline.com/#game"
+   },
+   "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+     {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+       "@id": "https://preview.playforkline.com/devlog/#v-WkXERqmQgZE"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "@type": "VideoObject",
+   "@id": "https://preview.playforkline.com/devlog/#v-WkXERqmQgZE",
+   "name": "Players said my space trading game was too hard, so my AI agents built a beginner mode",
+   "description": "Testers said the full mission was too much at first, so we built a short beginner mission with a coach that shows each next move.",
+   "thumbnailUrl": [
+    "https://i.ytimg.com/vi/WkXERqmQgZE/hqdefault.jpg"
+   ],
+   "uploadDate": "2026-11-01T00:59:00+09:00",
+   "duration": "PT53S",
+   "embedUrl": "https://www.youtube-nocookie.com/embed/WkXERqmQgZE",
+   "contentUrl": "https://www.youtube.com/watch?v=WkXERqmQgZE",
+   "publisher": {
+    "@id": "https://preview.playforkline.com/#studio"
+   },
+   "inLanguage": "en"
+  }
+ ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{color-scheme:dark;--deep:#070d18;--void:#0a1322;--panel:#101c30;--panel2:#16253e;--line:#2c4466;--ink:#f4efe4;--muted:#c9d1de;--amber:#f2a93b;--amber-ink:#1d1405;--ice:#86c9ea;--good:#6cc790;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--deep);color:var(--ink);font:17px/1.6 var(--f-body)}
+a{color:var(--ice)}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+/* nav */
+.top{position:sticky;top:0;z-index:5;background:rgba(7,13,24,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font:800 24px/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.brand img{width:34px;height:34px;border-radius:22%}.brand span{color:var(--amber)}
+.top nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+.top nav a{color:var(--muted);text-decoration:none;font-size:15px}.top nav a:hover{color:var(--ink)}
+.top .play{background:var(--amber);color:var(--amber-ink);font:800 17px/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;border-radius:9px;text-decoration:none}
+@media (max-width:760px){.top nav{display:none}}
+.top .dl{color:var(--ink);text-decoration:none;font-size:15px}.top .play{white-space:nowrap}@media (max-width:420px){.top .wrap{gap:12px}.top .play{padding:9px 12px;font-size:15px}.brand{font-size:21px}}@media (min-width:761px){.top .dl{display:none}}
+@media (max-width:760px){.top .dl{margin-left:auto}}
+/* hero */
+.hero{padding:44px 0 28px;display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-top:28px}}
+.eyebrow{font:500 12.5px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(40px,6vw,60px)/.95 var(--f-display);text-transform:uppercase;letter-spacing:.01em;margin:10px 0 14px}
+h1 span{color:var(--amber)}
+.lede{font-size:19px;color:var(--ink);max-width:34em;margin:0 0 20px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.btn{display:inline-grid;place-items:center;min-height:52px;padding:0 22px;border-radius:10px;font:800 20px/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;text-decoration:none}
+.btn.primary{background:var(--amber);color:var(--amber-ink)}
+.btn.ghost{border:2px solid var(--muted);color:var(--ink)}
+.status{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--f-mono);color:var(--good);border:1px solid var(--good);border-radius:999px;padding:3px 12px}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--good)}
+.shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+/* sections */
+section{padding:44px 0;border-top:1px solid var(--line)}
+h2{font:800 clamp(30px,4.5vw,40px)/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 22px;max-width:44em}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media (max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h3{font:800 22px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0 0 6px}
+.card p{margin:0}
+.icon{font-size:30px;line-height:1;margin-bottom:8px}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;padding:0;list-style:none}
+.facts li{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:15px}
+/* changelog */
+.rel{display:grid;grid-template-columns:120px 1fr;gap:6px 18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.rel:last-child{border-bottom:0}
+@media (max-width:600px){.rel{grid-template-columns:1fr}}
+.ver{font:500 14px var(--f-mono);color:var(--amber)}.ver small{display:block;color:var(--muted);font-size:12.5px}
+.rel h3{margin:0 0 4px;font-size:18px}
+.rel ul{margin:0;padding-left:20px}.rel li{margin:2px 0}
+details{margin-top:14px}summary{cursor:pointer;color:var(--ice)}
+details .rel{padding:8px 0}
+/* roadmap */
+.lane h3{display:flex;align-items:center;gap:8px}
+.tag{font:500 11.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.lane ul{margin:8px 0 0;padding-left:20px}.lane li{margin:6px 0}
+.credit{color:var(--good);font-size:14.5px}
+/* you said */
+.said{display:grid;gap:10px}
+.said .q{font-size:17px}.said .a{color:var(--muted);font-size:15.5px}
+.who{font:500 13px var(--f-mono);color:var(--amber)}
+.quote{font:700 22px/1.35 var(--f-body);margin:0 0 4px}
+/* players on X */
+.xh{font:800 22px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin:0 0 10px}
+.xposts{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.xpost{display:grid;gap:10px;align-content:start}
+.xhead{display:flex;gap:10px;align-items:center}
+.xhead b{display:block;font-size:16px}.xhead small{display:block;font:500 12.5px var(--f-mono);color:var(--muted)}
+.xav{width:38px;height:38px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;font:800 18px var(--f-display);color:var(--amber);flex:none}
+.xt{font-size:17px;line-height:1.45}
+.xa{color:var(--muted);font-size:15px}
+.xl{font-size:14.5px;justify-self:start}
+.xpost.pending{border-style:dashed}
+.xpost .pend{font:500 11.5px var(--f-mono);color:var(--amber)}
+/* progress */
+.meter{height:12px;background:var(--panel2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}.meter i{display:block;height:100%;background:var(--amber)}
+.dlv{display:grid;gap:8px;text-decoration:none;color:var(--ink);padding:12px}.dlv img{aspect-ratio:16/9;object-fit:cover;border-radius:8px;width:100%}.dlv b{font-size:17px;line-height:1.35}
+footer{border-top:1px solid var(--line);padding:28px 0 40px;color:var(--muted);font-size:15px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* devlog (generated by scripts/build_devlog.py) */
+.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.vid{padding:0;overflow:hidden;display:grid;align-content:start}
+.vid .meta{padding:14px 16px 16px}.vid h3{font-size:21px;margin:6px 0}.vid p{color:var(--muted);font-size:15.5px}
+.yt{position:relative;display:block;aspect-ratio:16/9;background:#000;overflow:hidden}
+.vid.short{max-width:340px;width:100%}.vid.short .yt{aspect-ratio:9/16}
+.yt img{width:100%;height:100%;object-fit:cover}
+.yt .pl{position:absolute;inset:0;margin:auto;width:72px;height:72px;border-radius:50%;background:rgba(7,13,24,.82);border:2px solid var(--amber);color:var(--amber);display:grid;place-items:center;font-size:28px;padding-left:5px}
+.yt .du{position:absolute;right:10px;bottom:10px;background:rgba(7,13,24,.85);font:500 13px var(--f-mono);padding:2px 8px;border-radius:6px;color:var(--ink)}
+.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cats{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 6px;padding:0;list-style:none}
+.cats a{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:15px;color:var(--ink);text-decoration:none}
+.top .dl{color:var(--ink);text-decoration:none;font-size:15px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/forkline-icon.svg" alt="" width="34" height="34"><b style="font-weight:800">Fork<span>line</span></b></a>
+    <nav aria-label="Site"><a href="/">Home</a><a href="/#new">What's new</a><a href="/devlog/" aria-current="page">Devlog</a><a href="/#help">Help test</a></nav>
+    <a class="play" href="/play/">Play free</a>
+  </div>
+</header>
+<main>
+  <div class="wrap" style="padding:36px 16px 8px">
+    <span class="eyebrow">Songtan Labs · building in public</span>
+    <h1>Fork<span>line</span> devlog</h1>
+    <p class="lede">Watch the game get built: full walkthroughs of each update, and one-minute devlogs on what testers told us and what we changed.</p>
+    <ul class="cats"><li><a href="#shorts">Devlog shorts</a></li></ul>
+    <p class="sub" style="margin:10px 0 0">Videos play from YouTube. Nothing loads from YouTube until you tap play.</p>
+  </div>
+  <section id="shorts"><div class="wrap"><h2>Devlog shorts</h2><p class="sub">One change, one minute: what testers said and what we built.</p><div class="vids"><article class="card vid short">
+  <a class="yt" href="https://www.youtube.com/shorts/WkXERqmQgZE" data-id="WkXERqmQgZE" target="_blank" rel="noopener" aria-label="Play: Players said my space trading game was too hard, so my AI agents built a beginner mode">
+    <img src="https://i.ytimg.com/vi/WkXERqmQgZE/hqdefault.jpg" alt="" loading="lazy" width="480" height="360"><span class="pl" aria-hidden="true">▶</span><span class="du">0:53</span>
+  </a>
+  <div class="meta"><span class="eyebrow">v25.9 · Short · <time datetime="2026-11-01">2026-11-01</time></span>
+    <h3>Players said my space trading game was too hard, so my AI agents built a beginner mode</h3><p>Testers said the full mission was too much at first, so we built a short beginner mission with a coach that shows each next move.</p></div>
+</article></div></div></section>
+  <section><div class="wrap"><h2>Play the game</h2><p class="sub">Free in your browser, no download or sign-up. After a mission, tap Send feedback: that's what the next video is made of.</p>
+    <div class="ctas"><a class="btn primary" href="/play/">Play free</a><a class="btn ghost" href="/report/?b=v25.10.1">Send a tester report</a></div></div></section>
+</main>
+<footer>
+  <div class="wrap">
+    <div>Forkline, from Songtan Labs. Made by <a href="https://jvholmes87.github.io/forkline/" target="_blank" rel="noopener">Jason Von Holmes</a>.</div>
+    <div><a href="mailto:hello@playforkline.com">hello@playforkline.com</a> · <a href="https://jvholmes87.github.io/" target="_blank" rel="noopener">@jasonvonholmes</a></div>
+    <div>Built to an E for Everyone standard. No pop-up ads, no tracking cookies.</div>
+  </div>
+</footer>
+<script>
+/* Click-to-play: swap the thumbnail for a privacy-enhanced YouTube player only when the visitor taps it. */
+document.querySelectorAll('.yt').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();
+  var f=document.createElement('iframe');f.src='https://www.youtube-nocookie.com/embed/'+a.dataset.id+'?autoplay=1&rel=0&playsinline=1';
+  f.title=a.getAttribute('aria-label').replace(/^Play: /,'');f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;a.replaceChildren(f);});});
+</script>
+<div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body>
+</html>
