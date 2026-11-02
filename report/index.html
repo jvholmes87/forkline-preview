@@ -216,13 +216,15 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 <script>
 'use strict';
 const QS = new URLSearchParams(location.search);
-const BUILD = (QS.get('b') || 'v25.9.1').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+const BUILD = (QS.get('b') || 'v25.10').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
 // v25.9.1: opened from the game's end screen (ACT-117): pre-fill what the game knows, record where the report came from.
 const SRC = /^(rate75|end|menu)$/.test(QS.get('src') || '') ? QS.get('src') : '', GAME_CLEAR = Math.max(0, Math.min(5, parseInt(QS.get('clear') || '0', 10) || 0));
 const MISSION = /^(beginner|daily|30|45|60)$/.test(QS.get('m') || '') ? QS.get('m') : '';
-const MISSION_OPT = { beginner: 'Beginner (7 days)', daily: 'Daily mission', '30': '30 days', '45': '45 days', '60': '60 days' }[MISSION] || '';
+const MISSION_OPT = { beginner: 'Beginner (10 days)', daily: 'Daily mission', '30': '30 days', '45': '45 days', '60': '60 days' }[MISSION] || '';
 const LOW_CLEAR = GAME_CLEAR >= 1 && GAME_CLEAR <= 3;
-const BV = parseFloat(BUILD.replace(/^v/, '')) || 99;   // questions marked 'since' only show for builds that have the feature
+// v25.10: compare versions part by part (25.10 is newer than 25.9; parseFloat would read it as 25.1)
+const vnum = v => { const p = String(v).replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0); return p[0] * 1e4 + (p[1] || 0) * 100 + (p[2] || 0); };
+const BV = /^v?\d+(\.\d+){0,2}$/.test(BUILD) ? vnum(BUILD) : 99e4;   // questions marked 'since' only show for builds that have the feature
 const API = 'https://oaemgwclfilzlycxxccg.supabase.co/rest/v1/tester_reports';
 const KEY = 'sb_publishable_OwdSfAEhMlxiuF-_kRe04g_EXFalTp_';   // publishable: insert-only by row-level security
 const DRAFT = 'forkline-report-draft';
@@ -280,8 +282,8 @@ const COMMON = [
   { id: 'fun', type: 'faces', q: 'How fun was it?', ends: ['boring', 'super fun'], col: 'fun' },
   { id: 'clear', type: 'scale', q: 'How easy was it to know what to do?', ends: ['very confusing', 'super easy'], col: 'clear' },
   { id: 'tips', type: 'one', q: 'Little tip boxes pop up while you play. They...', opts: ['helped a lot', 'helped a little', "I didn't notice them", 'got in the way'], cols: 2 },
-  { id: 'sound', type: 'one', since: 25.7, q: 'Game sounds: what did you do?', opts: ['kept them on', 'turned them down', 'turned them off', 'my sound was off'], cols: 2 },
-  { id: 'sound_feel', type: 'one', since: 25.7, q: 'The sounds were...', opts: ['helpful', 'fine', 'annoying', "I didn't hear any"], cols: 2 },
+  { id: 'sound', type: 'one', since: '25.7', q: 'Game sounds: what did you do?', opts: ['kept them on', 'turned them down', 'turned them off', 'my sound was off'], cols: 2 },
+  { id: 'sound_feel', type: 'one', since: '25.7', q: 'The sounds were...', opts: ['helpful', 'fine', 'annoying', "I didn't hear any"], cols: 2 },
   { id: 'words', type: 'many', ages: KID, q: "Tick every word you didn't understand.", hint: 'Skip the ones you know.', cols: 3,
     opts: ['debt', 'fund', 'fork', 'colony', 'cargo', 'freight', 'standing', 'Treasury', 'hull', 'insurance', 'shortage', 'glut', 'rumor', 'light-lag', 'spread', 'interest'] },
   { id: 'words_other', type: 'text', ages: KID, q: 'Any other words you didn\'t understand?', opt: true },
@@ -296,12 +298,15 @@ const COMMON = [
   { id: 'annoying', type: 'text', q: 'What was the most annoying part?', opt: true },
   { id: 'idea', type: 'text', q: 'If you could add or change ONE thing, what would it be?', opt: true },
   { id: 'difficulty', type: 'one', ages: ['13-17', '18+'], q: 'How hard was the game?', opts: ['too easy', 'about right', 'too hard'], cols: 3 },
-  { id: 'length', type: 'one', ages: ['18+'], q: 'Which mission did you play?', opts: ['Beginner (7 days)', '30 days', '45 days', '60 days', 'Daily mission'], cols: 2 },
+  { id: 'length', type: 'one', ages: ['18+'], q: 'Which mission did you play?', opts: ['Beginner (10 days)', '30 days', '45 days', '60 days', 'Daily mission'], cols: 2 },
   { id: 'economy', type: 'text', ages: ['18+'], q: 'Did prices, events and freight feel fair? Anything too strong or too weak?', opt: true },
   { id: 'pay', type: 'one', ages: ['18+'], q: 'Would you pay a one-time price (about $5) to unlock longer missions, an unlimited mission and extra sandbox slots? The full mission stays free.', opts: ['yes', 'maybe', 'no'], cols: 3 },
   { id: 'again', type: 'one', q: 'Would you play again tomorrow?', opts: ['yes!', 'maybe', 'no'], cols: 3 },
-  { id: 'calm', type: 'one', since: 25.8, q: 'Did you try the Calm view in the ☰ menu?', opts: ['yes, I liked it', "yes, but I didn't like it", "no, I didn't need it", "I didn't know about it"], cols: 2, opt: true },
-  { id: 'heard', type: 'one', since: 25.8, q: 'How did you hear about Forkline?', opts: ['X (Twitter)', 'Reddit', 'LinkedIn', 'a friend or family', 'a search', 'somewhere else'], cols: 2, opt: true },
+  { id: 'calm', type: 'one', since: '25.8', q: 'Did you try the Calm view in the ☰ menu?', opts: ['yes, I liked it', "yes, but I didn't like it", "no, I didn't need it", "I didn't know about it"], cols: 2, opt: true },
+  { id: 'heard', type: 'one', since: '25.8', q: 'How did you hear about Forkline?', opts: ['X (Twitter)', 'a video (YouTube, Shorts)', 'Reddit', 'LinkedIn', 'a friend or family', 'a search', 'somewhere else'], cols: 2, opt: true },
+  // v25.10 (ACT-125): two questions to tell 'the game is unclear' apart from 'new to this kind of game' or 'reading in a second language'.
+  { id: 'played', type: 'one', since: '25.10', q: 'Before Forkline, how often did you play strategy or trading games? Board games count.', opts: ['never', 'a few times', 'sometimes', 'a lot'], cols: 2, opt: true },
+  { id: 'english', type: 'one', since: '25.10', q: 'Is English your first language?', opts: ['yes', 'no'], cols: 2, opt: true },
   { id: 'credit', type: 'one', q: 'If your feedback makes it into the game, can we list your callsign in the game credits?', opts: ['Yes, list my callsign', 'No, thanks'], opt: true }
 ];
 const GROWNUP = [
@@ -314,9 +319,9 @@ const FACES = ['😣', '🙁', '😐', '🙂', '😄'];
 
 // v25.9.1 (ACT-117): a short report. Only the questions we act on: the two gate scores (fun, clarity), what confused them,
 // where they got stuck, would they play again, one idea, how they found us, and credits. The mission comes from the game when it can.
-const CORE = ['fun', 'clear', 'words', 'unclear', 'stuck', 'stuck_where', 'again', 'idea', 'length', 'heard', 'credit'];
+const CORE = ['fun', 'clear', 'words', 'unclear', 'stuck', 'stuck_where', 'again', 'idea', 'length', 'played', 'english', 'heard', 'credit'];
 function questionsFor() {
-  let qs = [...(PER_QUEST[st.quest] || []), ...COMMON.filter(q => CORE.includes(q.id) && !(q.id === 'length' && MISSION))].filter(q => (q.ages || ALL).includes(st.age) && (!q.since || BV >= q.since));
+  let qs = [...(PER_QUEST[st.quest] || []), ...COMMON.filter(q => CORE.includes(q.id) && !(q.id === 'length' && MISSION))].filter(q => (q.ages || ALL).includes(st.age) && (!q.since || BV >= vnum(q.since)));
   if (LOW_CLEAR) { const first = ['clear', 'unclear', 'words', 'words_other', 'stuck', 'stuck_where']; qs = [...first.map(id => qs.find(q => q.id === id)).filter(Boolean), ...qs.filter(q => !first.includes(q.id))]; }
   return st.grownUp ? [...qs, ...GROWNUP] : qs;
 }

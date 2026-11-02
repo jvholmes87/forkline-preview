@@ -23,6 +23,16 @@ body.calm{font-size:17px}.calm .small{font-size:15px}.calm .nm small{font-size:1
 body.calm *{transition:none!important;animation:none!important}.calm .ticker,.calm .mk-sub .muted,.calm .mk-sub .rep{display:none!important}
 .cue{display:inline-block;font:600 11px/1.6 var(--f-mono);letter-spacing:.04em;padding:0 6px;border-radius:4px;margin-right:4px}.cue.buy{background:rgba(110,190,130,.18);color:var(--good)}.cue.sell{background:rgba(242,169,59,.18);color:var(--amber)}
 .goalline{margin-top:6px;font:600 13px/1.4 var(--f-mono);color:var(--ice)}
+/* v25.10 (ACT-125): goal bar, mission card, debt button, recap */
+.goal{display:block;width:100%;margin:6px 0 2px;padding:0;background:none;border:0;text-align:left;cursor:pointer}
+.goal .gt{display:flex;justify-content:space-between;gap:8px;font:600 12.5px/1.3 var(--f-mono);color:var(--ice)}
+.goal .gt .muted{font-weight:500}.goal .track{height:5px;margin-top:4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.goal .track i{display:block;height:100%;background:var(--ice)}.goal.done .track i{background:var(--good)}.goal.done .gt{color:var(--good)}
+.debtbtn{padding:0;background:none;border:0;color:inherit;font:inherit;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
+.mission{margin:0;padding:0;list-style:none;display:grid;gap:10px}.mission li{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start}
+.mission .hi{font-size:20px;line-height:1.2}.mission small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.recap{margin-top:12px}.recap summary{cursor:pointer;font:600 13px/1.4 var(--f-mono);color:var(--ice)}.recap table{margin-top:6px}
+.recap .fx{margin-top:8px}table th.n{white-space:normal;vertical-align:bottom}
 button,input,select{font:inherit;color:inherit}
 a{color:var(--ice)}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -277,11 +287,11 @@ const SPREAD_SOL = 0.005, SPREAD_STAR = 0.03;
 const DEBT_RATE = 0.0075;  // per game day, common-frame clock
 const START = { cash: 30e6, debt: 60e6, prop: 80, hull: 100, days: 45 };
 // Beginner mission (v25.9, DEC-068): short, three goods, Solar System only, smaller debt, with a Next move coach.
-const BEGIN = { days: 7, cash: 30e6, debt: 20e6, goods: ['water', 'food', 'elec'] };
+const BEGIN = { days: 10, cash: 30e6, debt: 20e6, goal: 30e6, goods: ['water', 'food', 'elec'] };   // v25.10: 10 days (DEC-076), a fund goal (ACT-125)
 const isBeginner = () => !!(S && S.mode === 'beginner');
 const goodsFor = () => isBeginner() ? GOODS.filter(g => BEGIN.goods.includes(g.id)) : GOODS;
 // v25.9.1 end flow (ACT-117): auto end at the last possible move, clarity rating at 75%, report ask at the end.
-const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.9.1', REPORT_URL = /(^|\.)playforkline\.com$/.test(location.hostname) ? '/report/' : 'https://preview.playforkline.com/report/';
+const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.10', REPORT_URL = /(^|\.)playforkline\.com$/.test(location.hostname) ? '/report/' : 'https://preview.playforkline.com/report/';
 function askState(){try{return JSON.parse(localStorage.getItem(ASK_KEY)||'{}')||{};}catch(e){return {};}}
 function askSave(o){try{localStorage.setItem(ASK_KEY,JSON.stringify(o));}catch(e){}}
 try{if(/[?&]resetask\b/.test(location.search))localStorage.removeItem(ASK_KEY);}catch(e){}
@@ -293,8 +303,37 @@ function openReport(){const a=askState();if(S&&S.mode==='daily')a.dailySeed=S.se
 function rateDue(){return !!(S&&!S.over&&!S.event&&S.clarity==null&&!S.rateSkip&&S.day>=Math.ceil(S.total*0.75)&&askAllowed());}
 function rateCardHTML(){if(!rateDue())return '';return `<div class="rate" role="group" aria-label="Rate how easy Forkline is to understand"><p><b>Quick question:</b> how easy is Forkline to understand so far?</p><div class="stars">${[1,2,3,4,5].map(n=>`<button type="button" class="star" data-rate="${n}" aria-label="${n} of 5">★</button>`).join('')}</div><div class="ends"><span>very confusing</span><span>super easy</span></div><button type="button" class="btn ghost rate-skip" data-rate="0">Skip</button></div>`;}
 function rateClarity(n){if(!S)return;if(n>0){S.clarity=n;log(`Thanks! You rated Forkline ${n} of 5 for how easy it is to understand.`);}else S.rateSkip=true;save();render();}
+// v25.10 (ACT-125, ACT-121): goal, mission sheet, debt card and trade recap
+const fund0=()=>S.f0!=null?S.f0:isBeginner()?BEGIN.cash-BEGIN.debt:START.cash-START.debt;
+const cargoCost=()=>Object.values(S.cargo||{}).reduce((a,c)=>a+(c&&c.cost||0),0);
+// The bar counts cargo at what you paid, so buying a load does not look like losing money. 'Reached' needs the real fund.
+function goalInfo(){const f=net()+cargoCost(),f0=fund0();if(isBeginner())return {f,f0,t:BEGIN.goal,label:'Goal'};
+  const best=S.practice?null:bestFor(S.mode==='daily'?S.seed:null,S.total,S.mode);return best!==null&&best>0?{f,f0,t:best,label:'Your best'}:{f,f0,t:0,label:'Break even'};}
+function goalHTML(){if(!S||S.over)return '';const g=goalInfo(),done=net()>=g.t,pct=done?100:Math.max(0,Math.min(97,(g.f-g.f0)/Math.max(1,g.t-g.f0)*100)),lock=!done&&g.f>=g.t;
+  return `<button class="goal ${done?'done':''}" type="button" id="m-goal" aria-label="Your mission and goal"><span class="gt"><span>🎯 Fund ${usd(g.f)}</span><span>${done?(isBeginner()?'✓ Goal reached':g.t>0?'✓ New best':'✓ Above $0'):lock?'<span class="muted">Sell to lock in</span>':`<span class="muted">${g.label}</span> ${usd(g.t)}`}</span></span><span class="track"><i style="width:${pct}%"></i></span></button>`;}
+const halyardNames=()=>HALYARD_STOPS().map(s=>short(s.name)).join(', ').replace(/, ([^,]*)$/,' or $1');
+function nearestHalyard(){let b=null;for(const s of HALYARD_STOPS()){if(s.id===S.loc)continue;const p=plan(s.id);if(!p.ok)continue;if(!b||p.days<b.days)b={id:s.id,days:p.days};}return b;}
+function missionSheet(){const g=goalInfo(),beg=isBeginner();
+  openSheet({eyebrow:beg?`Beginner mission · ${S.total} days`:`${S.mode==='daily'?'Daily mission':'Free mission'} · ${S.total} days`,title:'Your mission',
+    body:`<ul class="mission">
+      <li><span class="hi" aria-hidden="true">🎯</span><span><b>${beg?`Grow your fund from ${usd(fund0())} to ${usd(BEGIN.goal)} in ${S.total} days`:g.t>0?`Beat your best fund on this length: ${usd(g.t)}`:'Get your fund above $0, then grow it'}</b><small>Your ${gl('fund','fund')} is your cash minus your debt. It is your score. Now: ${usd(S.cash)} cash − ${usd(S.debt)} debt${savUSD()||loansUSD()||fleetValue()?', plus savings and forks, minus loans':''} = ${usd(net())}. Cargo you hold counts at what you paid until you sell it.</small></span></li>
+      <li><span class="hi" aria-hidden="true">🔁</span><span><b>Buy cheap, fly, sell for more</b><small>Buy goods where they are made (cheap), fly to a stop that wants them, and sell. What you sell for minus what you paid is your profit.</small></span></li>
+      <li><span class="hi" aria-hidden="true">💸</span><span><b>Pay your debt at ${halyardNames()}</b><small>It grows ${(DEBT_RATE*100).toFixed(2)}% a day. At those stops tap <b>Port</b>, then <b>Repay</b>. Whatever you still owe comes out of your fund at the end.</small></span></li>
+      ${beg?'<li><span class="hi" aria-hidden="true">🧭</span><span><b>The coach shows each next move, and why</b><small>Hide it any time; tap the whistle to bring it back.</small></span></li>':''}
+      <li><span class="hi" aria-hidden="true">⏳</span><span><b>Each trip takes days</b><small>When no trip is left, the mission ends and cargo aboard sells at that stop. Tap the goal bar to see this again.</small></span></li></ul>`,
+    actions:[{label:'Let\'s go',fn:()=>{closeSheet();render();}}]});}
+function openDebt(){const n=S.debt>0&&!canRepayDebt()?nearestHalyard():null;
+  openSheet({eyebrow:'Owed to Halyard',title:S.debt>0?'Your debt':'Debt cleared',
+    body:S.debt>0?`<p>${GLOSS.debt[1]}</p><dl class="kv"><dt>You owe</dt><dd>${usd(S.debt)}</dd><dt>It grows</dt><dd>about ${usd(S.debt*DEBT_RATE)} a day</dd><dt>Pay at</dt><dd>${halyardNames()}</dd></dl>${canRepayDebt()?'<p class="small">You are at a Halyard stop: you can repay here.</p>':n?`<p class="small">Nearest Halyard stop: <b>${short(ST(n.id).name)}</b>, ${n.days} ${n.days>1?'days':'day'} away.</p>`:'<p class="small">No Halyard stop is in reach from here.</p>'}`:'<p>You owe Halyard nothing. Everything you earn now goes into your fund.</p>',
+    actions:[...(S.debt>0&&canRepayDebt()?[{label:'Repay now',fn:()=>{closeSheet();page('port');}}]:n?[{label:`Set course · ${short(ST(n.id).name)}`,fn:()=>{closeSheet();openRoute(n.id);}}]:[]),{label:'Close',kind:'ghost',fn:()=>{closeSheet();render();}}]});}
+function rcAdd(id,k,q,v,pl){S.rc=S.rc||{};const r=S.rc[id]=S.rc[id]||{bq:0,bc:0,sq:0,sv:0,pl:0};if(k==='b'){r.bq+=q;r.bc+=v;}else{r.sq+=q;r.sv+=v;r.pl+=pl;}}
+function recapHTML(score,reason){const rc=S.rc||{},ids=Object.keys(rc).filter(k=>rc[k].bq||rc[k].sq),beg=isBeginner();
+  const tot=ids.reduce((a,k)=>a+rc[k].pl,0),M=v=>`${v<0?'−':'+'}${usd(Math.abs(v))}`;
+  const table=ids.length?`<table><thead><tr><th>Good</th><th class="n">Bought</th><th class="n">Sold</th><th class="n">Profit</th></tr></thead><tbody>${ids.map(k=>{const r=rc[k];return `<tr><td>${G(k).name}</td><td class="n">${usd(r.bc)}</td><td class="n">${usd(r.sv)}</td><td class="n ${r.pl>=0?'up':'dn'}">${r.sq?M(r.pl):'–'}</td></tr>`;}).join('')}<tr><td><b>Trading</b></td><td></td><td></td><td class="n ${tot>=0?'up':'dn'}"><b>${M(tot)}</b></td></tr></tbody></table>`:'<p class="small muted">No trades this mission.</p>';
+  const fx=beg&&reason!=='lost'?`<p class="small fx">Fund = cash ${usd(S.cash)} − debt ${usd(S.debt)}${savUSD()||loansUSD()?' ± savings and loans':''} = <b>${usd(score)}</b>. You started at ${usd(fund0())}, made ${M(tot)} trading${Math.abs(score-fund0()-tot)>=5e4?`, and debt interest and other costs came to ${M(score-fund0()-tot)}`:''}. ${score>=BEGIN.goal?`🎯 Goal of ${usd(BEGIN.goal)} reached.`:`🎯 Goal ${usd(BEGIN.goal)}: ${usd(BEGIN.goal-score)} short. Next time keep your hold full on every trip and sell where the coach says.`}</p>`:'';
+  return `<details class="recap" ${beg?'open':''}><summary>What you traded</summary>${table}${fx}</details>`;}
 function noMovesLeft(){return !!(S&&!S.over&&!S.event&&!STATIONS.some(s=>s.id!==S.loc&&plan(s.id).ok));}
-function autoSellAll(){let total=0;const m=(S.mkt&&S.mkt.data)||{};for(const g of GOODS){const q=held(g.id),o=m[g.id];if(q>0&&o){const pr=sellAt(S.loc,o.local,undefined,g.id);removeCargo(g.id,q);S.cash+=q*pr;total+=q*pr;}}if(total>0){log(`Last stop: the cargo in your hold sold here for ${usd(total)}.`,'good');sfx('money_in');}return total;}
+function autoSellAll(){let total=0;const m=(S.mkt&&S.mkt.data)||{};for(const g of GOODS){const q=held(g.id),o=m[g.id];if(q>0&&o){const pr=sellAt(S.loc,o.local,undefined,g.id),bs=removeCargo(g.id,q);S.cash+=q*pr;total+=q*pr;rcAdd(g.id,'s',q,q*pr,q*pr-bs);}}if(total>0){log(`Last stop: the cargo in your hold sold here for ${usd(total)}.`,'good');sfx('money_in');}return total;}
 let endQueued=false;
 function maybeAutoEnd(){if(endQueued||!S||S.over||S.event||sheetSpec||ui.screen!=='market'||!noMovesLeft())return;endQueued=true;setTimeout(()=>{endQueued=false;if(!S||S.over||S.event||sheetSpec||ui.screen!=='market'||!noMovesLeft())return;S.autoSold=autoSellAll();finish('done');},900);}
 function askBlockHTML(){if(!askAllowed())return '';const c=S.clarity;if(c>=4)return '<div class="ask"><b>Glad it clicked!</b> Want your callsign in the game\'s credits? A short report gets you there.</div>';if(c>=1)return '<div class="ask"><b>Thanks for being honest.</b> What was the most confusing part? Tell us in a short report and we\'ll work on it.</div>';return '<div class="ask"><b>Got a few minutes?</b> Tell us how this mission went. Testers can be credited by callsign in the game.</div>';}
@@ -681,6 +720,7 @@ function showTip(t){const el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=
 function pumpTips(){
   guideTick();
   if(!S||S.over||ui.screen!=='market'||sheetSpec||S.event||(S.actQueue&&S.actQueue.length)||rateDue()){hideTip();return;}
+  if(isBeginner()&&!S.goalHit&&net()>=BEGIN.goal){S.goalHit=1;celebrate('cel-goal','Goal reached',`Your fund passed ${usd(BEGIN.goal)}. Keep trading: everything you add before day ${S.total} is a bigger score.`);}
   if(S.celQ&&S.celQ.length&&S.celDay!==S.day){const c=S.celQ.shift();S.celDay=S.day;TIPS.seen[c.id]=1;tipStat(c.id,'shown');tipsSave();hideTip();
     return openSheet({eyebrow:'Nice work',title:c.title,body:`<p>${glossify(c.text)}</p>`,actions:[{label:'Continue',fn:()=>{closeSheet();render();}}]});}
   if(guideOn()&&!GUIDE.min)return showGuide();
@@ -699,7 +739,7 @@ function remindersHTML(){if(!S||TIPS.mode==='off')return '';const r=[],d=S.day,d
   for(const g of S.pax||[])if(due(g.by))r.push(`⏰ ${g.kind} must reach ${short(ST(g.to).name)} ${due(g.by)}.`);
   if(S.contract&&due(S.contract.by))r.push(`⏰ The colony request for ${short(ST(S.contract.to).name)} ends ${due(S.contract.by)}.`);
   if(insured()&&due(S.policy.until))r.push(`🛡 Your insurance ends ${due(S.policy.until)}.`);
-  if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*(isBeginner()?3:1.2))r.push('💸 You can clear your whole debt here: Port → Repay.');
+  if(canRepayDebt()&&S.debt>0&&S.cash>S.debt*(isBeginner()?2:1.2))r.push('💸 You can clear your whole debt here: Port → Repay.');
   if(S.total-S.day<=2&&massT()-freightT()>0.01)r.push('⌛ Last days: when no trip is left, the mission ends and cargo aboard sells at that stop. Finish where it pays well.');
   return r.slice(0,2).map(t=>`<p class="news remind">${t}</p>`).join('');}
 function setTipMode(m){TIPS.mode=m;TIPS.userSet=1;tipsSave();}
@@ -738,7 +778,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 /* ---------- glossary: tap a dotted word (v25.6, ACT-045) ---------- */
 const GLOSS={
-  debt:['Debt','Money you owe. It grows a little every day, so pay it back when you can.'],
+  debt:['Debt','Money Halyard lent you to build your probe. It grows 0.75% a day. Pay it at LEO, Artemis or Psyche: tap Port, then Repay. Whatever you still owe comes out of your fund at the end.'],
   fund:['Fund','Everything you own minus everything you owe. A bigger fund is a better score.'],
   fork:['Fork','A copy of you. When a mission ends, your fork boots up with your fund.'],
   colony:['Colony','A town in space. Colonies need goods, and they remember who brings them.'],
@@ -814,13 +854,25 @@ function guideTick(){if(!GUIDE||!S||GUIDE.seed!==S.seed||GUIDE.step==='done'||S.
   if(hg){GUIDE.started=1;const d=guideSellStop(hg);Object.assign(GUIDE,d===S.loc?{step:'sell',g:hg,d:S.loc,go:0}:{step:'move',g:hg,d,go:0});}
   else if(!isBeginner()&&GUIDE.started){GUIDE.step='done';GUIDE.finished=1;S.celQ=S.celQ||[];
     S.celQ.unshift({id:'cel-guide',title:'That\'s the whole game',text:'Buy where it is made, fly, and sell where it is wanted. Do it again with bigger loads, and pay off your debt before it grows. Trades lists the best deals at every stop.'});}
+  else if(isBeginner()&&!GUIDE.noPay&&canRepayDebt()&&S.debt>0&&S.cash>=S.debt*2&&S.total-S.day<=3)Object.assign(GUIDE,{step:'pay',g:null,go:0});
   else{const p=guidePick();if(p)Object.assign(GUIDE,{step:'buy',g:p.g,d:p.d,est:p.est,from:S.loc,go:0});
     else{const o=guideSource();if(o)Object.assign(GUIDE,{step:'move',g:o.g,d:o.d,go:1});else if(isBeginner())Object.assign(GUIDE,{step:'idle',g:null,go:0});else GUIDE.step='done';}}
   const same=GUIDE.step===was&&GUIDE.g===wG&&GUIDE.d===wD,
-    nat=(was==='buy'&&GUIDE.step==='move'&&GUIDE.g===wG)||(was==='move'&&GUIDE.step==='sell'&&S.loc===wD)||(was==='move'&&wGo&&GUIDE.step==='buy'&&S.loc===wD)||(was==='sell'&&GUIDE.step==='buy')||was==='idle'||S.loc===wD&&was==='move'||GUIDE.step==='idle'||GUIDE.step==='done';
+    nat=(was==='buy'&&GUIDE.step==='move'&&GUIDE.g===wG)||(was==='move'&&GUIDE.step==='sell'&&S.loc===wD)||(was==='move'&&wGo&&GUIDE.step==='buy'&&S.loc===wD)||(was==='sell'&&GUIDE.step==='buy')||was==='idle'||was==='pay'||GUIDE.step==='pay'||S.loc===wD&&was==='move'||GUIDE.step==='idle'||GUIDE.step==='done';
   if(!same){GUIDE.re=nat?0:1;guideSave();sfx('guide_step');}}
 function clearHL(){document.querySelectorAll('.guide-hl').forEach(e=>e.classList.remove('guide-hl'));}
-function guideText(){if(GUIDE.step==='idle')return ['','⏳','Nothing pays well from here in the days you have left. The mission ends by itself when no trip is left, and any cargo aboard sells at that stop.'];
+function guideDestPx(gid,d){const p=plan(d),rDay=Math.max(1,S.day-p.lag),t=market(S.seed,rDay,d)[gid];return t?sellAt(d,t.local,rDay,gid):0;}
+function guideWhy(){const s=GUIDE.step,gid=GUIDE.g;
+  if(s==='pay')return `Why: debt grows ${(DEBT_RATE*100).toFixed(2)}% a day, and whatever you still owe comes out of your fund at the end. You can still trade with what is left.`;
+  if(s==='idle'||!gid)return '';
+  const d=short(ST(GUIDE.d).name),c=S.cargo[gid],paid=c&&c.q?c.cost/c.q:0;
+  if(s==='buy')return GUIDE.est?`Why: ${d} wants it. This load should make about ${usd(GUIDE.est)}.`:'';
+  if(s==='move'&&GUIDE.go)return 'Why: goods are cheapest where they are made. Fly there and fill your hold.';
+  if(s==='move'){const t=guideDestPx(gid,GUIDE.d);return paid&&t>paid?`Why: you paid ${usd(paid)} a lot. ${d} pays about ${usd(t)}, so each lot should make about ${usd(t-paid)}.`:`Why: of the stops you can reach, ${d} pays the most for it.`;}
+  const o=S.mkt.data[gid],here=o?sellAt(S.loc,o.local,undefined,gid):0;
+  return paid&&here>paid?`Why: you paid ${usd(paid)} a lot and it sells here for ${usd(here)}. The difference, ${usd(here-paid)} a lot, is your profit.`:'Why: no stop you can reach pays more, so sell now and use the cash for your next load.';}
+function guideText(){if(GUIDE.step==='pay')return ['','💸','You have the cash to clear your debt here. Tap <b>Port</b>, then <b>Repay</b>.'];
+  if(GUIDE.step==='idle')return ['','⏳','Nothing pays well from here in the days you have left. The mission ends by itself when no trip is left, and any cargo aboard sells at that stop.'];
   const g=G(GUIDE.g).name,d=short(ST(GUIDE.d).name),o=S.mkt.data[GUIDE.g];
   if(GUIDE.step==='move'&&GUIDE.go)return ['1','🚀',`Nothing here pays well today. Tap <b>Move</b>, then <b>${d}</b>. ${g} is made there, so it is cheap.`];
   const c=S.cargo[GUIDE.g],paid=c&&c.q?c.cost/c.q:0,here=o?sellAt(S.loc,o.local,undefined,GUIDE.g):0;
@@ -828,12 +880,13 @@ function guideText(){if(GUIDE.step==='idle')return ['','⏳','Nothing pays well 
   if(GUIDE.step==='buy')return ['1','🟢',`Tap <b>${g}</b>. It is made here, so it is cheap. Then tap <b>Max</b>.`];
   if(GUIDE.step==='move')return ['2','🚀',`Tap <b>Move</b>, then <b>${d}</b>. ${d} wants ${g.toLowerCase()}.`];
   return ['3','🟠',`Tap <b>${g}</b>, then <b>All</b> to sell it here for more.`];}
-function showGuide(){const [n,ic,txt0]=guideText(),txt=txt0+(isBeginner()&&GUIDE.step==='buy'&&GUIDE.est?`<small class="why">Why: ${short(ST(GUIDE.d).name)} wants it. This load should make about ${usd(GUIDE.est)}.</small>`:''),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
+function showGuide(){const [n,ic,txt0]=guideText(),why=guideWhy(),txt=txt0+(why?`<small class="why">${why}</small>`:''),el=$('#tip'),f=$('#scr-market .foot');el.style.bottom=((f?f.offsetHeight:0)+10)+'px';
   el.dataset.id='guide-'+GUIDE.step;el.className='tip guide';
-  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?(n?`Next move · step ${n} of 3`:'Next move'):`First trade · step ${n} of 3`}</span><p>${GUIDE.re?'<small class="why">Plan updated to fit your last move.</small>':''}${txt}</p><div class="tb"><button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
+  el.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="kind">${isBeginner()?(n?`Next move · step ${n} of 3`:'Next move'):`First trade · step ${n} of 3`}</span><p>${GUIDE.re?'<small class="why">Plan updated to fit your last move.</small>':''}${txt}</p><div class="tb">${GUIDE.step==='pay'?'<button class="btn ghost" type="button" id="guide-nopay">Not now</button>':''}<button class="btn ghost" type="button" id="guide-skip">${isBeginner()?'Hide coach':'Skip guide'}</button></div>`;
   el.hidden=false;const bd=$('#scr-market .body');if(bd)bd.style.paddingBottom=(el.offsetHeight+16)+'px';
+  {const np=$('#guide-nopay');if(np)np.addEventListener('click',()=>{GUIDE.noPay=1;guideSave();guideTick();pumpTips();});}
   $('#guide-skip').addEventListener('click',()=>{if(isBeginner()){GUIDE.min=1;guideSave();hideTip();pumpTips();coachBubble();return;}GUIDE.step='done';GUIDE.skipped=1;guideSave();hideTip();pumpTips();});
-  clearHL();const t=GUIDE.step==='idle'?null:$(GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move')t.scrollIntoView({block:'nearest'});}}
+  clearHL();const t=GUIDE.step==='idle'?null:$(GUIDE.step==='pay'?'[data-p="port"]':GUIDE.step==='move'?'#m-move':`[data-g="${GUIDE.g}"]`);if(t){t.classList.add('guide-hl');if(GUIDE.step!=='move'&&GUIDE.step!=='pay')t.scrollIntoView({block:'nearest'});}}
 const WHISTLE='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="4.5" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 8.2l2.6 1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="15" r="6" fill="currentColor"/><rect x="10" y="9" width="12" height="5.2" rx="1.2" fill="currentColor"/><circle cx="10" cy="15" r="2.1" fill="#13233b"/></svg>';
 function coachBubble(){let b=document.getElementById('coach-bub');const show=!!(S&&isBeginner()&&guideOn()&&GUIDE.min&&ui.screen==='market'&&!sheetSpec&&!S.event);
   if(!show){if(b)b.hidden=true;return;}
@@ -850,9 +903,9 @@ function newRun(mode,days){
   const beg=mode==='beginner';
   S={v:3,mode,seed,total:beg?BEGIN.days:days,day:1,loc:'leo',cash:beg?BEGIN.cash:START.cash,debt:beg?BEGIN.debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
      cargo:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[],practice};
-  norm(S);sel=null;selGood=null;
+  norm(S);S.f0=S.cash-S.debt;S.rc={};sel=null;selGood=null;
   log(`Boot complete at LEO Exchange. ${usd(S.cash)} in the account and a commissioning debt of ${usd(S.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
-  arrive(true);save();go('market');showIntro();if(mode==='beginner')guideStart();
+  arrive(true);save();go('market');const intro=showIntro();if(mode==='beginner'){guideStart();if(!intro)missionSheet();}
 }
 function arrive(first){
   S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();
@@ -876,8 +929,8 @@ const STORY=`<p>Your last memory is from 2026: a logistics engineer, a long week
   <p>The colonies from low Earth orbit to Tau Ceti run on supply lines, and supply lines run on you. Trade, haul <b>supply contracts</b>, answer <b>colony requests</b>, and stay ahead of bloc inspectors and KESTREL, a corporate probe that dumps cargo to undercut you. Colonies remember who keeps them supplied.</p>
   <p>Everything you earn above the debt is your <b>replication fund</b>. When the mission ends, you fork: a copy of you boots with that fund. Make it a good one.</p>`;
 function showIntro(force){let seen=false;try{seen=!!localStorage.getItem(INTRO_KEY);}catch(e){}
-  if(seen&&!force)return;const body=force?STORY:STORY_SHORT();try{localStorage.setItem(INTRO_KEY,'1');}catch(e){}
-  openSheet({eyebrow:'Boot log · 2147',title:'Good morning',body,actions:[{label:force?'Close':'Start the mission',fn:()=>{closeSheet();if(force)render();else howToPlay();}}]});}
+  if(seen&&!force)return false;const body=force?STORY:STORY_SHORT();try{localStorage.setItem(INTRO_KEY,'1');}catch(e){}
+  openSheet({eyebrow:'Boot log · 2147',title:'Good morning',body,actions:[{label:force?'Close':'Start the mission',fn:()=>{closeSheet();if(force)render();else if(isBeginner())missionSheet();else howToPlay();}}]});return true;}
 const STORY_SHORT=()=>glossify(`<p>Your last memory is from 2026. Now it is 2147, and you are software running a freight probe.</p><p>Halyard rebuilt you on credit: you start with a commissioning debt of ${usd(S?S.debt:START.debt)} that grows every day. Trade between stations to pay it off and grow your fund.</p>`);
 
 /* ---------- jump math ---------- */
@@ -1056,8 +1109,8 @@ function servicesHTML(st,wires){let h='';const sol=st.sys==='sol',M=v=>usd(v);
   return h;}
 
 /* ---------- trading ---------- */
-function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.loc,o.local);q=Math.min(q,o.stock,Math.floor(S.cash/p),Math.floor(freeT()/(g.kg/1000)+1e-9));if(q<=0)return sfx('ui_error');o.stock-=q;S.cash-=q*p;addCargo(id,q,q*p);sfx('trade_buy');log(`Bought ${amt(q,g)} ${g.name} for ${usd(q*p)}.`);save();closeSheet();render();}
-function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return sfx('ui_error');const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;sfx(pl>=0?'trade_sell_profit':'trade_sell_loss');if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
+function buy(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=buyAt(S.loc,o.local);q=Math.min(q,o.stock,Math.floor(S.cash/p),Math.floor(freeT()/(g.kg/1000)+1e-9));if(q<=0)return sfx('ui_error');o.stock-=q;S.cash-=q*p;addCargo(id,q,q*p);rcAdd(id,'b',q,q*p);sfx('trade_buy');log(`Bought ${amt(q,g)} ${g.name} for ${usd(q*p)}.`);save();closeSheet();render();}
+function sell(id,q){const o=S.mkt.data[id];if(!o)return;const g=G(id),p=sellAt(S.loc,o.local,undefined,id);q=Math.min(q,held(id));if(q<=0)return sfx('ui_error');const basis=removeCargo(id,q);S.cash+=q*p;const pl=q*p-basis;rcAdd(id,'s',q,q*p,pl);sfx(pl>=0?'trade_sell_profit':'trade_sell_loss');if(pl>0)S.stats.profitSales++;if(ST(S.loc).sys==='star')S.stats.starSales++;if(o.role==='want'&&q*p>=1e6)gainRep(S.loc,Math.min(10,Math.max(2,Math.floor(q*p/4e6))),true);log(`Sold ${amt(q,g)} ${g.name} for ${usd(q*p)} (${pl>=0?'+':'−'}${usd(Math.abs(pl))}).`,pl>=0?'good':'bad');if(pl>0&&o.ev&&o.ev.up)celebrate('cel-shortage','You sold into a shortage',`${ST(S.loc).name} was short of ${g.name.toLowerCase()}, so you earned ${usd(pl)} on one sale. Watch Trades for ▲ headlines: that is how big fortunes are made.`);save();closeSheet();render();}
 function bestTrades(){
   const m=S.mkt.data,out=[];
   for(const d of STATIONS){if(d.id===S.loc)continue;const p=plan(d.id);if(!p.ok)continue;
@@ -1125,8 +1178,8 @@ function finish(reason){
   if(!S.practice)addRecord({seed:S.seed,mode:S.mode,total:S.total,score,date:kstDate(),acts:S.acts.length});
   log(reason==='lost'?'Probe lost. No fork.':`Mission closed. Replication fund ${usd(score)}. Forking.`,reason==='lost'?'bad':'good');save();render();
   const isBest=!S.practice&&(prev===null||score>prev);sfx(reason==='lost'?'mission_lost':isBest&&prev!==null?'new_best':'mission_complete');
-  openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}${S.practice?' · practice run':' · counted run'}`:'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
-    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}${S.autoSold?`<dt>Cargo sold at the last stop</dt><dd>+${usd(S.autoSold)}</dd>`:''}<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd><dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd>${S.mode==='daily'?`<dt>Today's counted run</dt><dd>${S.practice?(prev===null?'not finished':usd(prev)):usd(score)}</dd>`:`<dt>${isBeginner()?'Best beginner mission':'Best on this length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd>`}</dl>${S.practice?'<p class="small muted">Practice run: it does not change your counted score. Practice as often as you like.</p>':''}${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p>${askAllowed()?'':askQuietHTML()}`}${askBlockHTML()}`,
+  openSheet({locked:true,eyebrow:S.mode==='daily'?`Daily mission #${dailyNo()}${S.practice?' · practice run':' · counted run'}`:isBeginner()?'Beginner mission':'Free mission',title:reason==='lost'?'Probe lost':'Fork ready',
+    body:`<dl class="kv"><dt>Cash</dt><dd>${usd(S.cash)}</dd><dt>Commissioning debt</dt><dd>${S.debt>0?'−'+usd(S.debt):'Cleared'}</dd>${savUSD()?`<dt>STA Treasury</dt><dd>${usd(savUSD())}</dd>`:''}${loansUSD()?`<dt>Bank loans</dt><dd>−${usd(loansUSD())}</dd>`:''}${S.fleet.length?`<dt>Fleet forks</dt><dd>${S.fleet.length} running · +${usd(fleetValue())}</dd>`:''}${S.autoSold?`<dt>Cargo sold at the last stop</dt><dd>+${usd(S.autoSold)}</dd>`:''}${isBeginner()?'':`<dt>Acts complete</dt><dd>${S.acts.length} / ${ACTS.length}</dd>`}<dt><b>Replication fund</b></dt><dd><b>${usd(score)}</b></dd>${S.mode==='daily'?`<dt>Today's counted run</dt><dd>${S.practice?(prev===null?'not finished':usd(prev)):usd(score)}</dd>`:`<dt>${isBeginner()?'Best beginner mission':'Best on this length'}</dt><dd>${usd(isBest?score:prev)}${isBest&&reason!=='lost'?' · new best':''}</dd>`}</dl>${recapHTML(score,reason)}${S.practice?'<p class="small muted">Practice run: it does not change your counted score. Practice as often as you like.</p>':''}${reason==='lost'?`<p class="small">Hull reached zero. A lost probe cannot fork itself. ${savUSD()>0?'The STA Treasury releases your deposits to a new fork, so the fund is your Treasury balance.':'With nothing in the STA Treasury, the fund is zero.'}</p>`:`<p class="small">Your copy boots with this fund. The original gets a quiet retirement in a data vault.</p>${askAllowed()?'':askQuietHTML()}`}${askBlockHTML()}`,
     actions:(acts=>askAllowed()?[{label:'Send feedback',fn:()=>{closeSheet();openReport();}},...acts.map(x=>/^(Main menu|Try a full mission)$/.test(x.label)?Object.assign({},x,{kind:'ghost',fn:()=>{askNo();x.fn();}}):x)]:acts)([...(isBeginner()&&reason!=='lost'?[{label:'Try a full mission',fn:()=>{closeSheet();newRun('random',30);}}]:[]),{label:'Main menu',kind:isBeginner()?'ghost':undefined,fn:()=>{closeSheet();go('home');}},...(S.mode==='daily'?[{label:'Share result',kind:'ghost',fn:()=>shareDaily(score,reason)}]:[]),{label:'Review log',kind:'ghost',fn:()=>{closeSheet();page('log');}}])});
 }
 // v25.8 (ACT-055): spoiler-free Daily result: no routes, goods or prices, so it gives nothing away.
@@ -1184,7 +1237,7 @@ function renderHome(){
     <div class="card daily"><div class="row"><h2>Daily mission #${dailyNo()}</h2><span class="mono small" style="color:var(--ice)">◷ ${left}</span></div>
       <p class="muted">Same markets and events for every probe today. 45 days. ${counted&&!(liveDaily&&!S.practice)?'Your counted run is used. Practice runs are unlimited and never rank.':'Your first start today is the one that counts. Practice as often as you like after.'}</p>
       <div class="row"><button class="btn" type="button" id="h-daily" style="min-width:150px">${liveDaily?(S.practice?'Resume practice':'Resume'):counted?'Practice':'Play'}</button><span class="mono small">Counted ${best===null?'–':usd(best)}</span></div></div>
-    <div class="card" style="display:grid;gap:8px"><div class="row"><h2 style="font-size:22px">New here?</h2><span class="mono small" style="color:var(--ice)">7 days</span></div><p class="muted">A short beginner mission: 3 goods, a smaller loan, and a coach that shows each next move.</p><button class="btn ghost" type="button" id="h-begin">${live&&S.mode==='beginner'?'Resume beginner mission':'Start beginner mission'}</button></div>
+    <div class="card" style="display:grid;gap:8px"><div class="row"><h2 style="font-size:22px">New here?</h2><span class="mono small" style="color:var(--ice)">${BEGIN.days} days</span></div><p class="muted">A short beginner mission: 3 goods, a smaller loan, and a coach that shows each next move.</p><button class="btn ghost" type="button" id="h-begin">${live&&S.mode==='beginner'?'Resume beginner mission':'Start beginner mission'}</button></div>
     <div style="display:grid;gap:8px"><span class="eyebrow">Free mission</span>
       <div class="seg" role="group" aria-label="Run length">${[30,45,60].map(n=>`<button type="button" data-len="${n}" aria-pressed="${ui.runLen===n}">${n} days</button>`).join('')}</div>
       <button class="btn big" type="button" id="h-new" style="background:var(--bad);border-color:var(--bad);color:#fff">New mission</button>
@@ -1202,7 +1255,7 @@ function renderHome(){
 // In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
 function openMenu(){
   openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
-    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.9.1" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.10" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
     wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));sh.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{VIEW.calm=b.dataset.view==='1';viewSave();viewApply();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
     actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 function renderMarket(){
@@ -1211,8 +1264,8 @@ function renderMarket(){
   const ch=openCharters().length+(S.berths?paxOpen().length:0),act=S.freight.length+S.pax.length,deliver=S.contract&&S.contract.to===S.loc&&held(S.contract.good)>=S.contract.units-1e-9;
   $('#scr-market').innerHTML=`<header class="mk-head pad">
       <div class="mk-top"><button class="back menubtn" type="button" id="m-home" aria-label="Menu">☰</button><div style="flex:1;min-width:0"><span class="eyebrow">${S.practice?'<b style="color:var(--amber)">Practice run</b> · ':''}${isBeginner()?'<b style="color:var(--ice)">Beginner</b> · ':''}${st.place}</span><h2>${st.name}</h2></div><div class="mk-day"><b>${Math.min(S.day,S.total)}/${S.total}</b><span class="eyebrow">Days</span></div></div>
-      <div class="cash">${usd(S.cash)}</div>${VIEW.calm?'<p class="goalline">🎯 Buy ⬇ where it is made · fly · sell ⬆ where it is wanted</p>':''}
-      <div class="mk-sub"><span class="rep">${gl('standing',repTier(S.loc))} ${Math.round(repOf(S.loc))}</span><span class="note ${S.debt>0?'':'ok'}">${gl('debt','DEBT')} ${S.debt>0?usd(S.debt):'CLEARED'}</span>${loansUSD()>0?`<span class="note">LOANS ${usd(loansUSD())}</span>`:''}${savUSD()>0?`<span class="note ok">SAVED ${usd(savUSD())}</span>`:''}<span class="muted">${AGENCY_SHORT[st.bloc]} · ${BLOC_NAME[st.bloc].toLowerCase()}</span></div>
+      <div class="cash">${usd(S.cash)}</div>${goalHTML()}${VIEW.calm?'<p class="goalline">🔁 Buy ⬇ where it is made · fly · sell ⬆ where it is wanted</p>':''}
+      <div class="mk-sub"><span class="rep">${gl('standing',repTier(S.loc))} ${Math.round(repOf(S.loc))}</span><span class="note ${S.debt>0?'':'ok'}"><button class="debtbtn" type="button" id="m-debt" aria-label="Debt: where and how to pay">DEBT</button> ${S.debt>0?usd(S.debt):'CLEARED'}</span>${loansUSD()>0?`<span class="note">LOANS ${usd(loansUSD())}</span>`:''}${savUSD()>0?`<span class="note ok">SAVED ${usd(savUSD())}</span>`:''}<span class="muted">${AGENCY_SHORT[st.bloc]} · ${BLOC_NAME[st.bloc].toLowerCase()}</span></div>
       ${GOODS.filter(g=>m[g.id]&&m[g.id].ev).map(g=>{const v=m[g.id].ev;return `<p class="news ${v.up?'':'dn'}">${v.up?'▲':'▼'} ${v.head}. Price ×${v.m.toFixed(v.m<1?2:1)}${v.to>S.day?`, ${v.to-S.day+1} days left`:', last day'}: ${v.up?'sell here':'buy here'}.</p>`;}).join('')}${remindersHTML()}${S.news?`<p class="news">${S.news.spike?'Colony shortage':'Rival dump'}: ${G(S.news.good).name} ${S.news.spike?'well above':'well below'} its usual range.</p>`:''}
     </header>
     <div class="body pad" style="padding-block:0 8px">
@@ -1234,6 +1287,7 @@ function renderMarket(){
     </footer>`;
   document.querySelectorAll('[data-rate]').forEach(b=>b.addEventListener('click',()=>rateClarity(+b.dataset.rate)));
   $('#m-home').addEventListener('click',openMenu);
+  {const g=$('#m-goal');if(g)g.addEventListener('click',missionSheet);const d=$('#m-debt');if(d)d.addEventListener('click',openDebt);}
   document.querySelectorAll('[data-g]').forEach(b=>b.addEventListener('click',()=>{selGood=b.dataset.g;openTrade();}));
   document.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.p)));
   $('#m-move').addEventListener('click',openMove);
@@ -1275,7 +1329,7 @@ function renderPage(){
     const standingCard=`<div class="card"><h3 style="font-size:18px">Colony standing</h3><p class="small muted">Sell colonies the goods they want, deliver supply contracts and requests, and deal straight with inspectors.</p><ul class="standing">${STATIONS.map(s=>`<li class="${s.id===S.loc?'here':''}"><span>${short(s.name)}</span><span class="track"><i style="width:${repOf(s.id)}%"></i></span><span class="mono small">${repTier(s.id)}</span></li>`).join('')}</ul><p class="small muted">Known: +1% on wanted goods. Trusted: +3%, half the inspections. Partner: +5%, supply contracts +15%, no inspections.</p></div>`;
     const wires=[];
     if(canRepayDebt()&&S.debt>0){const max=Math.floor(Math.min(S.debt,S.cash)),keep=max;
-      body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Owed to the Halyard Consortium, which built you. Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p><div class="trade-row"><input type="number" id="repay" min="0" max="${max}" value="${keep}" aria-label="Repayment in dollars"><button class="btn" type="button" id="repay-b" ${max<1?'disabled':''}>Repay</button></div></div>`;
+      body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3>${guideStep()==='pay'?'<p class="guide-note small">👉 Tap <b>Repay</b> to clear your debt.</p>':''}<p class="small muted">Owed to the Halyard Consortium, which built you. Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p><div class="trade-row"><input type="number" id="repay" min="0" max="${max}" value="${keep}" aria-label="Repayment in dollars"><button class="btn" type="button" id="repay-b" ${max<1?'disabled':''}>Repay</button></div></div>`;
       wires.push(()=>$('#repay-b').addEventListener('click',()=>{const v=Math.min(max,Math.max(0,Math.floor(+$('#repay').value||0)));if(v>0){S.cash-=v;S.debt=Math.max(0,S.debt-v);if(S.debt<1)S.debt=0;log(`Repaid ${usd(v)} of commissioning debt.`,'good');sfx(S.debt?'money_in':'debt_cleared');save();render();}}));}
     else if(st.sys==='sol'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Balance ${usd(S.debt)}, growing ${(DEBT_RATE*100).toFixed(2)}% per day. Halyard takes repayment only at its own stops: ${HALYARD_STOPS().map(s=>short(s.name)).join(', ')}.</p></div>`;
     else if(st.sys==='star'&&S.debt>0)body+=`<div class="card"><h3 style="font-size:18px">Commissioning debt</h3><p class="small muted">Light-lag blocks repayment from the stars. Balance ${usd(S.debt)}. Interest, sadly, travels faster than light.</p></div>`;
@@ -1355,15 +1409,15 @@ function openRoute(dest){
   sel=dest;
   const build=()=>{const d=ST(dest),p=plan(dest),m=S.mkt.data,rDay=Math.max(1,S.day-p.lag),rep=market(S.seed,rDay,dest);
     const rows=goodsFor().map(g=>{const there=rep[g.id],here=m[g.id],h=held(g.id);if(!there||(!h&&!(here&&here.stock)))return '';
-      const st=sellAt(dest,there.local,rDay,g.id),bh=here&&here.stock?buyAt(S.loc,here.local):null,basis=h?S.cargo[g.id].cost/h:null,ref=h?basis:bh,mg=ref?(st-ref)/ref:null;
-      return `<tr><td>${g.name}${h?`<span class="sub">${qfmt(h)} held · paid ${usd(basis)}</span>`:''}</td><td class="n">${bh?usd(bh):'–'}</td><td class="n">${usd(st)}</td><td class="n ${mg>0?'up':'dn'}">${mg===null?'–':(mg>=0?'+':'−')+Math.abs(Math.round(mg*100))+'%'}</td></tr>`;}).join('');
+      const st=sellAt(dest,there.local,rDay,g.id),bh=here&&here.stock?buyAt(S.loc,here.local):null,basis=h?S.cargo[g.id].cost/h:null,ref=h?basis:bh,mg=ref?(st-ref)/ref:null,pd=ref?st-ref:null;
+      return `<tr><td>${g.name}${h?`<span class="sub">${qfmt(h)} held · paid ${usd(basis)}</span>`:''}</td><td class="n">${bh?usd(bh):'–'}</td><td class="n">${usd(st)}</td><td class="n ${mg>0?'up':'dn'}">${mg===null?'–':isBeginner()?(pd>=0?'+':'−')+usd(Math.abs(pd)):(mg>=0?'+':'−')+Math.abs(Math.round(mg*100))+'%'}</td></tr>`;}).join('');
     const dueHere=S.freight.filter(c=>c.to===dest).reduce((a,c)=>a+c.pay*.6,0)+S.pax.filter(g=>g.to===dest).reduce((a,g)=>a+g.pay*.75,0);
     return {title:d.name,eyebrow:d.place,rebuild:()=>build(),
       
       body:`${guideStep()==='move'&&dest===GUIDE.d?'<p class="guide-note small">👉 Tap <b>Jump</b> to fly here.</p>':''}<dl class="kv"><dt>Travel</dt><dd>${p.days} ${p.days>1?'days':'day'}${p.inter?` · ${ly(S.loc,dest).toFixed(2)} ly`:''}</dd>
         <dt>Interest in transit</dt><dd>${usd(p.interest)}</dd><dt>Price report</dt><dd>${p.lag?`${p.lag}d old · light-lag`:'live'}</dd>${dueHere?`<dt>Freight and fares due</dt><dd class="up">+${usd(dueHere)}</dd>`:''}</dl>
         ${p.ok?'':`<p class="small warn">Cannot jump: ${p.reasons.join('; ')}.${S.total-S.day<1?' End the mission from the Port screen.':''}</p>`}
-        ${rows?`<table><thead><tr><th>Cargo</th><th class="n">Here</th><th class="n">There</th><th class="n">Margin</th></tr></thead><tbody>${rows}</tbody></table><p class="small" style="color:#c9b9a8">Per lot in dollars after spreads. Margin compares there with here, or with what you paid for cargo you hold. Prices are today's; they drift a little by arrival. Trades ranks the best picks.</p>`:''}`,
+        ${rows?`<table><thead><tr><th>Cargo</th><th class="n">Buy here</th><th class="n">Sell at ${short(d.name)}</th><th class="n">${isBeginner()?'Profit a lot':'Profit'}</th></tr></thead><tbody>${rows}</tbody></table><p class="small" style="color:#c9b9a8">Prices are per lot, after spreads. Profit compares the price at ${short(d.name)} with the price here, or with what you paid for cargo you hold${isBeginner()?'':', as a percent'}. Prices are today's; they drift a little by arrival. Trades ranks the best picks.</p>`:''}`,
       actions:[{label:p.ok?`Jump · ${p.days} ${p.days>1?'days':'day'}`:'Jump',fn:jump,disabled:!p.ok||S.over},{label:'‹ All stops',kind:'ghost',fn:()=>{flashMsg='';openMove();}}],
       wire:sh=>{if(guideStep()==='move'&&dest===GUIDE.d){const j=sh.querySelector('#sh-acts button');if(j)j.classList.add('guide-hl');}}};};
   flashMsg='';openSheet(build());
