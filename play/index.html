@@ -24,10 +24,10 @@ body.calm *{transition:none!important;animation:none!important}.calm .ticker,.ca
 .cue{display:inline-block;font:600 11px/1.6 var(--f-mono);letter-spacing:.04em;padding:0 6px;border-radius:4px;margin-right:4px}.cue.buy{background:rgba(110,190,130,.18);color:var(--good)}.cue.sell{background:rgba(242,169,59,.18);color:var(--amber)}
 .goalline{margin-top:6px;font:600 13px/1.4 var(--f-mono);color:var(--ice)}
 /* v25.10 (ACT-125): goal bar, mission card, debt button, recap */
-.goal{display:block;width:100%;margin:6px 0 2px;padding:0;background:none;border:0;text-align:left;cursor:pointer}
+.goal{display:block;width:100%;margin:6px 0 8px;padding:0;background:none;border:0;text-align:left;cursor:pointer;-webkit-appearance:none;appearance:none;color:inherit;line-height:1.3}
 .goal .gt{display:flex;justify-content:space-between;gap:8px;font:600 12.5px/1.3 var(--f-mono);color:var(--ice)}
-.goal .gt .muted{font-weight:500}.goal .track{height:5px;margin-top:4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
-.goal .track i{display:block;height:100%;background:var(--ice)}.goal.done .track i{background:var(--good)}.goal.done .gt{color:var(--good)}
+.goal .gt .muted{font-weight:500}.goal .track{display:block;height:5px;margin-top:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.goal .track i{display:block;height:5px;background:var(--ice)}.goal.done .track i{background:var(--good)}.goal.done .gt{color:var(--good)}
 .debtbtn{padding:0;background:none;border:0;color:inherit;font:inherit;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
 .mission{margin:0;padding:0;list-style:none;display:grid;gap:10px}.mission li{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start}
 .mission .hi{font-size:20px;line-height:1.2}.mission small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
