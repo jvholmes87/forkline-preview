@@ -216,7 +216,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 <script>
 'use strict';
 const QS = new URLSearchParams(location.search);
-const BUILD = (QS.get('b') || 'v25.10').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+const BUILD = (QS.get('b') || 'v25.11').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
 // v25.9.1: opened from the game's end screen (ACT-117): pre-fill what the game knows, record where the report came from.
 const SRC = /^(rate75|end|menu)$/.test(QS.get('src') || '') ? QS.get('src') : '', GAME_CLEAR = Math.max(0, Math.min(5, parseInt(QS.get('clear') || '0', 10) || 0));
 const MISSION = /^(beginner|daily|30|45|60)$/.test(QS.get('m') || '') ? QS.get('m') : '';
