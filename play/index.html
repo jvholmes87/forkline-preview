@@ -168,6 +168,7 @@ input[type=number]{background:var(--deep);border:1px solid var(--line);border-ra
 .toggle button{appearance:none;border:0;background:transparent;padding:6px 12px;cursor:pointer;font:500 12px var(--f-mono)}
 .toggle button[aria-pressed="true"]{background:var(--amber);color:var(--amber-ink)}
 /* v25.11: Move > Compare (ACT-123) */
+.toggle{grid-auto-columns:auto;min-width:max-content;flex-shrink:0}.toggle button{padding:6px 8px}@media (max-width:360px){.toggle button{padding:6px 6px;font-size:11px}}
 .cmp-lbl{font:500 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .cmp-chips{display:flex;gap:6px;margin:0 0 10px;padding:0 0 4px;overflow-x:auto;scrollbar-width:none;flex:0 0 auto;min-height:48px}.cmp-chips::-webkit-scrollbar{display:none}
 .cmp-chip{appearance:none;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;font:700 13px var(--f-body);cursor:pointer;white-space:nowrap;flex:0 0 auto}
@@ -1406,8 +1407,8 @@ function mapSVG(){
     return `<g class="node${s.sys==='star'?' star':''}${isHere?' here':''}${p&&!p.ok?' dim':''}" data-id="${s.id}" tabindex="${isHere?-1:0}" role="button" aria-label="${s.name}">${isHere?`<circle class="halo" cx="${x}" cy="${y}" r="11"/>`:''}<circle class="dot" cx="${x}" cy="${y}" r="${isHere?6:5.5}"/><circle cx="${x}" cy="${y}" r="18" fill="transparent"/><text x="${right?x+11:x-11}" y="${y+4}" text-anchor="${right?'start':'end'}">${short(s.name)}</text></g>`;}).join('');
   return `<div class="chart"><svg viewBox="0 0 640 640" role="group" aria-label="Log-scale chart, distance from Earth">${svg}</svg></div>`;
 }
-/* v25.11 (ACT-123): Move > Compare. One good, every stop's price at today's report, best trip first. Display only. */
-function cmpPick(){const gs=goodsFor();if(ui.cmpGood&&gs.some(g=>g.id===ui.cmpGood))return ui.cmpGood;
+/* v25.11 (ACT-123): Move > Compare. One good, every stop's price at today's report, best trip marked. Display only. */
+function cmpPick(){const gs=goodsFor();if(ui.cmpGood&&ui.cmpSeed===S.seed&&gs.some(g=>g.id===ui.cmpGood))return ui.cmpGood;
   let best=null,bq=0;for(const g of gs){const h=held(g.id);if(h>bq){bq=h;best=g.id;}}if(best)return best;
   if(GUIDE&&GUIDE.g&&gs.some(g=>g.id===GUIDE.g))return GUIDE.g;
   const m=S.mkt.data,mk=gs.find(g=>m[g.id]&&m[g.id].stock&&m[g.id].role==='make');return (mk||gs[0]).id;}
@@ -1416,11 +1417,11 @@ function compareBody(){
   const bh=here&&here.stock?buyAt(S.loc,here.local):null,basis=h?S.cargo[gid].cost/h:null,ref=h?basis:bh;
   const chips=goodsFor().map(x=>`<button type="button" class="cmp-chip" data-g="${x.id}" aria-pressed="${x.id===gid}">${x.name}</button>`).join('');
   const rows=STATIONS.filter(s=>s.id!==S.loc&&(!beg||s.sys==='sol')).map(s=>{const p=plan(s.id),rDay=Math.max(1,S.day-p.lag),t=market(S.seed,rDay,s.id)[gid];if(!t)return null;
-      const st=sellAt(s.id,t.local,rDay,gid),pd=ref?st-ref:null,mg=ref?(st-ref)/ref:null;return {s,p,st,pd,mg,per:ref?(beg?pd:mg)/p.days:st,want:t.role==='want'};})
-    .filter(Boolean).sort((a,b)=>(b.p.ok-a.p.ok)||(b.per-a.per));
-  const top=Math.max(0,...rows.filter(r=>r.p.ok).map(r=>r.per)),bestId=(rows.find(r=>r.p.ok&&(!ref||r.pd>0))||{}).s;
-  const li=rows.map(r=>{const {s,p}=r,best=bestId&&s.id===bestId.id,ghl=guideStep()==='move'&&s.id===GUIDE.d;
-      const prof=!ref?'–':beg?(r.pd>=0?'+':'−')+usd(Math.abs(r.pd)):(r.mg>=0?'+':'−')+Math.abs(Math.round(r.mg*100))+'%'+(p.days>1?` · ${Math.round(r.mg*100/p.days)}%/day`:'');
+      const st=sellAt(s.id,t.local,rDay,gid),pd=ref?st-ref:null,mg=ref?(st-ref)/ref:null;const per=ref?(beg?pd:mg)/p.days:st;return {s,p,st,pd,mg,per,shown:ref&&!beg?Math.round(mg*100/p.days):per,want:t.role==='want'};})
+    .filter(Boolean).sort((a,b)=>(b.p.ok-a.p.ok)||(b.shown-a.shown)||(b.per-a.per));
+  const top=Math.max(0,...rows.filter(r=>r.p.ok).map(r=>r.per)),bestId=ref?(rows.find(r=>r.p.ok&&r.pd>0)||{}).s:null;
+  const li=rows.map(r=>{const {s,p}=r,best=bestId&&s.id===bestId.id,ghl=guideStep()==='move'&&s.id===GUIDE.d&&gid===GUIDE.g;
+      const prof=!ref?'–':beg?(r.pd>=0?'+':'−')+usd(Math.abs(r.pd)):(r.mg>=0?'+':'−')+Math.abs(Math.round(r.mg*100))+'%'+(p.days>1?` · ${r.shown<0?'−':''}${Math.abs(r.shown)}%/day`:'');
       const w=top>0&&r.per>0?Math.max(4,Math.round(r.per/top*100)):0;
       return `<li><button type="button" class="cmp-row${best?' best':''}${p.ok?'':' off'}${ghl?' guide-hl':''}" data-id="${s.id}"><span class="cmp-nm"><b class="${s.sys==='star'?'st':''}">${short(s.name)}</b>${best?`<i class="cmp-tag">${beg?'Best':'Best per day'}</i>`:''}${r.want?'<i class="cmp-want">wants it</i>':''}${ghl?'<i class="cmp-want">👉 sell here</i>':''}</span><span class="cmp-days">${p.days} ${p.days>1?'days':'day'}${p.lag?` · report ${p.lag}d old`:''}</span><span class="cmp-px">sells ${usd(r.st)}</span><span class="cmp-pf ${!ref?'':r.pd>0?'up':'dn'}">${prof}</span><span class="cmp-bar"><i style="width:${w}%"></i></span></button></li>`;}).join('');
   const refLine=h?`You hold ${qfmt(h)} · paid ${usd(basis)} a lot`:bh?`Buy here at ${short(ST(S.loc).name)}: <b class="up">${usd(bh)}</b> a lot`:`Not sold here today: showing what each stop pays.`;
@@ -1442,8 +1443,8 @@ function openMove(){
       body:ui.moveView==='list'?list:ui.moveView==='compare'?compareBody():mapSVG()+'<p class="small" style="color:#c9b9a8">Log scale from Earth. Tap a station.</p>',
       wire:sh=>{sh.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>{ui.moveView=b.dataset.v;openSheet(build());}));
         sh.querySelectorAll('.stop:not([disabled])').forEach(b=>b.addEventListener('click',()=>openRoute(b.dataset.id)));
-        sh.querySelectorAll('.cmp-chip').forEach(b=>b.addEventListener('click',()=>{ui.cmpGood=b.dataset.g;openSheet(build());}));
-        {const cc=sh.querySelector('.cmp-chips'),on=sh.querySelector('.cmp-chip[aria-pressed="true"]');if(cc&&on)cc.scrollLeft=Math.max(0,on.offsetLeft-cc.offsetLeft-8);}
+        sh.querySelectorAll('.cmp-chip').forEach(b=>b.addEventListener('click',()=>{ui.cmpGood=b.dataset.g;ui.cmpSeed=S.seed;openSheet(build());}));
+        {const cc=sh.querySelector('.cmp-chips'),on=sh.querySelector('.cmp-chip[aria-pressed="true"]');if(cc&&on){const x=on.offsetLeft-cc.offsetLeft;if(x+on.offsetWidth>cc.clientWidth)cc.scrollLeft=Math.max(0,x-8);}}
         sh.querySelectorAll('.cmp-row').forEach(b=>b.addEventListener('click',()=>openRoute(b.dataset.id)));
         sh.querySelectorAll('.node').forEach(n=>{const f=()=>{if(n.dataset.id!==S.loc)openRoute(n.dataset.id);};n.addEventListener('click',f);n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f();}});});}};};
   openSheet(build());
