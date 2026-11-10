@@ -202,6 +202,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
       <li>We ask for an age group, a made-up callsign, which quest you played, your device type and your answers. Nothing else.</li>
       <li>To keep out spam and bots, the server limits how many reports one connection can send. It keeps your connection address only as a scrambled code that can't be turned back into the address and is deleted within 2 days. We also use Cloudflare Turnstile, a privacy-friendly bot check.</li>
       <li>We count visits with Cloudflare Web Analytics, which uses no cookies and doesn't identify you.</li>
+      <li>The game sends anonymous daily totals (for example how many missions started and where players stopped) with no player ID, device ID or cookie.</li>
       <li>Reports never ask for names, emails, photos or locations. Please don't type them in answers.</li>
       <li>Adults (18+) can choose to join the crew list after sending a report. We keep the email, and a first name if you give one, separately from your report, and use it only for Forkline and Songtan Labs updates. It isn't sold or shared. We email you once to confirm; if you don't confirm within 7 days, the address is deleted. Once confirmed, it's kept until you unsubscribe or ask to be removed: email <a href="mailto:crew@playforkline.com">crew@playforkline.com</a>. Under-18s never see this option.</li>
       <li>Under 14, a parent or guardian must say OK first.</li>
@@ -216,7 +217,7 @@ details ul{padding-left:20px;margin:8px 0} details li{margin:4px 0}
 <script>
 'use strict';
 const QS = new URLSearchParams(location.search);
-const BUILD = (QS.get('b') || 'v25.11').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
+const BUILD = (QS.get('b') || 'v25.11.1').replace(/[^\w.]/g, '').slice(0, 12), FORM = 'r4';
 // v25.9.1: opened from the game's end screen (ACT-117): pre-fill what the game knows, record where the report came from.
 const SRC = /^(rate75|end|menu)$/.test(QS.get('src') || '') ? QS.get('src') : '', GAME_CLEAR = Math.max(0, Math.min(5, parseInt(QS.get('clear') || '0', 10) || 0));
 const MISSION = /^(beginner|daily|30|45|60)$/.test(QS.get('m') || '') ? QS.get('m') : '';
