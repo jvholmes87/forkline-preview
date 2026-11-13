@@ -310,9 +310,10 @@ const START = { cash: 30e6, debt: 60e6, prop: 80, hull: 100, days: 45 };
 // Beginner mission (v25.9, DEC-068): short, three goods, Solar System only, smaller debt, with a Next move coach.
 const BEGIN = { days: 10, cash: 30e6, debt: 20e6, goal: 30e6, goods: ['water', 'food', 'elec'] };   // v25.10: 10 days (DEC-076), a fund goal (ACT-125)
 const isBeginner = () => !!(S && S.mode === 'beginner');
-const goodsFor = () => isBeginner() ? GOODS.filter(g => BEGIN.goods.includes(g.id)) : GOODS;
+const activeGoods = () => GOODS.filter(g => !g.flag || !!(S && S.rules && S.rules[g.flag]));   // v25.13: flagged goods exist only in missions whose rules turn them on
+const goodsFor = () => isBeginner() ? GOODS.filter(g => BEGIN.goods.includes(g.id)) : activeGoods();
 // v25.9.1 end flow (ACT-117): auto end at the last possible move, clarity rating at 75%, report ask at the end.
-const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.12', REPORT_URL = /(^|\.)playforkline\.com$/.test(location.hostname) ? '/report/' : 'https://preview.playforkline.com/report/';
+const ASK_KEY = 'forkline-ask-v1', ASK_BUILD = 'v25.13', REPORT_URL = /(^|\.)playforkline\.com$/.test(location.hostname) ? '/report/' : 'https://preview.playforkline.com/report/';
 function askState(){try{return JSON.parse(localStorage.getItem(ASK_KEY)||'{}')||{};}catch(e){return {};}}
 function askSave(o){try{localStorage.setItem(ASK_KEY,JSON.stringify(o));}catch(e){}}
 try{if(/[?&]resetask\b/.test(location.search))localStorage.removeItem(ASK_KEY);}catch(e){}
@@ -338,6 +339,18 @@ function cntFlush(){if(CNT.t){clearTimeout(CNT.t);CNT.t=null;}const q=CNT.q,fp=C
 function cntScreen(){if(ui.screen==='market')return sheetSpec&&(sheetSpec.title==='Move'||(sheetSpec.actions||[]).some(a=>a.fn===jump))?'move':'market';
   if(ui.screen==='page')return /^(port|freight|log|codex)$/.test(ui.page||'')?ui.page:'other';return 'other';}
 function cntReach(){if(!S||!S.total)return;S.cnt=S.cnt||{};for(const r of [25,50,75])if(!S.cnt['r'+r]&&S.day*100>=S.total*r){S.cnt['r'+r]=1;cnt('reach_'+r);}}
+/* KESTREL follows your lane (v25.13, DEC-086 #2, Season 1 Ch1). Three legs on the same pair in a row and the rival probe
+   may reach the far stop first and dump your most valuable held good there. Seeded on the player's own leg count, so a
+   replay with the same moves gets the same result and the Daily stays the same for everyone who plays the same way. */
+const LANE={p:0.6,cut:0.4,legs:3};
+function laneTrack(a,b){if(!S)return;const k=[a,b].sort().join('-');S.lane=(S.lane||[]).concat([k]).slice(-LANE.legs);S.laneHit=null;
+  if(!(S.rules&&S.rules.lane)||S.lane.length<LANE.legs||!S.lane.every(x=>x===k))return;
+  const r=rngFor(S.seed,'lane|'+b+'|'+((S.cnt&&S.cnt.legs)||0));if(r()>=LANE.p)return;
+  let best=null,bv=0;for(const gid in S.cargo){const c=S.cargo[gid];if(c&&c.q>0&&c.cost>bv){bv=c.cost;best=gid;}}
+  if(best)S.laneHit=best;}
+function laneApply(){if(!S||!S.laneHit||!S.mkt||!S.mkt.data[S.laneHit]){if(S)S.laneHit=null;return;}const g=G(S.laneHit);
+  S.mkt.data[g.id].local*=(1-LANE.cut);S.news={good:g.id,spike:false,lane:true};S.laneHits=(S.laneHits||0)+1;S.laneHit=null;
+  log(`KESTREL got here first. It dumped ${g.name.toLowerCase()} at ${ST(S.loc).name}: price down ${Math.round(LANE.cut*100)}%. It has learned your route.`,'bad');}
 function cntJump(a,b){S.cnt=S.cnt||{};const c=S.cnt;c.legs=(c.legs||0)+1;const k=[a,b].sort().join('-');c.pairs=c.pairs||{};c.pairs[k]=(c.pairs[k]||0)+1;c.stops=c.stops||{};c.stops[a]=1;c.stops[b]=1;cntReach();}
 function cntTrade(id,rev,quiet){S.cnt=S.cnt||{};const c=S.cnt;c.goods=c.goods||{};c.goods[id]=1;if(rev){c.rev=c.rev||{};c.rev[id]=(c.rev[id]||0)+rev;}if(!c.ft&&!quiet){c.ft=1;cnt('first_trade');}}
 function cntFP(reason,score){const c=(S&&S.cnt)||{},legs=c.legs||0,pairs=c.pairs||{},rev=c.rev||{};let tp='',tn=0;for(const k in pairs)if(pairs[k]>tn){tn=pairs[k];tp=k;}
@@ -395,12 +408,13 @@ const GOODS = [
   { id: 'leu',   name: 'Reactor fuel (LEU)',   unit: 'crate', kg: 100,  min: 6000,  max: 30000, cap: [3, 12], restricted: true },
   { id: 'pgm',   name: 'Platinum-group metals',unit: 'kg',    kg: 1,    min: 45000, max: 95000, cap: [50, 300] },
   { id: 'he3',   name: 'Helium-3',             unit: '100 g', kg: 0.1,  min: 9e6,   max: 36e6,  cap: [5, 25] },
-  { id: 'samp',  name: 'Exoplanet samples',    unit: '100 g', kg: 0.1,  min: 1e6,   max: 60e6,  cap: [4, 14] }
+  { id: 'samp',  name: 'Exoplanet samples',    unit: '100 g', kg: 0.1,  min: 1e6,   max: 60e6,  cap: [4, 14] },
+  { id: 'comp',  name: 'Compute blocks',       unit: 'rack',  kg: 250,  min: 2e6,   max: 9e6,   cap: [2, 6], flag: 'compute' }   // v25.13 (DEC-092; off until v25.14): sealed processor racks from the LEO data center
 ];
 
 const STATIONS = [
   { id: 'leo', name: 'LEO Exchange', place: 'Low Earth orbit · 400 km', bloc: 'USD', sys: 'sol', km: 6771, ang: 200,
-    make: ['elec', 'leu', 'food'], want: ['he3', 'pgm', 'samp', 'water'], svc: ['bank', 'shipyard', 'repair'],
+    make: ['elec', 'leu', 'food', 'comp'], want: ['he3', 'pgm', 'samp', 'water'], svc: ['bank', 'shipyard', 'repair'],
     px: { water: [900, 1700], prop: [900, 1600], he3: [18e6, 24e6], pgm: [60000, 75000], samp: [12e6, 30e6], elec: [8000, 15000], leu: [6000, 12000], food: [3500, 5000] } },
   { id: 'gw', name: 'Gateway Depot', place: 'Near-rectilinear halo orbit', bloc: 'EUR', sys: 'sol', km: 2.5e5, ang: 300,
     make: [], want: ['water', 'metal', 'nitro'], svc: ['bank', 'insurance', 'repair'],
@@ -412,7 +426,7 @@ const STATIONS = [
     make: ['he3', 'metal'], want: ['elec', 'nitro', 'food'], svc: ['bank'],
     px: { he3: [9e6, 14e6], metal: [150, 600] } },
   { id: 'mars', name: 'Utopia Base', place: 'Utopia Planitia · Mars surface', bloc: 'CNY', sys: 'sol', km: 2.25e8, ang: 70,
-    make: ['food', 'nitro'], want: ['elec', 'leu', 'pgm'], svc: ['yard', 'repair'] },
+    make: ['food', 'nitro'], want: ['elec', 'leu', 'pgm', 'comp'], svc: ['yard', 'repair'] },
   { id: 'ceres', name: 'Ceres Station', place: 'Occator crater · Ceres', bloc: 'EUR', sys: 'sol', km: 4.1e8, ang: 98,
     make: ['water', 'nitro'], want: ['food', 'elec', 'leu'], svc: ['warehouse'],
     px: { water: [100, 250], nitro: [300, 900] } },
@@ -420,13 +434,13 @@ const STATIONS = [
     make: ['pgm', 'metal'], want: ['food', 'water', 'elec'], svc: ['foundry'],
     px: { pgm: [45000, 55000] } },
   { id: 'prox', name: 'Proxima b Outpost', place: 'Proxima Centauri · 4.24 ly', bloc: 'USD', sys: 'star', pos: [-1.55, -1.18, -3.77], ang: 217,
-    make: ['samp'], want: ['he3', 'elec', 'leu', 'food'], svc: ['repair'],
+    make: ['samp'], want: ['he3', 'elec', 'leu', 'food', 'comp'], svc: ['repair'],
     px: { he3: [26e6, 34e6], elec: [50000, 80000], leu: [35000, 55000], food: [6000, 8500], samp: [3e6, 9e6] } },
   { id: 'barn', name: 'Barnard b Station', place: "Barnard's Star · 5.96 ly", bloc: 'CNY', sys: 'star', pos: [-0.06, -5.94, 0.49], ang: 269,
-    make: ['samp', 'pgm'], want: ['he3', 'elec', 'food'], svc: [],
+    make: ['samp', 'pgm'], want: ['he3', 'elec', 'food', 'comp'], svc: [],
     px: { he3: [27e6, 35e6], elec: [55000, 85000], food: [6500, 9000], samp: [4e6, 11e6], pgm: [48000, 58000] } },
   { id: 'tau', name: 'Tau Ceti Survey', place: 'Tau Ceti · 11.9 ly', bloc: 'EUR', sys: 'star', pos: [10.27, 5.01, -3.26], ang: 26,
-    make: ['samp'], want: ['he3', 'elec', 'leu'], svc: [],
+    make: ['samp'], want: ['he3', 'elec', 'leu', 'comp'], svc: [],
     px: { he3: [29e6, 36e6], elec: [60000, 90000], leu: [40000, 60000], samp: [5e6, 14e6] } }
 ];
 
@@ -457,9 +471,9 @@ const DV = (() => {
 const dv = (a, b) => isInterstellar(a, b) ? 0 : DV[a][b];
 /* ---------- simple economy (v20) ---------- */
 // Prices follow one rule: each good has a base price ($/kg). Stops that make it sell cheap, stops that want it pay more.
-const BASE = { water: 700, metal: 1400, nitro: 3000, food: 5000, elec: 30000, leu: 25000, pgm: 60000, he3: 15e6, samp: 8e6 };
+const BASE = { water: 700, metal: 1400, nitro: 3000, food: 5000, elec: 30000, leu: 25000, pgm: 60000, he3: 15e6, samp: 8e6, comp: 12000 };
 const PBAND = { make: [0.75, 0.90], n: [0.95, 1.10], want: [1.22, 1.42] };
-const STOCK_MULT = { water: 0.3, metal: 0.3, nitro: 0.3, food: 0.3, elec: 0.3, leu: 0.3, pgm: 0.3 };
+const STOCK_MULT = { water: 0.3, metal: 0.3, nitro: 0.3, food: 0.3, elec: 0.3, leu: 0.3, pgm: 0.3, comp: 0.5 };
 const STAR_X = 1.4, STAR_K = 0.15, CONTRACT_PER_T = 6000, ROUTE_K = 1e6;   // tuning (DEC-035, DEC-036); STAR_K per extra travel day (v25.8, ACT-091)
 const pMid = r => (PBAND[r][0] + PBAND[r][1]) / 2;
 const starX = (st, role) => st.sys === 'star' && role !== 'make' ? STAR_X + STAR_K * (legDays('leo', st.id) - 1) : 1;   // star colonies pay more for what they import, more the farther they are (v25.8)
@@ -503,16 +517,24 @@ const EV_T = [
   { up: 0, g: 'samp',  at: ['prox', 'barn', 'tau'],         head: 'Survey haul floods {st} with samples', rumor: 'The {st} survey team is coming home early' },
   { up: 0, g: null,    at: null,                            head: 'KESTREL fire sale at {st}: {g} dumped', rumor: 'KESTREL was spotted docking at {st}' }
 ];
+// v25.13 (DEC-092): the LEO data center. Added to the tree only when S.rules.compute is on, so older missions keep their trees.
+const EV_DC = [
+  { up: 1, g: 'metal', at: ['leo'],                 head: 'Data center expansion at LEO: radiator metal wanted', rumor: 'Halyard ordered a second radiator wing at LEO' },
+  { up: 1, g: 'water', at: ['leo'],                 head: 'Coolant loop fault at LEO: water ice bought at any price', rumor: 'Thermal alarms on the LEO rack farm' },
+  { up: 1, g: 'comp',  at: ['prox', 'barn', 'tau'], head: 'Survey backlog at {st}: compute blocks wanted', rumor: 'The {st} survey team is weeks behind on analysis' },
+  { up: 0, g: 'comp',  at: ['leo'],                 head: 'LEO overbuilt: compute blocks dumped', rumor: 'Halyard brought a rack wing online early' }
+];
+const evTemplates = () => (S && S.rules && S.rules.compute) ? EV_T.concat(EV_DC) : EV_T;
 const EV_CACHE = {};
 const evDist = (a, b) => isInterstellar(a, b) ? ly(a, b) * 10 : dv(a, b);
 function eventTree(seed, total) {
-  const key = seed + '|' + total; if (EV_CACHE[key]) return EV_CACHE[key];
+  const T = evTemplates(), key = seed + '|' + total + '|' + T.length; if (EV_CACHE[key]) return EV_CACHE[key];
   const r = rngFor(seed, 'evtree|' + total), n = Math.max(3, Math.round(total / 6)), lo = 3, span = (total - 2 - lo) / n, out = [];
   const used = [], sol = STATIONS.filter(s => s.sys === 'sol').map(s => s.id), bulk = ['water', 'metal', 'nitro', 'food', 'elec', 'leu'];
   for (let i = 0; i < n; i++) {
     let t, stop, tries = 0;   // no template twice per mission (until all are used), no stop twice in a row
-    do { t = EV_T[Math.floor(r() * EV_T.length)]; stop = t.at ? t.at[Math.floor(r() * t.at.length)] : sol[Math.floor(r() * sol.length)]; tries++; }
-    while (tries < 12 && ((used.includes(t) && used.length < EV_T.length) || (out.length && out.filter(e => e.stage === 'event').slice(-1).some(e => e.stop === stop))));
+    do { t = T[Math.floor(r() * T.length)]; stop = t.at ? t.at[Math.floor(r() * t.at.length)] : sol[Math.floor(r() * sol.length)]; tries++; }
+    while (tries < 12 && ((used.includes(t) && used.length < T.length) || (out.length && out.filter(e => e.stage === 'event').slice(-1).some(e => e.stop === stop))));
     used.push(t);
     const g = t.g || bulk[Math.floor(r() * bulk.length)];
     const from = Math.round(lo + span * i + r() * span * 0.6), dur = 2 + Math.floor(r() * 3), to = from + dur - 1;
@@ -545,7 +567,7 @@ function pxPos(seed, id, gid, day, j) {
 }
 function market(seed, day, id, total) {
   const st = ST(id), r = rngFor(seed, 'm|' + day + '|' + id), out = {};
-  for (const g of GOODS) {
+  for (const g of activeGoods()) {   // v25.13: flagged goods come last in GOODS, so the other goods' draws are unchanged
     const role = roleOf(st, g.id), j = r(), c = (r(), r());
     const sellsHere = !!(st.sells && st.sells.includes(g.id));   // v22: every stop buys and sells every good
     const x = pxPos(seed, id, g.id, day, j);
@@ -650,7 +672,7 @@ function impactAdd(id,gid,q){if(!S||!S.rules||!S.rules.impact||!(q>0))return 0;S
 function impTag(id,gid){const d=S&&S.rules&&S.rules.impact?impactNow(id,gid):0;return d>=0.05?`<i class="imp-tag">flooded −${Math.round(d*100)}%</i>`:'';}
 function log(text,kind){S.log.unshift({day:S.day,text,kind:kind||''});S.log=S.log.slice(0,100);}
 function save(){if(S&&!S.over)settleFleet();checkActs();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-function norm(s){if(!s)return s;s.rep=s.rep||{};s.repDay=s.repDay||{};s.acts=s.acts||[];s.actQueue=s.actQueue||[];s.stats=s.stats||{profitSales:0,starSales:0};s.loans=s.loans||{};s.sav=s.sav||null;s.fleet=s.fleet||[];s.forkN=s.forkN||0;s.wh=s.wh||{};s.policy=s.policy||null;s.eng=s.eng||0;s.plate=!!s.plate;s.freight=s.freight||[];s.pax=s.pax||[];s.berths=s.berths||0;s.rules=s.rules||{impact:false};s.imp=s.imp||{};if(s.charter){if(s.charter.by==null){s.charter.by=Math.min(s.total,s.day+CONTRACT_DAYS);s.charter.adv=s.charter.pay*.4;}s.freight.push(s.charter);s.charter=null;}return s;}
+function norm(s){if(!s)return s;s.rep=s.rep||{};s.repDay=s.repDay||{};s.acts=s.acts||[];s.actQueue=s.actQueue||[];s.stats=s.stats||{profitSales:0,starSales:0};s.loans=s.loans||{};s.sav=s.sav||null;s.fleet=s.fleet||[];s.forkN=s.forkN||0;s.wh=s.wh||{};s.policy=s.policy||null;s.eng=s.eng||0;s.plate=!!s.plate;s.freight=s.freight||[];s.pax=s.pax||[];s.berths=s.berths||0;s.rules=s.rules||{impact:false};s.rules.compute=!!s.rules.compute;s.rules.lane=!!s.rules.lane;s.imp=s.imp||{};s.lane=s.lane||[];if(s.charter){if(s.charter.by==null){s.charter.by=Math.min(s.total,s.day+CONTRACT_DAYS);s.charter.adv=s.charter.pay*.4;}s.freight.push(s.charter);s.charter=null;}return s;}
 // v20 migration: propellant cargo is refunded at cost, euro/yuan loans convert to dollars, today's market is re-read in dollars
 function migrate20(s){if(!s||s.econ>=20)return s;
   for(const box of [s.cargo,s.wh])if(box&&box.prop){s.cash+=box.prop.cost||0;delete box.prop;}
@@ -760,6 +782,7 @@ const TIP_DEF=[
   {id:'exp-pax',kind:'explain',icon:'🧑‍🚀',text:'Your cabins are ready. Passenger groups wait on the Freight page and pay when they arrive.',act:toFreight,when:()=>S.berths>0},
   {id:'exp-star',kind:'explain',icon:'📡',text:'Star prices are old news: the report left this star days ago, so prices here may have moved.',when:()=>ST(S.loc).sys==='star'},
   {id:'nudge-trades',kind:'nudge',icon:'👉',text:'No profit yet? Tap Trades. It lists the best buys here and where to sell them.',act:toTrades,when:()=>S.day>=4&&!S.stats.profitSales},
+  {id:'exp-lane',kind:'explain',card:'KESTREL learned your route',icon:'🛰️',text:'Fly the same pair three times in a row and the rival probe can beat you to the far stop and dump your best cargo there first. Change routes now and then, or carry something it cannot guess.',when:()=>!!(S.rules&&S.rules.lane&&S.laneHits)},
   {id:'exp-flood',kind:'explain',card:'Flooding a market',icon:'🌊',text:'You sold a lot at once, so this stop now pays less for that good. It recovers over a few days. Spread big sales across stops, or wait.',when:()=>!!(S.rules&&S.rules.impact&&S.flooded)},
   {id:'nudge-empty',kind:'nudge',icon:'👉',text:'You flew with an empty hold. Buy something here before you leave, so every trip earns.',when:()=>!!S.flewEmpty}
 ];
@@ -960,13 +983,13 @@ function newRun(mode,days){
   const practice=mode==='daily'&&dailyCounted(seed);if(mode==='daily'&&!practice){try{localStorage.setItem(DAILY_KEY,seed);}catch(e){}}
   const beg=mode==='beginner';
   S={v:3,mode,seed,total:beg?BEGIN.days:days,day:1,loc:'leo',cash:beg?BEGIN.cash:START.cash,debt:beg?BEGIN.debt:START.debt,hull:START.hull,hold:HOLD0,mods:0,shield:false,
-     cargo:{},rules:{impact:!beg},imp:{},econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[],practice};
+     cargo:{},rules:{impact:!beg,compute:false,lane:!beg},imp:{},lane:[],econ:20,fxAdj:{},mkt:null,news:null,event:null,contract:null,charter:null,freight:[],pax:[],berths:0,taken:[],over:false,outcome:null,log:[],practice};
   norm(S);S.f0=S.cash-S.debt;S.rc={};S.cnt={};cnt('mission_start');sel=null;selGood=null;
   log(`Boot complete at LEO Exchange. ${usd(S.cash)} in the account and a commissioning debt of ${usd(S.debt)} at ${(DEBT_RATE*100).toFixed(2)}% a day. Good morning.`);
   arrive(true);save();go('market');const intro=showIntro();if(mode==='beginner'){guideStart();if(!intro)missionSheet();}
 }
 function arrive(first){
-  S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();
+  S.mkt={day:S.day,loc:S.loc,data:market(S.seed,S.day,S.loc)};S.news=null;logNews();if(!first)laneApply();
   const r=rngFor(S.seed,'e|'+S.day+'|'+S.loc);
   const a=r(),b=r(),c=r(),d=r(),e=r(),f=r();
   if(first)return;sfx('travel_arrive');
@@ -1003,7 +1026,7 @@ function jump(){
   if(!sel||S.over||S.event)return;const p=plan(sel);if(!p.ok)return;sfx('travel_jump');sndAfterJump();
   const from=ST(S.loc).name;if(!p.inter&&massT()-freightT()<0.01&&S.cash>10e6)S.flewEmpty=true;
   const before=S.debt;S.debt=S.debt>0?S.debt*Math.pow(1+DEBT_RATE,p.days):0;
-  S.day+=p.days;cntJump(S.loc,sel);
+  S.day+=p.days;cntJump(S.loc,sel);laneTrack(S.loc,sel);
   if(held('food')>0){const lost=held('food')*(1-Math.pow(1-G('food').perish,p.days));removeCargo('food',lost);if(lost>=.05)log(`${lost.toFixed(1)} t of food spoiled in transit.`,'bad');}
   S.loc=sel;sel=null;selGood=null;
   log(`${from} to ${ST(S.loc).name}: ${p.days} ${p.days>1?'days':'day'}.${before?` Debt now ${usd(S.debt)}.`:''}`);
@@ -1315,7 +1338,7 @@ function renderHome(){
 // In-game menu: the market is the mission's root screen, so its corner button opens a menu instead of leaving.
 function openMenu(){
   openSheet({eyebrow:`Day ${Math.min(S.day,S.total)} of ${S.total} · saved after every action`,title:'Menu',
-    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/">Forkline home</a>: updates and what's next.</p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.12" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
+    body:`<p>Your mission is saved. Going to the main menu does not end it: tap <b>Continue mission</b> there to pick up here.</p><span class="eyebrow">Tips</span><div class="tipmode seg" role="group" aria-label="Tips">${[['guided','Guided'],['light','Light'],['off','Off']].map(([k,l])=>`<button type="button" data-tm="${k}" aria-pressed="${TIPS.mode===k}">${l}</button>`).join('')}</div><p class="small muted">Guided teaches as you go. Light shows only celebrations and reminders. <button class="linkbtn" type="button" id="tip-reset">Reset tips</button></p><span class="eyebrow">Sound</span><div class="tipmode seg" role="group" aria-label="Sound">${[[1,'On'],[0,'Off']].map(([k,l])=>`<button type="button" data-snd="${k}" aria-pressed="${!!SND.on===!!k}">${l}</button>`).join('')}</div><label class="small muted sndvol" for="snd-vol">Volume <input type="range" id="snd-vol" min="0.1" max="1" step="0.1" value="${SND.vol}" ${SND.on?'':'disabled'}></label><p class="small muted">Sounds mark trades, travel and events. Everything they tell you is also on screen.</p><span class="eyebrow">View</span><div class="tipmode seg" role="group" aria-label="View">${[[0,'Standard'],[1,'Calm']].map(([k,l])=>`<button type="button" data-view="${k}" aria-pressed="${!!VIEW.calm===!!k}">${l}</button>`).join('')}</div><p class="small muted">Calm: bigger text, nothing moving, fewer numbers, and a buy or sell sign on every good.</p><p class="small" style="margin-top:10px"><a href="https://preview.playforkline.com/about/" target="_blank" rel="noopener">How to play</a> (players, parents, teachers) · <a href="https://preview.playforkline.com/">Forkline home</a></p><p class="small" style="margin-top:10px">Played a mission? <a href="https://preview.playforkline.com/report/?b=v25.13" target="_blank" rel="noopener">Send a tester report</a> (about 5 minutes, no names).</p>`,
     wire:sh=>{sh.querySelectorAll('[data-tm]').forEach(b=>b.addEventListener('click',()=>{setTipMode(b.dataset.tm);openMenu();}));sh.querySelector('#tip-reset').addEventListener('click',()=>{resetTips();openMenu();});sh.querySelectorAll('[data-snd]').forEach(b=>b.addEventListener('click',()=>{SND.on=b.dataset.snd==='1';sndSave();openMenu();}));sh.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{VIEW.calm=b.dataset.view==='1';viewSave();viewApply();openMenu();}));const v=sh.querySelector('#snd-vol');v.addEventListener('change',()=>{SND.vol=+v.value;sndSave();sfx('trade_sell_profit');});},
     actions:[{label:'Resume',fn:()=>{closeSheet();render();}},{label:'Codex',kind:'ghost',fn:()=>{closeSheet();page('codex');}},{label:'Main menu',kind:'ghost',fn:()=>{closeSheet();go('home');}}]});}
 function renderMarket(){
@@ -1539,6 +1562,7 @@ function codexHTML(){
     <li><b>Prices follow one rule.</b> Each good has a base price. Stops that make it sell at ${Math.round(PBAND.make[0]*100)}–${Math.round(PBAND.make[1]*100)}% of base, neutral stops trade at ${Math.round(PBAND.n[0]*100)}–${Math.round(PBAND.n[1]*100)}%, and stops that want it pay ${Math.round(PBAND.want[0]*100)}–${Math.round(PBAND.want[1]*100)}%. Star colonies pay more for the goods they import, and the farther the star, the more they pay: ${starXTxt()}. They also sell exoplanet samples to bring home. Buy where it is made, sell where it is wanted.</li>
     <li><b>Markets move.</b> Prices drift inside each stop's range on trends that turn every few days, so the trade sheet shows the usual range and where today sits. Every stop buys and sells every good, so there is always something to trade. Market events (above) and small surprise shortages and KESTREL dumps break the pattern.</li>
     <li><b>Flooding a market.</b> Selling a lot of one good at one stop lowers the price that stop pays for it: selling a stop's whole daily stock cuts its price about ${Math.round(IMP.k*100)}%, and the cut never passes ${Math.round(IMP.max*100)}%. The price recovers ${Math.round(IMP.rec*100)} points a day, so a full flood is back to normal in about ${Math.ceil(IMP.max/IMP.rec)} days. Real markets work the same way: sell a lot at once and buyers pay less. Spread big sales across stops, or wait. Not in the Beginner mission.</li>
+    <li><b>KESTREL learns your route.</b> Fly the same pair of stops ${LANE.legs} times in a row and Tallis Freight's probe may reach the far stop before you and dump your most valuable cargo there, ${Math.round(LANE.cut*100)}% off. The log says when it happens. Vary your routes, or carry goods it cannot guess. Not in the Beginner mission.</li>
     <li><b>Travel is free; time is not.</b> Halyard's service contract covers your refuelling at every stop. What a trip costs is days: interest keeps growing, markets keep moving and contracts keep their deadlines. Star trips take 2–7 days.</li>
     <li><b>All prices are in dollars.</b> The three blocs run their own stations, banks and inspectors, but trade settles in dollars on the common clock. Spread 0.5% in-system, 3% at the stars.</li>
     <li><b>Best trades</b> shows each trade's profit after spreads, ranked by profit per day of travel.</li>
