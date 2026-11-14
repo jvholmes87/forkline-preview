@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head><meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fleet: what's coming to Forkline's community</title>
+<meta name="description" content="A first look at The Fleet, the community space we plan to build for Forkline players: how joining would work, what members aged 13 to 17 would see, how reporting works, the rules and a page for parents. Mockups, not a live product.">
+<link rel="canonical" href="https://preview.playforkline.com/fleet/">
+<meta name="theme-color" content="#0a1322">
+<link rel="icon" type="image/svg+xml" href="/forkline-icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Forkline">
+<meta property="og:title" content="The Fleet: what's coming to Forkline's community">
+<meta property="og:description" content="Five screens showing how we plan to build a community space that is safe for players 13 and up. Nothing here is live yet.">
+<meta property="og:url" content="https://preview.playforkline.com/fleet/">
+<meta property="og:image" content="https://preview.playforkline.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@jasonvonholmes">
+<style>
+:root{--bg:#070d18;--panel:#0e1829;--line:#1f2d45;--ink:#e8eef8;--mute:#8a9bb8;--gold:#f3b53f;--green:#4fd18b;--red:#ff6b6b;--blue:#5aa9ff;--teal:#3fc9c0}
+:root:not([data-theme="light"]){color-scheme:dark}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f4f6fa;--panel:#ffffff;--line:#d7deea;--ink:#101828;--mute:#5a6a86}}
+:root[data-theme="dark"]{--bg:#070d18;--panel:#0e1829;--line:#1f2d45;--ink:#e8eef8;--mute:#8a9bb8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:28px 16px 8px;max-width:1180px;margin:0 auto}
+h1{font-size:22px;margin:0 0 6px;letter-spacing:.02em}
+header p{margin:0;color:var(--mute);max-width:70ch}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--mute);margin-top:10px}
+main{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));max-width:1180px;margin:0 auto;padding:16px}
+figure{margin:0}
+figcaption{font-size:13px;color:var(--mute);margin:0 0 8px;padding:0 4px}
+figcaption b{color:var(--ink)}
+.phone{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:14px;min-height:560px;position:relative;overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+.top .t{font-weight:700;letter-spacing:.04em}
+.top .s{font-size:11px;color:var(--mute);letter-spacing:.12em;text-transform:uppercase}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:color-mix(in srgb,var(--panel) 85%,var(--bg))}
+.card h3{margin:0 0 6px;font-size:14px;letter-spacing:.03em}
+.card p{margin:4px 0;color:var(--mute);font-size:13px}
+label{display:block;font-size:12px;color:var(--mute);margin:10px 0 4px}
+.in{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--bg);font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.btn{display:block;text-align:center;border-radius:10px;padding:11px;font-weight:700;letter-spacing:.06em;margin-top:12px}
+.btn.gold{background:var(--gold);color:#1b1200}
+.btn.ghost{border:1px solid var(--line);color:var(--ink)}
+.btn.red{background:var(--red);color:#1b0000}
+.warn{border-left:3px solid var(--gold);padding:8px 10px;color:var(--ink);font-size:13px;background:color-mix(in srgb,var(--gold) 10%,transparent);border-radius:6px}
+.ok{border-left:3px solid var(--green)}
+.chan{display:flex;gap:8px;align-items:center;padding:7px 8px;border-radius:8px;font-size:14px}
+.chan.on{background:color-mix(in srgb,var(--blue) 14%,transparent)}
+.chan .h{color:var(--mute)}
+.lock{margin-left:auto;font-size:11px;color:var(--mute)}
+.msg{display:grid;grid-template-columns:30px 1fr;gap:8px;padding:8px 4px;border-bottom:1px solid var(--line)}
+.av{width:30px;height:30px;border-radius:50%;background:var(--line)}
+.msg .n{font-weight:700;font-size:13px}
+.msg .n small{color:var(--mute);font-weight:400;margin-left:6px}
+.msg .b{font-size:14px}
+.pill{display:inline-block;font-size:10px;padding:1px 7px;border-radius:999px;border:1px solid var(--teal);color:var(--teal);margin-left:6px;vertical-align:middle}
+.pill.mod{border-color:var(--gold);color:var(--gold)}
+.sheet{position:absolute;left:10px;right:10px;bottom:10px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.sheet h3{margin:0 0 8px;font-size:14px}
+.opt{padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin:6px 0;font-size:13px}
+.opt.sel{border-color:var(--gold)}
+ul{padding-left:18px;margin:6px 0}
+li{margin:4px 0;font-size:13px}
+.foot{max-width:1180px;margin:0 auto;padding:8px 16px 40px;color:var(--mute);font-size:12px}
+.foot a{color:var(--blue)}
+</style>
+</head>
+<body>
+<header>
+  <p style="margin:0 0 10px"><a href="/" style="color:var(--blue);text-decoration:none">← Forkline</a></p>
+  <h1>The Fleet: what's coming</h1>
+  <p>A first look at the community space we plan to build for Forkline players after launch. These five screens show the words and the safety steps before anything is built, so you can tell us what you think. We plan to build it on an open-source chat server and to offer our safety additions back to that project.</p>
+  <span class="tag">Mockups · November 2026 · nothing here is live yet</span>
+</header>
+<main>
+
+<figure>
+<figcaption><b>1. Join.</b> Invite code first, then a verified email, then the age step. Under 13 stops here with a plain message and a link for parents.</figcaption>
+<div class="phone">
+  <div class="top"><div><div class="s">The Fleet</div><div class="t">JOIN WITH YOUR INVITE</div></div><div class="s">1 / 3</div></div>
+  <label>Invite code (from a Fleet member or the game)</label>
+  <div class="in">FLEET-8K2Q-TAU</div>
+  <label>Email (we send a 6-digit code; nothing else goes to it)</label>
+  <div class="in">you@example.com</div>
+  <label>Birth year</label>
+  <div class="in">2011</div>
+  <div class="warn" style="margin-top:10px">The Fleet is for ages 13 and up. If you are younger, you can still play Forkline and send us notes from the game's report form. <u>Information for parents</u></div>
+  <div class="card ok"><h3>What we keep</h3><p>Your callsign, your email (for sign-in only) and your age band: "13–17" or "18+". Not your birth year, not your name.</p></div>
+  <a class="btn gold">SEND MY CODE ›</a>
+  <a class="btn ghost">I'M UNDER 13: SHOW ME THE REPORT FORM</a>
+</div>
+</figure>
+
+<figure>
+<figcaption><b>2. The teen view.</b> Members aged 13–17 see teen channels only. No direct messages, no voice, and a moderator is always on. Channels go read-only when nobody is.</figcaption>
+<div class="phone">
+  <div class="top"><div><div class="s">The Fleet · Teen deck</div><div class="t">CHANNELS</div></div><div class="s">mod on duty ●</div></div>
+  <div class="chan on"><span class="h">#</span> trade-talk <span class="pill">teen</span></div>
+  <div class="chan"><span class="h">#</span> daily-mission <span class="pill">teen</span></div>
+  <div class="chan"><span class="h">#</span> bug-reports <span class="pill">teen</span></div>
+  <div class="chan"><span class="h">#</span> fleet-news <span class="lock">read only</span></div>
+  <div class="chan" style="opacity:.5"><span class="h">🔇</span> voice <span class="lock">18+ only</span></div>
+  <div class="chan" style="opacity:.5"><span class="h">✉</span> direct messages <span class="lock">off for 13–17</span></div>
+  <div class="card"><h3>Why some things are off</h3><p>Direct messages on the Fleet are private even from moderators, so teen accounts do not have them. Voice is adults only. Every teen channel can be read by every moderator.</p></div>
+  <div class="msg"><div class="av"></div><div><div class="n">Cass_7 <span class="pill">teen</span><small>14:02</small></div><div class="b">KESTREL beat me to Proxima twice. Switching to Tau Ceti runs.</div></div></div>
+  <div class="msg"><div class="av"></div><div><div class="n">Hal <span class="pill mod">mod</span><small>14:03</small></div><div class="b">Try the Compare view before you jump: it shows where it is not waiting.</div></div></div>
+</div>
+</figure>
+
+<figure>
+<figcaption><b>3. Report.</b> Any message, one tap. The reporter gets a receipt; a moderator sees the message with the ten before it. Our plan: a first action within an hour while a moderator is on.</figcaption>
+<div class="phone">
+  <div class="top"><div><div class="s">#trade-talk</div><div class="t">REPORT A MESSAGE</div></div></div>
+  <div class="msg"><div class="av"></div><div><div class="n">someone<small>13:58</small></div><div class="b" style="color:var(--mute)">[message you are reporting]</div></div></div>
+  <div class="sheet">
+    <h3>What's wrong with it?</h3>
+    <div class="opt sel">Someone is being unkind or unsafe</div>
+    <div class="opt">Asking for personal details or to talk somewhere else</div>
+    <div class="opt">Spam, links or ads</div>
+    <div class="opt">Something else (tell us)</div>
+    <p style="font-size:12px;color:var(--mute);margin:8px 0 0">Reports are private. The person you report does not see your name. A moderator reads it and you get a note when it is handled.</p>
+    <a class="btn red">SEND REPORT</a>
+  </div>
+</div>
+</figure>
+
+<figure>
+<figcaption><b>4. Rules.</b> Shown before the first message and again when they change. Short on purpose, in the game's voice.</figcaption>
+<div class="phone">
+  <div class="top"><div><div class="s">The Fleet</div><div class="t">FLEET RULES</div></div></div>
+  <div class="card">
+    <ul>
+      <li><b>Callsigns only.</b> No real names, schools, towns or photos of people.</li>
+      <li><b>Be a good trading partner.</b> No insults, no pile-ons, no slurs.</li>
+      <li><b>Keep it here.</b> Do not ask anyone to move to another app or to share contact details.</li>
+      <li><b>Ages 13 and up.</b> Members 13–17 use the teen deck. Adults do not message them privately; they cannot.</li>
+      <li><b>Report, don't retaliate.</b> One tap on any message. We plan for moderators to answer within the hour when on duty.</li>
+      <li><b>Moderators can see everything in the channels.</b> Direct messages are private but are adults-only.</li>
+      <li><b>Breaking the rules</b> gets a timed mute, then removal. Appeals by email.</li>
+    </ul>
+  </div>
+  <div class="card"><h3>Your data</h3><p>We plan to keep channel messages for 90 days, then delete them. You can delete your account and everything you posted from Settings. We keep no advertising profile and sell nothing.</p></div>
+  <a class="btn gold">I'VE READ THEM ›</a>
+</div>
+</figure>
+
+<figure>
+<figcaption><b>5. For parents.</b> A public page linked from the join screen and the game. States who can join, what is kept and how to reach us. We plan to have the final text reviewed before the teen deck opens.</figcaption>
+<div class="phone">
+  <div class="top"><div><div class="s">playforkline.com/fleet/parents</div><div class="t">FOR PARENTS</div></div></div>
+  <div class="card"><h3>Who can join</h3><p>Members 13 and older, by invitation, with a verified email. Children under 13 cannot create an account. The game itself has no chat.</p></div>
+  <div class="card"><h3>What 13–17 members can do</h3><p>Post in teen channels that every moderator can read. They have no private messages and no voice chat. Channels close when no moderator is on.</p></div>
+  <div class="card"><h3>What we keep</h3><p>A callsign, an email for sign-in and an age band. Messages for 90 days. No names, no location, no advertising.</p></div>
+  <div class="card"><h3>If your child is under 13 and has an account</h3><p>Tell us and we will remove the account and its data as soon as we can, the same day where possible.</p></div>
+  <div class="card"><h3>Contact</h3><p>A contact address will be published here before the Fleet opens.</p></div>
+</div>
+</figure>
+
+</main>
+<div class="foot">These are plans, not promises: dates, features and wording can change. Built on <a href="https://github.com/ancsemi/haven">Haven</a> (open source, AGPL-3.0) with safety additions we plan to offer back to that project. Questions: reply to <a href="https://x.com/jasonvonholmes">@jasonvonholmes</a> on X. <a href="/">Play Forkline</a> · <a href="/about/">How to play</a></div>
+<div style="position:fixed;z-index:99999;bottom:8px;left:8px;background:#ff6b6b;color:#1d1405;font:700 12px/1 system-ui,sans-serif;padding:6px 10px;border-radius:6px;pointer-events:none">PREVIEW · not public</div></body>
+</html>
