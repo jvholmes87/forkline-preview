@@ -1,0 +1,6 @@
+# Proposed reviewed non-secret historical matches. Owner review required.
+# No key or password values are stored here. New/changed matches still fail.
+# supabase_public_publishable_key_verify_RLS
+59a4c58df4c8ee539fb88df0607fdb547bd4d8a7:index.html:generic-api-key:313
+# supabase_public_publishable_key_verify_RLS
+029fb929ac30f4bc61a111e8cd1acd402192931b:report/index.html:generic-api-key:219
